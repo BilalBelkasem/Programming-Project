@@ -17,7 +17,11 @@ export default function App() {
       />
       <Route
         path="/dashboard"
-        element={isLoggedIn ? <UInfoPagina /> : <GInfoPagina />}
+        element={
+          isLoggedIn
+            ? <UInfoPagina onLogout={() => setIsLoggedIn(false)} />
+            : <GInfoPagina />
+        }
       />
     </Routes>
   );
