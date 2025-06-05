@@ -46,7 +46,14 @@ export default function LoginPagina({ onLogin }) {
   <Link to="/bedrijf-registratie" style={{ color: '#d63031', fontWeight: 'bold' }}>
     Registreer je bedrijf
   </Link>
+  <div className="admin-login-container">
+  <p><strong>Ben je een admin?</strong></p>
+  <Link to="/admin" className="admin-login-button">
+    Ga naar Admin Dashboard
+  </Link>
+</div>
 </p>
     </div>
+    
   );
 }
