@@ -1,36 +1,17 @@
-import React, { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { useState } from 'react'
+import reactLogo from './assets/react.svg'
+import viteLogo from '/vite.svg'
+import './App.css'
+import CompanyRegistrationForm from './components/CompanyRegistrationForm';
 
-import GInfoPagina from './pages/jsx/GInfoPagina.jsx';
-import UInfoPagina from './pages/jsx/UInfoPagina.jsx';
-import LoginPagina from './pages/jsx/LoginPagina.jsx';
-import UBedrijven from './pages/jsx/UBedrijven.jsx';
-
-
-export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+function App() {
+  const [count, setCount] = useState(0)
 
   return (
-    <Routes>
-      <Route path="/" element={<GInfoPagina />} />
-      <Route
-        path="/login"
-        element={<LoginPagina onLogin={() => setIsLoggedIn(true)} />}
-      />
-      <Route
-        path="/dashboard"
-        element={
-          isLoggedIn
-            ? <UInfoPagina onLogout={() => setIsLoggedIn(false)} />
-            : <GInfoPagina />
-        }
-      />
-      <Route
-  path="/bedrijven"
-  element={
-    isLoggedIn ? <UBedrijven /> : <GInfoPagina />
-  }
-/>
-    </Routes>
-  );
+    <>
+   <CompanyRegistrationForm />
+    </>
+  )
 }
+
+export default App
