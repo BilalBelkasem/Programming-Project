@@ -5,36 +5,51 @@ import GInfoPagina from './pages/jsx/GInfoPagina.jsx';
 import UInfoPagina from './pages/jsx/UInfoPagina.jsx';
 import LoginPagina from './pages/jsx/LoginPagina.jsx';
 import UBedrijven from './pages/jsx/UBedrijven.jsx';
-import CompanyRegistrationForm from './components/CompanyRegistrationForm';
+import AdminDashboard from './pages/jsx/AdminDashboard.jsx';
+import CompanyRegistrationForm from './pages/jsx/CompanyRegistrationForm.jsx';
 
-
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>ddd</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Routes>
+      {/* Publieke startpagina */}
+      <Route path="/" element={<GInfoPagina />} />
 
-export default App
+      {/* Loginpagina met login handler */}
+      <Route
+        path="/login"
+        element={<LoginPagina onLogin={() => setIsLoggedIn(true)} />}
+      />
+
+      {/* Bedrijven registratiepagina */}
+      <Route
+        path="/bedrijf-registratie"
+        element={<CompanyRegistrationForm />}
+      />
+
+      {/* Gebruikersdashboard, enkel zichtbaar als ingelogd */}
+      <Route
+        path="/dashboard"
+        element={
+          isLoggedIn
+            ? <UInfoPagina onLogout={() => setIsLoggedIn(false)} />
+            : <GInfoPagina />
+        }
+      />
+
+      {/* Bedrijvenpagina voor ingelogde gebruikers */}
+      <Route
+        path="/bedrijven"
+        element={
+          isLoggedIn
+            ? <UBedrijven />
+            : <GInfoPagina />
+        }
+      />
+
+      {/* Admin dashboard – beveiliging optioneel */}
+      <Route path="/admin" element={<AdminDashboard />} />
+    </Routes>
+  );
+}

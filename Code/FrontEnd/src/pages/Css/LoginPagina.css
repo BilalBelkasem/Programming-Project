@@ -32,3 +32,10 @@
   button[type="submit"]:hover {
     background-color: #e17055;
   }
+  a {
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+  }

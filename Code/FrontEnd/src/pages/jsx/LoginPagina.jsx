@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Css/LoginPagina.css';
+import { Link } from 'react-router-dom';
 
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
@@ -40,6 +41,12 @@ export default function LoginPagina({ onLogin }) {
         </div>
         <button type="submit" style={{ padding: '10px 20px' }}>Inloggen</button>
       </form>
+      <p style={{ marginTop: '20px' }}>
+  Nog geen account?{" "}
+  <Link to="/bedrijf-registratie" style={{ color: '#d63031', fontWeight: 'bold' }}>
+    Registreer je bedrijf
+  </Link>
+</p>
     </div>
   );
 }
