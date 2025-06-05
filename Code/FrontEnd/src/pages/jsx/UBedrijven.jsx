@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo Erasmus.png';
-import '../pages/UBedrijven.jsx';
+import logo from '../../assets/logo Erasmus.png';
+import '../jsx/UBedrijven.jsx';
 
 export default function UBedrijven({ onLogout }) {
   const [likedCompanies, setLikedCompanies] = useState([]);
