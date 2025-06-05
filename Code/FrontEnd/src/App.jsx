@@ -7,6 +7,7 @@ import LoginPagina from './pages/jsx/LoginPagina.jsx';
 import UBedrijven from './pages/jsx/UBedrijven.jsx';
 import AdminDashboard from './pages/jsx/AdminDashboard.jsx';
 import CompanyRegistrationForm from './pages/jsx/CompanyRegistrationForm.jsx';
+import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -47,6 +48,7 @@ export default function App() {
             : <GInfoPagina />
         }
       />
+      <Route path="/registreer" element={<ClientRegistration />} />
 
       {/* Admin dashboard – beveiliging optioneel */}
       <Route path="/admin" element={<AdminDashboard />} />
