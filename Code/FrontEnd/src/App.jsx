@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
@@ -52,11 +53,4 @@ export default function App() {
       <Route path="/admin" element={<AdminDashboard />} />
     </Routes>
   );
-  import GInfoPagina from './pages/jsx/GInfoPagina.jsx';
-
-<Routes>
-  <Route path="/" element={<GInfoPagina />} />
-  {/* andere routes */}
-</Routes>
-
 }

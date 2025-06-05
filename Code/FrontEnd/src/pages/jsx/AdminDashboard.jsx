@@ -7,9 +7,9 @@ import { useNavigate } from 'react-router-dom';
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
-const handleLogout = () => {
-  navigate('/'); // Stuur naar GInfoPagina (homepage)
-};
+  const handleLogout = () => {
+    navigate('/'); // Gaat naar GInfoPagina (homepage)
+  };
 
   return (
     <div className="admin-container">
