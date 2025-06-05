@@ -38,7 +38,7 @@ export default function UBedrijven({ onLogout }) {
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
-          <Link to="/" className="navLink">info</Link>
+          <Link to="/dashboard" className="navLink">info</Link>
           <Link to="/bedrijven" className="navLink">bedrijven</Link>
           <Link to="/plattegrond" className="navLink">plattegrond</Link>
           <Link to="/favorieten" className="navLink">favorieten</Link>
