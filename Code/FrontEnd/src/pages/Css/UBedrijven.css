@@ -58,7 +58,7 @@
 
 .bedrijvenContainer {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   justify-items: center;
   max-width: 1000px;
@@ -67,7 +67,7 @@
 }
 
 .bedrijfCard {
-  width: 300px;
+  /*width: 300px;*/
   aspect-ratio: 2 / 1; 
   padding: 16px;
   border-radius: 6px;
@@ -78,7 +78,7 @@
   justify-content: center;
   position: relative;
   text-align: center;
-  width: 100%; /* Nieuw: laat grid het regelen */
+  width: 100%; 
 }
 
 
@@ -103,13 +103,26 @@
 }
 
 .likeButton {
+  width: 40px;
+  height: 40px;
+  background-color: #b2bec3;
+  color: white;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0;
   border: none;
-  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   top: 8px;
   right: 8px;
-  font-size: 20px;
-  cursor: pointer;
+}
+.likeButton:hover {
+  background-color: #d63031;
 }
 
 .likeButton.liked {
