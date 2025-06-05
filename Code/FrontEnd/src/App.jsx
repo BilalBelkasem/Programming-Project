@@ -1,12 +1,12 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import InfoPagina from './InfoPagina';
+import LoginPagina from './LoginPagina';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
+<<<<<<< Updated upstream
     <>
       <div>
         <a href="https://vite.dev" target="_blank">
@@ -30,6 +30,15 @@ function App() {
       </p>
     </>
   )
+=======
+    <Router>
+      <Routes>
+        <Route path="/" element={<InfoPagina />} />
+        <Route path="/login" element={<LoginPagina />} />
+      </Routes>
+    </Router>
+  );
+>>>>>>> Stashed changes
 }
 
-export default App
+export default App;
