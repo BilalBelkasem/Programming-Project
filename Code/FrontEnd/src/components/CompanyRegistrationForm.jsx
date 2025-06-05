@@ -1,5 +1,7 @@
 
 import React, { useState } from 'react';
+import './CompanyRegistrationForm.css';
+
 
 export default function CompanyRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -26,7 +28,7 @@ export default function CompanyRegistrationForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
-    // TODO: Voeg API call of opslaglogica hier toe
+  
   };
 
   return (
