@@ -19,3 +19,9 @@ button {
   margin-right: 0;
   text-align: right;
 }
+
+input,
+textarea {
+  color: white;        
+
+}
