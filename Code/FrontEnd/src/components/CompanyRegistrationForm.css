@@ -3,3 +3,19 @@ body {
     font-family: Arial, sans-serif;
   }
   
+label,
+input,
+select,
+textarea,
+button {
+  display: block;
+  text-align: left;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.form-container {
+  margin-left: auto;
+  margin-right: 0;
+  text-align: right;
+}

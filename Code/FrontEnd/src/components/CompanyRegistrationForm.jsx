@@ -1,7 +1,5 @@
-
 import React, { useState } from 'react';
 import './CompanyRegistrationForm.css';
-
 
 export default function CompanyRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -28,12 +26,11 @@ export default function CompanyRegistrationForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formData);
-  
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto p-4 space-y-4">
-      <h2 className="text-2xl font-semibold text-center">registreren bedrijf</h2>
+    <form onSubmit={handleSubmit} className="form-container">
+      <h2 className="form-title">Registreren bedrijf</h2>
 
       {[
         { label: 'E-mailadres', name: 'email' },
@@ -51,25 +48,20 @@ export default function CompanyRegistrationForm() {
         { label: 'E-mailadres Contactpersoon facturatie', name: 'invoiceContactEmail' },
         { label: 'BTW-nummer', name: 'vatNumber' },
       ].map((field) => (
-        <div key={field.name}>
-          <label className="block mb-1 font-medium">{field.label}</label>
+        <div key={field.name} className="form-group">
+          <label htmlFor={field.name}>{field.label}</label>
           <input
             type="text"
+            id={field.name}
             name={field.name}
             value={formData[field.name]}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded px-3 py-2"
           />
         </div>
       ))}
 
-      <button
-        type="submit"
-        className="w-full bg-gray-800 text-white py-2 rounded hover:bg-gray-700 transition"
-      >
-        registreren
-      </button>
-      <p className="text-center mt-2 text-sm text-gray-500 hover:underline cursor-pointer">terug</p>
+      <button type="submit" className="form-button">Registreren</button>
+      <p className="form-back">Terug</p>
     </form>
   );
 }
