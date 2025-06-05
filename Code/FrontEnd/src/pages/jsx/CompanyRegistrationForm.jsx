@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../../pages/Css/AdminDashboard.css';
+import '../Css/CompanyRegistrationForm.css';
 
 export default function CompanyRegistrationForm() {
   const [formData, setFormData] = useState({
