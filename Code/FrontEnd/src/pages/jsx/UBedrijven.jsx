@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-import '../jsx/UBedrijven.jsx';
+import '../css/UBedrijven.css';
 
 export default function UBedrijven({ onLogout }) {
   const [likedCompanies, setLikedCompanies] = useState([]);
@@ -25,6 +25,12 @@ export default function UBedrijven({ onLogout }) {
       beschrijving: 'Big Data platformen en analyses voor de retailsector.',
       tags: ['Data', 'Backend', 'Retail'],
     },
+    {
+      id: 4,
+      naam: 'colruyt',
+      beschrijving: 'onderhoud van alle sysemen',
+      tags: ['Data', 'Retail'],
+    }
   ];
 
   const toggleLike = (id) => {
