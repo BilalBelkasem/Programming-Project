@@ -1,0 +1,114 @@
+.pageWrapper {
+  min-height: 100vh;
+  width: 100vw;
+  background-color: #ffffff;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f0f0f0;
+  padding: 10px 20px;
+}
+
+.logo {
+  height: 40px;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-evenly;
+  flex-grow: 1;
+  margin: 0 40px;
+}
+
+.navLink {
+  text-decoration: none;
+  color: #000000;
+  font-weight: bold;
+  font-size: 16px;
+  padding: 8px 12px;
+}
+
+.logoutIcon {
+  font-size: 24px;
+  color: #000000;
+  cursor: pointer;
+}
+
+.main {
+  padding: 30px 40px;
+  background-color: #ffffff;
+}
+
+.title {
+  margin-bottom: 20px;
+  color: #d63031;
+}
+
+.bedrijvenContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.bedrijfCard {
+  width: 300px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.bedrijfNaam {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2d3436;
+  margin-bottom: 10px;
+}
+
+.bedrijfBeschrijving {
+  font-size: 14px;
+  text-align: center;
+  color: #636e72;
+  margin-bottom: 10px;
+}
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.tag {
+  background-color: #dfe6e9;
+  color: #2d3436;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.likeButton {
+  border: none;
+  color: #ffffff;
+  font-size: 18px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: #b2bec3;
+  transition: background-color 0.3s;
+}
+
+.likeButton.liked {
+  background-color: #d63031;
+}
