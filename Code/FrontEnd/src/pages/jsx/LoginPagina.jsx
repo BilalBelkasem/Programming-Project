@@ -52,6 +52,12 @@ export default function LoginPagina({ onLogin }) {
     Ga naar Admin Dashboard
   </Link>
 </div>
+<div className="client-registration-container">
+  <p><strong>Nog geen account als student?</strong></p>
+  <Link to="/registreer" className="client-registration-button">
+    Registreer als gebruiker
+  </Link>
+</div>
 </p>
     </div>
     
