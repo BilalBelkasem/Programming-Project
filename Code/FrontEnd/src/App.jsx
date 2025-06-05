@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import GInfoPagina from './pages/GInfoPagina.jsx';
-import UInfoPagina from './pages/UInfoPagina.jsx';
-import LoginPagina from './pages/LoginPagina.jsx';
-import UBedrijven from './pages/UBedrijven.jsx';
+import GInfoPagina from './pages/jsx/GInfoPagina.jsx';
+import UInfoPagina from './pages/jsx/UInfoPagina.jsx';
+import LoginPagina from './pages/jsx/LoginPagina.jsx';
+import UBedrijven from './pages/jsx/UBedrijven.jsx';
 
 
 export default function App() {

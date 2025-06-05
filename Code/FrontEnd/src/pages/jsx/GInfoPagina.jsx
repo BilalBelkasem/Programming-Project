@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo Erasmus.png';
-import careerBanner from '../assets/Banner C.png';
-import './GInfoPagina.css';
+import logo from '../../assets/logo Erasmus.png';
+import careerBanner from '../../assets/Banner C.png';
+import '../Css/GInfoPagina.css';
 
 export default function GInfoPagina() {
   return (

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo Erasmus.png';
-import careerBanner from '../assets/Banner C.png';
+import logo from '../../assets/logo Erasmus.png';
+import careerBanner from '../../assets/Banner C.png';
 
 export default function UInfoPagina({ onLogout }) {
   return (

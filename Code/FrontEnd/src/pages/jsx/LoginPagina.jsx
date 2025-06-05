@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './LoginPagina.css';
+import '../Css/LoginPagina.css';
 
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
