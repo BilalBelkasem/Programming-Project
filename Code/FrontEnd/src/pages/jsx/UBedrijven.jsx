@@ -1,0 +1,74 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import logo from '../../assets/logo Erasmus.png';
+import '../jsx/UBedrijven.jsx';
+
+export default function UBedrijven({ onLogout }) {
+  const [likedCompanies, setLikedCompanies] = useState([]);
+
+  const bedrijven = [
+    {
+      id: 1,
+      naam: 'TechNova',
+      beschrijving: 'Wij zijn gespecialiseerd in AI-oplossingen voor de zorgsector.',
+      tags: ['AI', 'Healthcare', 'Backend'],
+    },
+    {
+      id: 2,
+      naam: 'WebFlex',
+      beschrijving: 'Frontend development agency met focus op React en UX design.',
+      tags: ['Frontend', 'React', 'UX/UI'],
+    },
+    {
+      id: 3,
+      naam: 'DataCore',
+      beschrijving: 'Big Data platformen en analyses voor de retailsector.',
+      tags: ['Data', 'Backend', 'Retail'],
+    },
+  ];
+
+  const toggleLike = (id) => {
+    setLikedCompanies((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  return (
+    <div className="pageWrapper">
+      <header className="header">
+        <img src={logo} alt="Erasmus Logo" className="logo" />
+        <nav className="nav">
+          <Link to="/dashboard" className="navLink">info</Link>
+          <Link to="/bedrijven" className="navLink">bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">plattegrond</Link>
+          <Link to="/favorieten" className="navLink">favorieten</Link>
+          <Link to="/dashboard" className="navLink">mijn profiel</Link>
+        </nav>
+        <div onClick={onLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+      </header>
+
+      <main className="main">
+        <h2 className="title">Ontdek bedrijven</h2>
+        <div className="bedrijvenContainer">
+          {bedrijven.map((bedrijf) => (
+            <div key={bedrijf.id} className="bedrijfCard">
+              <h3 className="bedrijfNaam">{bedrijf.naam}</h3>
+              <p className="bedrijfBeschrijving">{bedrijf.beschrijving}</p>
+              <div className="tagContainer">
+                {bedrijf.tags.map((tag, index) => (
+                  <span key={index} className="tag">{tag}</span>
+                ))}
+              </div>
+              <button
+                onClick={() => toggleLike(bedrijf.id)}
+                className={`likeButton ${likedCompanies.includes(bedrijf.id) ? 'liked' : ''}`}
+              >
+                ♥
+              </button>
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
