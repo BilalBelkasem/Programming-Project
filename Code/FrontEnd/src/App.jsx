@@ -9,6 +9,7 @@ import AdminDashboard from './pages/jsx/AdminDashboard.jsx';
 import CompanyRegistrationForm from './pages/jsx/CompanyRegistrationForm.jsx';
 import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
 import Profielbedrijven from './pages/jsx/ProfielBedrijven.jsx';
+import Profielbedrijven from './pages/jsx/ProfielBedrijven.jsx';
 import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
 
 export default function App() {
@@ -52,8 +53,8 @@ export default function App() {
       />
       <Route path="/registreer" element={<ClientRegistration />} />
 
-      <Route path="/profielbedrijven" element={<Profielbedrijven />} />
-
+      <Route path="/profiel-bedrijf" element={<ProfielBedrijven />} />
+      
       {/* Admin dashboard – beveiliging optioneel */}
       <Route path="/admin" element={<AdminDashboard />} />
 
