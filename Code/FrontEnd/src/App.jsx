@@ -38,7 +38,7 @@ export default function App() {
 
       <Route
         path="/dashboard"
-        element={isLoggedIn ? <UInfoPagina onLogout={() => setIsLoggedIn(false)} /> : <Navigate to="/login" />}
+        element={isLoggedIn ? <UInfoPagina onLogout={() => setIsLoggedIn(false)} /> : <Navigate to="/bedrijven" />}
       />
 
       <Route
