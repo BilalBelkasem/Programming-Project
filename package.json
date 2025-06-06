@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "name": "project-root",
     "private": true,
     "scripts": {
@@ -7,4 +8,9 @@
     "devDependencies": {
         "concurrently": "^8.2.2"
     }
+=======
+  "dependencies": {
+    "react-icons": "^5.5.0"
+  }
+>>>>>>> Admin2
 }
