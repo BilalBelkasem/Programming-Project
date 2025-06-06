@@ -4,15 +4,15 @@ import '../Css/ProfielBedrijven.css';
 export default function CompanyProfilePage() {
 
   const company = {
-    name: 'Gabriel',
-    lastname: 'Tintas',
-    companyName: 'colruyt',
-    function: 'Administrateur',
-    email: 'colruytBelgium@gmail.be',
-    linkedin: 'https://www.linkedin.com/in/gabriel-tintas-299533281/',
-    about: 'Een bedrijf gespecialiseerd in renovatie en restauratie van gebouwen.',
-    lookingFor: ['jobstudent', 'connecties', 'stage', 'job'],
-    domains: ['Data', 'software', 'netwerking', 'robotica / AI']
+    name: '',
+    lastname: '',
+    companyName: '',
+    function: '',
+    email: '',
+    linkedin: '',
+    about: '',
+    lookingFor: [''],
+    domains: ['']
   };
 
   return (

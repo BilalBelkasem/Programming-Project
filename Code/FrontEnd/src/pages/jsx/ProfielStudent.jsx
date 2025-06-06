@@ -3,16 +3,16 @@ import '../Css/Profielstudent';
 
 export default function StudentProfilePage() {
   const student = {
-    name: 'Marwan',
-    lastname: 'Amakran',
+    name: '',
+    lastname: '',
     school: '',
-    direction: 'Toegepaste informatica',
-    year: 'Eerste jaar',
+    direction: '',
+    year: '',
     linkedin: '',
-    email: 'Marwan.Amakran@student.ehb.Be',
-    about: 'Ik ben Marwan, een eerste jaar student in toegepaste informatica. Ik ben een geïnteresseerd student in programmeren.',
-    lookingFor: ['jobstudent', 'connecties', 'stage', 'job'],
-    domains: ['Data', 'software', 'netwerking', 'robotica / AI'],
+    email: 'µ',
+    about: '',
+    lookingFor: [''],
+    domains: [''],
     feedback: ''
   };
 
