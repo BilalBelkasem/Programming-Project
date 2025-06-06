@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../Css/ClientRegistration.css'
+import '../Css/ClientRegistration.css';
 
 
 const Register = () => {
@@ -27,7 +27,7 @@ const Register = () => {
 
   return (
     <div className="register-container">
-      <img src="/logo.png" alt="Erasmus Hogeschool Brussel" className="logo" />
+      <img src="../assets/logo Erasmus.png" alt="Erasmus Hogeschool Brussel" className="logo" />
       <h2 className="title">registreren</h2>
       <h3 className="subtitle">student</h3>
       <form onSubmit={handleSubmit} className="register-form">

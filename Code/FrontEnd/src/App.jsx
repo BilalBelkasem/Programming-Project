@@ -13,6 +13,7 @@ import AdminBedrijf from './pages/jsx/AdminBedrijf.jsx';
 import AdminBadge from './pages/jsx/AdminBadge.jsx';
 
 import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
+import ProfielBedrijven from './pages/jsx/ProfielBedrijven.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -49,11 +50,13 @@ export default function App() {
         }
       />
       <Route path="/registreer" element={<ClientRegistration />} />
+      <Route path="/Profielstudent" element={<Profielstudent />} />
+
+      <Route path="/profiel-bedrijf" element={<ProfielBedrijven />} />
 
       <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/admin/studenten" element={<AdminStudent />} />
-      <Route path="/admin/bedrijven" element={<AdminBedrijf />} />
-      <Route path="/admin/badges" element={<AdminBadge />} />
+
+
     </Routes>
     
   );
