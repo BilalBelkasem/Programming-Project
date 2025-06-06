@@ -36,18 +36,29 @@
 }
 
 .back-wrapper {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
+  padding: 4px 8px;
+}
+
+.back-wrapper:hover .back-text {
+  text-decoration: underline;
 }
 
 .back-icon {
-  font-size: 18px;
+  font-size: 20px;
+  display: inline-block;
 }
 
 .back-text {
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
 }
 
 .logout-icon {
