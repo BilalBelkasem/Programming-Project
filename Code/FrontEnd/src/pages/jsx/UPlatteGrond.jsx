@@ -15,18 +15,20 @@ export default function UPlatteGrond() {
   return (
     <div className="uplattegrond-wrapper">
       {/* Header */}
-      <header style={styles.header}>
-              <img src={logo} alt="Erasmus Logo" style={styles.logo} />
-              <nav style={styles.nav}>
-                <Link to="/dashboard" style={styles.navLink}>info</Link>
-                <Link to="/bedrijven" style={styles.navLink}>bedrijven</Link>
-                <Link to="/plattegrond" style={styles.navLink}>Plattegrond</Link>
-                <Link to="/favorieten" style={styles.navLink}>favorieten</Link>
-                <Link to="/dashboard" style={styles.navLink}>mijn profiel</Link>
-              </nav>
-              <div onClick={onLogout} style={styles.logoutIcon} title="Uitloggen">⇦</div>
-        </header>
+      <header className="header">
+            <img src={logo} alt="Erasmus Logo" className="logo" />
+            
+            <nav className="nav">
+                <Link to="/dashboard" className="navLink">Info</Link>
+                <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+                <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+                <Link to="/favorieten" className="navLink">Favorieten</Link>
+                <Link to="/profiel-bedrijf" className="navLink">Mijn Profiel</Link>
+            </nav>
 
+            <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+        </header>
+        
       {/* Inhoud */}
       <div className="uplattegrond-kader">
         <div className="uplattegrond-title-box">

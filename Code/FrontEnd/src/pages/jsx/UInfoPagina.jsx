@@ -9,13 +9,16 @@ export default function UInfoPagina({ onLogout }) {
       {/* Header */}
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
+        
         <nav className="nav">
-          <Link to="/dashboard" style={styles.navLink}>info</Link>
-          <Link to="/bedrijven" className="navLink">bedrijven</Link>
-          <Link to="/plattegrond" style={styles.navLink}>plattegrond</Link>
-          <Link to="/favorieten" style={styles.navLink}>favorieten</Link>
-          <Link to="/dashboard" style={styles.navLink}>mijn profiel</Link>
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/profiel-bedrijf" className="navLink">Mijn Profiel</Link>
         </nav>
+
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
       {/* Info Content */}
