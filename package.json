@@ -1,0 +1,10 @@
+{
+    "name": "project-root",
+    "private": true,
+    "scripts": {
+        "start": "concurrently \"npm run server --prefix Code/BackEnd\" \"npm run start --prefix Code/FrontEnd\""
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}
