@@ -10,7 +10,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 }
 
 .admin-logo-block {
@@ -50,6 +50,12 @@
   justify-content: center;
   align-items: center;
   min-height: 150px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-tile:hover {
+  background-color: #c0c0c0;
 }
 
 .studenten {

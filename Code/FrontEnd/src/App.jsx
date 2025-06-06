@@ -8,28 +8,28 @@ import LoginPagina from './pages/jsx/LoginPagina.jsx';
 import UBedrijven from './pages/jsx/UBedrijven.jsx';
 import AdminDashboard from './pages/jsx/AdminDashboard.jsx';
 import CompanyRegistrationForm from './pages/jsx/CompanyRegistrationForm.jsx';
+import AdminStudent from './pages/jsx/AdminStudent.jsx';
+import AdminBedrijf from './pages/jsx/AdminBedrijf.jsx';
+import AdminBadge from './pages/jsx/AdminBadge.jsx';
+
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <Routes>
-      {/* Publieke startpagina */}
       <Route path="/" element={<GInfoPagina />} />
 
-      {/* Loginpagina met login handler */}
       <Route
         path="/login"
         element={<LoginPagina onLogin={() => setIsLoggedIn(true)} />}
       />
 
-      {/* Bedrijven registratiepagina */}
       <Route
         path="/bedrijf-registratie"
         element={<CompanyRegistrationForm />}
       />
 
-      {/* Gebruikersdashboard, enkel zichtbaar als ingelogd */}
       <Route
         path="/dashboard"
         element={
@@ -39,7 +39,6 @@ export default function App() {
         }
       />
 
-      {/* Bedrijvenpagina voor ingelogde gebruikers */}
       <Route
         path="/bedrijven"
         element={
@@ -49,8 +48,12 @@ export default function App() {
         }
       />
 
-      {/* Admin dashboard – beveiliging optioneel */}
       <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="/admin/studenten" element={<AdminStudent />} />
+      <Route path="/admin/bedrijven" element={<AdminBedrijf />} />
+      <Route path="/admin/badges" element={<AdminBadge />} />
     </Routes>
+    
   );
+  
 }

@@ -8,12 +8,11 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate('/'); // Gaat naar GInfoPagina (homepage)
+    navigate('/'); 
   };
 
   return (
     <div className="admin-container">
-      {/* Header */}
       <header className="admin-header">
         <div className="admin-logo-block">
           <img src={logo} alt="Erasmus logo" className="admin-logo" />
@@ -22,11 +21,25 @@ export default function AdminDashboard() {
         <FaSignOutAlt className="logout-icon" onClick={handleLogout} />
       </header>
 
-      {/* Main Grid */}
       <main className="admin-grid">
-        <div className="admin-tile studenten">studenten</div>
-        <div className="admin-tile bedrijf">bedrijf</div>
-        <div className="admin-tile badge">badge</div>
+        <div
+          className="admin-tile studenten"
+          onClick={() => navigate('/admin/studenten')}
+        >
+          studenten
+        </div>
+        <div
+          className="admin-tile bedrijf"
+          onClick={() => navigate('/admin/bedrijven')}
+        >
+          bedrijf
+        </div>
+        <div
+          className="admin-tile badge"
+          onClick={() => navigate('/admin/badges')}
+        >
+          badge
+        </div>
       </main>
     </div>
   );
