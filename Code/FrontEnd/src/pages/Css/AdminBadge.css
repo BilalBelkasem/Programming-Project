@@ -1,0 +1,127 @@
+/* src/pages/Css/AdminBadge.css */
+
+.admin-badge-container {
+  padding: 30px;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.admin-header {
+  background-color: #dcdcdc;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.admin-logo-block {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.admin-logo {
+  width: 55px;
+}
+
+.admin-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.admin-buttons {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+}
+
+.back-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.back-wrapper:hover .back-text {
+  text-decoration: underline;
+}
+
+.back-icon {
+  font-size: 20px;
+}
+
+.back-text {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+  color: inherit;
+}
+
+.logout-icon {
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.zoekbalk-wrapper {
+  margin-bottom: 35px;
+}
+
+.zoek-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1.5px solid #000;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.badge-lijst {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.badge-kaart {
+  background-color: #ddd;
+  padding: 20px 25px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+
+.badge-naam {
+  font-weight: bold;
+  font-size: 17px;
+  margin: 0;
+}
+
+.badge-knop {
+  background-color: #444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: auto;
+  min-width: 120px; 
+  text-align: center;
+  white-space: nowrap;
+}
+
+
+.badge-knop:hover {
+  background-color: #222;
+}
+
+
+.badge-knop:hover {
+  background-color: #222;
+}
