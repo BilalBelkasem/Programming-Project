@@ -1,10 +1,17 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../css/UBedrijven.css';
 
 export default function UBedrijven({ onLogout }) {
   const [likedCompanies, setLikedCompanies] = useState([]);
+
+  const navigate = useNavigate();
+
+const handleLogout = () => {
+  if (onLogout) onLogout();
+  navigate("/login");
+};
 
   const bedrijven = [
     {

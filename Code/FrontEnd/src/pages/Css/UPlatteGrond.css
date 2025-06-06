@@ -2,10 +2,11 @@
   background-color: #f8f8f8;
   min-height: 100vh;
   font-family: sans-serif;
+  padding-top: 40px;
 }
 
 /* HERGEBRUIK header layout van UBedrijven */
-.uplattegrond-header {
+.header {
   background-color: white;
   display: flex;
   justify-content: space-between;
@@ -35,6 +36,9 @@
   text-decoration: underline;
 }
 
+.main {
+  padding-top: 80px; /* iets groter dan header height */
+}
 /* KAART + LEGENDE */
 .uplattegrond-kader {
   margin: 1rem;

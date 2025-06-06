@@ -46,6 +46,7 @@
 }
 
 .main {
+  margin-top: 70px; /* ruimte voor de header */
   padding: 30px 40px;
   background-color: #ffffff;
 }
