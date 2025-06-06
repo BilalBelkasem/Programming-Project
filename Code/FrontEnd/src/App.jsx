@@ -12,6 +12,7 @@ import AdminStudent from './pages/jsx/AdminStudent.jsx';
 import AdminBedrijf from './pages/jsx/AdminBedrijf.jsx';
 import AdminBadge from './pages/jsx/AdminBadge.jsx';
 
+import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -47,6 +48,7 @@ export default function App() {
             : <GInfoPagina />
         }
       />
+      <Route path="/registreer" element={<ClientRegistration />} />
 
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/studenten" element={<AdminStudent />} />
