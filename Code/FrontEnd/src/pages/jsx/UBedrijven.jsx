@@ -46,11 +46,11 @@ export default function UBedrijven({ onLogout }) {
         <nav className="nav">
           <Link to="/dashboard" className="navLink">info</Link>
           <Link to="/bedrijven" className="navLink">bedrijven</Link>
-          <Link to="/plattegrond" className="navLink">plattegrond</Link>
+          <Link to="/Uplattegrond" className="navLink">plattegrond</Link>
           <Link to="/favorieten" className="navLink">favorieten</Link>
           <Link to="/dashboard" className="navLink">mijn profiel</Link>
         </nav>
-        <div onClick={onLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+        <div onClick={onLogout}  className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
       <main className="main">

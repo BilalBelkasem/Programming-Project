@@ -12,7 +12,7 @@ export default function UInfoPagina({ onLogout }) {
         <nav style={styles.nav}>
           <Link to="/dashboard" style={styles.navLink}>info</Link>
           <Link to="/bedrijven" style={styles.navLink}>bedrijven</Link>
-          <Link to="/plattegrond" style={styles.navLink}>plattegrond</Link>
+          <Link to="/plattegrond">plattegrond</Link>
           <Link to="/favorieten" style={styles.navLink}>favorieten</Link>
           <Link to="/dashboard" style={styles.navLink}>mijn profiel</Link>
         </nav>
