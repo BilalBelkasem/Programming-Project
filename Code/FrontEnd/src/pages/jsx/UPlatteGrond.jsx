@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import plattegrondImg from "../../assets/plattegrond.png";
 import logo from "../../assets/logo Erasmus.png";
 import "../css/UPlatteGrond.css";
@@ -11,24 +11,31 @@ const legendItems = [
   { id: 4, naam: "Colruyt" },
 ];
 
-export default function UPlatteGrond() {
+export default function UPlatteGrond({ onLogout }) {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    if (onLogout) onLogout(); // roep App.jsx logout functie aan
+    navigate("/login");
+  };
+
   return (
     <div className="uplattegrond-wrapper">
       {/* Header */}
       <header className="header">
-            <img src={logo} alt="Erasmus Logo" className="logo" />
-            
-            <nav className="nav">
-                <Link to="/dashboard" className="navLink">Info</Link>
-                <Link to="/bedrijven" className="navLink">Bedrijven</Link>
-                <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-                <Link to="/favorieten" className="navLink">Favorieten</Link>
-                <Link to="/profiel-bedrijf" className="navLink">Mijn Profiel</Link>
-            </nav>
+        <img src={logo} alt="Erasmus Logo" className="logo" />
 
-            <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
-        </header>
-        
+        <nav className="nav">
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/profiel-bedrijf" className="navLink">Mijn Profiel</Link>
+        </nav>
+
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+      </header>
+
       {/* Inhoud */}
       <div className="uplattegrond-kader">
         <div className="uplattegrond-title-box">

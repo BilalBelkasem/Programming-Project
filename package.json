@@ -1,9 +1,4 @@
 {
-<<<<<<< HEAD
-  "dependencies": {
-    "react-icons": "^5.5.0"
-  }
-=======
     "name": "project-root",
     "private": true,
     "scripts": {
@@ -12,5 +7,4 @@
     "devDependencies": {
         "concurrently": "^8.2.2"
     }
->>>>>>> Jelle
 }
