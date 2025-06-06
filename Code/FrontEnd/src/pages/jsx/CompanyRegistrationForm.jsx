@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import '../Css/CompanyRegistrationForm.css';
+import { useNavigate } from 'react-router-dom';
+import '../Css/ProfielBedrijven.css';
 
 export default function CompanyRegistrationForm() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: '',
     phone: '',
@@ -25,7 +29,9 @@ export default function CompanyRegistrationForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formData);
+    console.log("Bedrijf geregistreerd:", formData);
+    // hier zou je eventueel een fetch/axios POST kunnen doen
+    navigate('/profiel-bedrijf');
   };
 
   return (
@@ -60,7 +66,9 @@ export default function CompanyRegistrationForm() {
         </div>
       ))}
 
-      <button type="submit" className="form-button">Registreren</button>
+<Link to="/profiel-bedrijf" className="form-button">
+  Registreren
+</Link>
       <p className="form-back">Terug</p>
     </form>
   );
