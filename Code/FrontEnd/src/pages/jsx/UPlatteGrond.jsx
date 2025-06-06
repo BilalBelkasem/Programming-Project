@@ -4,63 +4,52 @@ import plattegrondImg from "../../assets/plattegrond.png";
 import logo from "../../assets/logo Erasmus.png";
 import "../css/UPlatteGrond.css";
 
-export default function UPlatteGrond({ onLogout }) {
-  const bedrijven = [
-    { id: 1, naam: "TechNova" },
-    { id: 2, naam: "WebFlex" },
-    { id: 3, naam: "DataCore" },
-    { id: 4, naam: "Colruyt" },
-  ];
+const legendItems = [
+  { id: 1, naam: "TechNova" },
+  { id: 2, naam: "WebFlex" },
+  { id: 3, naam: "DataCore" },
+  { id: 4, naam: "Colruyt" },
+];
 
+export default function UPlatteGrond() {
   return (
-    <div className="pageWrapper">
-      <header className="header">
-        <img src={logo} alt="Erasmus Logo" className="logo" />
-        <nav className="nav">
-          <Link to="/dashboard" className="navLink">
-            info
-          </Link>
-          <Link to="/bedrijven" className="navLink">
-            bedrijven
-          </Link>
-          <Link to="/plattegrond" className="navLink">
-            plattegrond
-          </Link>
-          <Link to="/favorieten" className="navLink">
-            favorieten
-          </Link>
-          <Link to="/dashboard" className="navLink">
-            mijn profiel
-          </Link>
-        </nav>
-        <div onClick={onLogout} className="logoutIcon" title="Uitloggen">
-          ⇦
+    <div className="uplattegrond-wrapper">
+      {/* Header */}
+      <header style={styles.header}>
+              <img src={logo} alt="Erasmus Logo" style={styles.logo} />
+              <nav style={styles.nav}>
+                <Link to="/dashboard" style={styles.navLink}>info</Link>
+                <Link to="/bedrijven" style={styles.navLink}>bedrijven</Link>
+                <Link to="/plattegrond" style={styles.navLink}>Plattegrond</Link>
+                <Link to="/favorieten" style={styles.navLink}>favorieten</Link>
+                <Link to="/dashboard" style={styles.navLink}>mijn profiel</Link>
+              </nav>
+              <div onClick={onLogout} style={styles.logoutIcon} title="Uitloggen">⇦</div>
+        </header>
+
+      {/* Inhoud */}
+      <div className="uplattegrond-kader">
+        <div className="uplattegrond-title-box">
+          <h1 className="uplattegrond-title">Plattegrond</h1>
         </div>
-      </header>
-
-      <main className="main">
-        <div className="contentWrapper">
-          <h1 className="title">Plattegrond</h1>
-
-          <div className="contentContainer">
-            <img
-              src={plattegrondImg}
-              alt="Plattegrond van de Career Launch"
-              className="plattegrond-image"
-            />
-            <aside className="legend">
-              <h3>Legende</h3>
-              <ul>
-                {bedrijven.map((bedrijf) => (
-                  <li key={bedrijf.id}>
-                    {bedrijf.id}. {bedrijf.naam}
-                  </li>
-                ))}
-              </ul>
-            </aside>
+        <div className="uplattegrond-content-box">
+          <img
+            src={plattegrondImg}
+            alt="Plattegrond van de Career Launch"
+            className="uplattegrond-image"
+          />
+          <div className="uplattegrond-legend-box">
+            <h2 className="legend-title">Legenda</h2>
+            <ul className="legend-list">
+              {legendItems.map((item) => (
+                <li key={item.id} className="legend-item">
+                  <span className="legend-number">{item.id}.</span> {item.naam}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
