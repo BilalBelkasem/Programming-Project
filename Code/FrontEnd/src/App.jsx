@@ -50,9 +50,10 @@ export default function App() {
         }
       />
       <Route path="/registreer" element={<ClientRegistration />} />
+      <Route path="/Profielstudent" element={<Profielstudent />} />
 
       <Route path="/profiel-bedrijf" element={<ProfielBedrijven />} />
-      
+
       {/* Admin dashboard – beveiliging optioneel */}
       <Route path="/admin" element={<AdminDashboard />} />
 
