@@ -9,7 +9,7 @@ import AdminDashboard from './pages/jsx/AdminDashboard.jsx';
 import CompanyRegistrationForm from './pages/jsx/CompanyRegistrationForm.jsx';
 import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
 import Profielbedrijven from './pages/jsx/ProfielBedrijven.jsx';
-import UPlatteGrond from "./pages/jsx/UPlatteGrond.jsx";
+import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -56,6 +56,16 @@ export default function App() {
 
       {/* Admin dashboard – beveiliging optioneel */}
       <Route path="/admin" element={<AdminDashboard />} />
+
+      <Route
+  path="/plattegrond"
+  element={
+    isLoggedIn
+      ? <UPlatteGrond onLogout={() => setIsLoggedIn(false)} />
+      : <GInfoPagina />
+  }
+/>
+
     </Routes>
   );
-}
+} 

@@ -4,6 +4,7 @@ import logo from "../../assets/logo Erasmus.png";
 import plattegrondImg from "../../assets/plattegrond.png";
 import "../css/UPlatteGrond.css";
 
+
 export default function UPlatteGrond({ onLogout }) {
   const bedrijven = [
     { id: 1, naam: "TechNova" },
@@ -13,13 +14,13 @@ export default function UPlatteGrond({ onLogout }) {
   ];
 
   return (
-    <div className="pageWrapper">
+    <div className="pageWrapper UPlatteGrond">
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
           <Link to="/dashboard" className="navLink">info</Link>
           <Link to="/bedrijven" className="navLink">bedrijven</Link>
-          <Link to="/Uplattegrond" className="navLink">plattegrond</Link>
+          <Link to="/plattegrond" className="navLink">plattegrond</Link>
           <Link to="/favorieten" className="navLink">favorieten</Link>
           <Link to="/dashboard" className="navLink">mijn profiel</Link>
         </nav>
@@ -27,25 +28,27 @@ export default function UPlatteGrond({ onLogout }) {
       </header>
 
       <main className="main">
-        <div className="titleCard">Plattegrond</div>
-        <div className="contentCard">
-          <div className="plattegrond-left">
+        <div className="titleBox">Plattegrond</div>
+
+        <div className="contentContainer">
+          <div className="imageContainer">
             <img
               src={plattegrondImg}
-              alt="Plattegrond van de Career Launch"
+              alt="Plattegrond Career Launch"
               className="plattegrondImage"
             />
           </div>
-          <div className="plattegrond-right">
-            <div className="legendaBox">
-              <div className="legendaTitle">Legenda</div>
-              <ol className="legendaList">
-                {bedrijven.map((bedrijf) => (
-                  <li key={bedrijf.id}>{bedrijf.naam}</li>
-                ))}
-              </ol>
-            </div>
-          </div>
+
+          <aside className="legend">
+            <h3>Legende</h3>
+            <ul>
+              {bedrijven.map((bedrijf) => (
+                <li key={bedrijf.id}>
+                  <strong>{bedrijf.id}.</strong> {bedrijf.naam}
+                </li>
+              ))}
+            </ul>
+          </aside>
         </div>
       </main>
     </div>

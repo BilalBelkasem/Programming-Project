@@ -1,135 +1,154 @@
-/* Reset voor body en root containers */
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-/* Algemene layout en stijl (consistent met UBedrijven) */
-.pageWrapper {
+/* scoped voor UPlatteGrond */
+.UPlatteGrond {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  font-family: sans-serif;
-  background-color: #f9f9f9;
+  background-color: #f3f4f6; /* zelfde lichte achtergrond als UInfoPagina */
 }
 
-/* Header exact zoals UBedrijven */
-.header {
-  height: 80px;
-  background-color: #f0f0f0;
+/* Header uit UInfoPagina.css */
+.UPlatteGrond .header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 56px;
+  background-color: #0e1726; /* exact dezelfde donkerblauwe tint */
   display: flex;
   align-items: center;
-  padding: 0 1.5rem;
-  justify-content: space-between;
-  border-bottom: 1px solid #ccc;
+  padding: 0 1rem;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
 }
 
-.logo {
-  height: 50px;
+.UPlatteGrond .logo {
+  height: 40px;
+  margin-right: 1.5rem;
 }
 
-.nav {
+.UPlatteGrond .nav {
   display: flex;
-  gap: 1rem;
+  gap: 1.25rem;
+  flex-grow: 1;
 }
 
-.navLink {
-  color: #222;
+.UPlatteGrond .navLink {
+  color: #e0e7ff; /* lichtblauw/indigo-200 zoals in UInfoPagina */
   text-decoration: none;
   font-weight: 500;
+  font-size: 1rem;
+  text-transform: lowercase;
+  transition: color 0.2s ease-in-out;
 }
 
-.logoutIcon {
+.UPlatteGrond .navLink:hover {
+  color: #6366f1; /* indigo-500 accent */
+}
+
+.UPlatteGrond .logoutIcon {
   cursor: pointer;
+  color: #e0e7ff;
   font-size: 1.5rem;
+  user-select: none;
 }
 
-/* Hoofdinhoud */
-.main {
-  flex: 1;
-  height: calc(100vh - 80px);
-  padding: 1rem;
+/* main content */
+.UPlatteGrond .main {
+  padding-top: 60px; /* header height + padding */
+  flex-grow: 1;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  width: 95%;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  box-sizing: border-box;
-  overflow: hidden;
+  align-items: center;
 }
 
-/* Titel in een mooi kader */
-.titleCard {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  font-size: 1.75rem;
-  font-weight: bold;
-  color: #222;
+/* titel kader uit UInfoPagina */
+.UPlatteGrond .titleBox {
+  border: 2px solid #6366f1; /* indigo-500 */
+  border-radius: 0.5rem;
+  padding: 1rem 2rem;
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #0e1726;
+  margin-bottom: 1.5rem;
+  width: fit-content;
+  user-select: none;
+  background-color: #e0e7ff; /* licht indigo background */
 }
 
-/* Contentcontainer met afbeelding + legende in één kader */
-.contentCard {
+/* content container met plattegrond en legende */
+.UPlatteGrond .contentContainer {
   display: flex;
-  flex: 1;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.06);
+  width: 100%;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
   overflow: hidden;
-  gap: 1rem;
+  height: 75vh;
 }
 
-/* Linkerzijde: afbeelding */
-.plattegrond-left {
+/* plattegrond 75% */
+.UPlatteGrond .imageContainer {
   flex: 3;
   display: flex;
-  flex-direction: column;
-  height: 100%;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
   overflow: hidden;
 }
 
-.plattegrondImage {
-  width: 100%;
-  height: 100%;
+.UPlatteGrond .plattegrondImage {
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
-  border-radius: 1rem;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* Rechterzijde: legende */
-.plattegrond-right {
+/* legende 25% */
+.UPlatteGrond .legend {
   flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  height: 100%;
+  padding: 1.5rem;
   overflow-y: auto;
+  border-left: 1px solid #d1d5db; /* gray-300 */
+  color: #0e1726;
 }
 
-.legendaBox {
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
-  padding: 1.25rem;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 280px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
-.legendaTitle {
+.UPlatteGrond .legend h3 {
+  margin-top: 0;
   margin-bottom: 1rem;
+  font-weight: 700;
   font-size: 1.25rem;
-  font-weight: bold;
-  color: #333;
+  user-select: none;
 }
 
-.legendaList {
-  list-style: decimal;
-  padding-left: 1.25rem;
-  color: #333;
-  line-height: 1.6;
+.UPlatteGrond .legend ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.UPlatteGrond .legend li {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  font-size: 1.125rem;
+  user-select: none;
+}
+
+.UPlatteGrond .legend li strong {
+  margin-right: 0.5rem;
+  color: #6366f1; /* indigo-500 accent */
+}
+
+/* scrollbar styling */
+.UPlatteGrond .legend::-webkit-scrollbar {
+  width: 6px;
+}
+
+.UPlatteGrond .legend::-webkit-scrollbar-thumb {
+  background-color: #c7d2fe; /* indigo-200 */
+  border-radius: 3px;
+}
+
+.UPlatteGrond .legend::-webkit-scrollbar-track {
+  background-color: transparent;
 }
