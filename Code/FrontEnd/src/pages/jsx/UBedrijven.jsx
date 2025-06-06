@@ -41,16 +41,16 @@ export default function UBedrijven({ onLogout }) {
 
   return (
     <div className="pageWrapper">
-      <header style={styles.header}>
-              <img src={logo} alt="Erasmus Logo" style={styles.logo} />
-              <nav style={styles.nav}>
-                <Link to="/dashboard" style={styles.navLink}>info</Link>
-                <Link to="/bedrijven" style={styles.navLink}>bedrijven</Link>
-                <Link to="/plattegrond" style={styles.navLink}>Plattegrond</Link>
-                <Link to="/favorieten" style={styles.navLink}>favorieten</Link>
-                <Link to="/dashboard" style={styles.navLink}>mijn profiel</Link>
-              </nav>
-              <div onClick={onLogout} style={styles.logoutIcon} title="Uitloggen">⇦</div>
+      <header className="header">
+        <img src={logo} alt="Erasmus Logo" className="logo" />
+        <nav className="nav">
+          <Link to="/dashboard" className="navLink">info</Link>
+          <Link to="/bedrijven" className="navLink">bedrijven</Link>
+          <Link to="/plattegrond" style={"navLink"}>Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">favorieten</Link>
+          <Link to="/dashboard" className="navLink">mijn profiel</Link>
+        </nav>
+        <div onClick={onLogout}  className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
       <main className="main">
