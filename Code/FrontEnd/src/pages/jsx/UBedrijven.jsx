@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-import '../jsx/UBedrijven.jsx';
+import '../css/UBedrijven.css';
 
 export default function UBedrijven({ onLogout }) {
   const [likedCompanies, setLikedCompanies] = useState([]);
@@ -25,6 +25,12 @@ export default function UBedrijven({ onLogout }) {
       beschrijving: 'Big Data platformen en analyses voor de retailsector.',
       tags: ['Data', 'Backend', 'Retail'],
     },
+    {
+      id: 4,
+      naam: 'colruyt',
+      beschrijving: 'onderhoud van alle sysemen',
+      tags: ['Data', 'Retail'],
+    }
   ];
 
   const toggleLike = (id) => {
@@ -37,14 +43,16 @@ export default function UBedrijven({ onLogout }) {
     <div className="pageWrapper">
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
+        
         <nav className="nav">
-          <Link to="/dashboard" className="navLink">info</Link>
-          <Link to="/bedrijven" className="navLink">bedrijven</Link>
-          <Link to="/plattegrond" className="navLink">plattegrond</Link>
-          <Link to="/favorieten" className="navLink">favorieten</Link>
-          <Link to="/dashboard" className="navLink">mijn profiel</Link>
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/profiel-bedrijf" className="navLink">Mijn Profiel</Link>
         </nav>
-        <div onClick={onLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
       <main className="main">
