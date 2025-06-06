@@ -8,7 +8,7 @@ import UBedrijven from './pages/jsx/UBedrijven.jsx';
 import AdminDashboard from './pages/jsx/AdminDashboard.jsx';
 import CompanyRegistrationForm from './pages/jsx/CompanyRegistrationForm.jsx';
 import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
-import Profielbedrijven from './pages/jsx/ProfielBedrijven.jsx';
+import ProfielBedrijven from './pages/jsx/ProfielBedrijven.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -51,8 +51,8 @@ export default function App() {
       />
       <Route path="/registreer" element={<ClientRegistration />} />
 
-      <Route path="/profielbedrijven" element={<Profielbedrijven />} />
-
+      <Route path="/profiel-bedrijf" element={<ProfielBedrijven />} />
+      
       {/* Admin dashboard – beveiliging optioneel */}
       <Route path="/admin" element={<AdminDashboard />} />
 
