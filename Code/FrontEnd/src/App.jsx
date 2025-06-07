@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Pagina-imports
@@ -15,47 +14,75 @@ import AdminBadge from './pages/jsx/AdminBadge.jsx';
 import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
 import ProfielBedrijven from './pages/jsx/ProfielBedrijven.jsx';
 import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
+import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Persistent isLoggedIn state via localStorage
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  });
+
+  // Synchroniseer localStorage bij verandering van isLoggedIn
+  useEffect(() => {
+    localStorage.setItem('isLoggedIn', isLoggedIn ? 'true' : 'false');
+  }, [isLoggedIn]);
+
+  const [favorieteBedrijven, setFavorieteBedrijven] = useState([
+    { id: 1, naam: 'CoolCompany', beschrijving: 'Innovatief softwarebedrijf' },
+    { id: 2, naam: 'Techies BV', beschrijving: 'Specialist in AI-oplossingen' }
+  ]);
 
   return (
     <Routes>
       <Route path="/" element={<GInfoPagina />} />
 
-      {/* Loginpagina met login handler */}
       <Route
         path="/login"
         element={<LoginPagina onLogin={() => setIsLoggedIn(true)} />}
       />
 
-      {/* Publieke registratiepagina's */}
       <Route path="/bedrijf-registratie" element={<CompanyRegistrationForm />} />
       <Route path="/registreer" element={<ClientRegistration />} />
-
-      {/* Profielpagina voor geregistreerd bedrijf (geen bescherming nodig tenzij gewenst) */}
       <Route path="/profiel-bedrijf" element={<ProfielBedrijven />} />
 
       <Route
         path="/dashboard"
-        element={isLoggedIn ? <UInfoPagina onLogout={() => setIsLoggedIn(false)} /> : <Navigate to="/bedrijven" />}
+        element={
+          isLoggedIn ? (
+            <UInfoPagina onLogout={() => setIsLoggedIn(false)} />
+          ) : (
+            <Navigate to="/bedrijven" />
+          )
+        }
       />
-
 
       <Route
         path="/bedrijven"
         element={isLoggedIn ? <UBedrijven /> : <Navigate to="/login" />}
       />
 
+      <Route path="/plattegrond" element={<UPlatteGrond />} />
 
-<Route path="/plattegrond" element={<UPlatteGrond />} />
-  
+      <Route
+        path="/favorieten"
+        element={
+          isLoggedIn ? (
+            <UFavorietenBedrijven
+              favorieten={favorieteBedrijven}
+              onUnsave={(id) =>
+                setFavorieteBedrijven((prev) => prev.filter((b) => b.id !== id))
+              }
+            />
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
+
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/studenten" element={<AdminStudent />} />
       <Route path="/admin/bedrijven" element={<AdminBedrijf />} />
       <Route path="/admin/badges" element={<AdminBadge />} />
     </Routes>
-    
   );
-  
 }
