@@ -1,62 +1,140 @@
-
 .register-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background-color: white;
+    background-color: #f8fafc;
+    padding: 2rem;
+    font-family: 'Segoe UI', Roboto, sans-serif; 
 }
-  
-.logo {
-    margin-bottom: 1.5rem;
-}
-  
+
 .title {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 0.25rem;
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+
+    text-transform: capitalize; 
 }
-  
+
 .subtitle {
-    font-size: 1.25rem;
-    font-weight: bold;
-    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: #6b7280;
 }
-  
+
 .register-form {
     width: 100%;
     max-width: 24rem;
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
-  
+
 .form-label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
 }
-  
+
 .form-input {
     width: 100%;
-    padding: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
+    padding: 0.75rem;
+    margin-bottom: 1.25rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
-  
+
+.form-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 .register-button {
     width: 100%;
-    padding: 0.5rem;
-    background-color: #d1d5db;
+    padding: 0.75rem;
+    background-color: #1e40af; 
+    color: white;
     font-weight: 600;
     cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
 }
-  
+
 .register-button:hover {
-    background-color: #9ca3af;
+    background-color: #1e3a8a;
+    transform: translateY(-1px);
 }
-  
+
+.register-button:active {
+    transform: translateY(0);
+}
+
 .back-text {
-    margin-top: 1rem;
+    margin-top: 1.5rem;
     text-align: center;
     font-size: 0.875rem;
-    color: #4b5563;
+    color: #6b7280;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.back-text:hover {
+    color: #1e40af; 
+}
+
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.register-form {
+    animation: fadeIn 0.4s ease-out forwards;
+}
+.register-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f8fafc;
+    padding: 2rem;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #e30613; 
+    text-transform: capitalize;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: #6b7280;
+}
+
+.back-text:hover {
+    color: #6b7280; 
+    text-decoration: underline; 
+    text-underline-offset: 3px; 
+}
+.logo {
+    width: 60px; /* of elke gewenste grootte in pixels */
+    height: 60px; /* behoud aspect ratio */
+    margin-bottom: 2rem; /* ruimte onder de logo */
 }

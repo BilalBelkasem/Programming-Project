@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import '../Css/ClientRegistration.css';
+import logo from '../../assets/logo Erasmus.png';
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -70,7 +71,7 @@ const Register = () => {
 
   return (
     <div className="register-container">
-      <img src="/src/assets/logo Erasmus.png" alt="Erasmus Hogeschool Brussel" className="logo" />
+      <img src={logo} alt="Erasmus Logo" className="logo" />
       <h2 className="title">registreren</h2>
       <h3 className="subtitle">student</h3>
       
@@ -92,9 +93,7 @@ const Register = () => {
         <label className="form-label">wachtwoord herhalen*</label>
         <input type="password" name="herhaalWachtwoord" value={form.herhaalWachtwoord} onChange={handleChange} className="form-input" required />
 
-        <button type="submit" className="register-button" disabled={loading}>
-          {loading ? 'Bezig met registreren...' : 'registreren'}
-        </button>
+        <button type="submit" className="register-button">registreren</button>
         <Link to="/login" className="back-text">terug</Link>
       </form>
     </div>
