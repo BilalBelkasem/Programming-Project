@@ -1,5 +1,6 @@
 import React from 'react';
 import '../Css/Profielstudent';
+import { Link } from 'react-router-dom';
 
 export default function StudentProfilePage() {
   const student = {

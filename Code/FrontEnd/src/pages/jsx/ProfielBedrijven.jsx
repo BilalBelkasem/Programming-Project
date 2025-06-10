@@ -1,6 +1,6 @@
 import React from 'react';
 import '../Css/ProfielBedrijven.css';
-
+import { Link } from 'react-router-dom';
 export default function CompanyProfilePage() {
 
   const company = {
