@@ -1,43 +1,115 @@
 const QRCode = require('qrcode');
 
-async function renderBadgeHTML(user, student) {
+async function renderBadgeHTML(data, student = null) {
+  // Determine if we're receiving new badge assignment format or old student format
+  const isNewFormat = data.badge_id !== undefined;
+  
+  let qrDataURL, name, title, organization, school, interests, domains, about;
 
-  const qrDataURL = await QRCode.toDataURL(`https://example.com/student/${user.id}`);
+  if (isNewFormat) {
+    // New badge assignment format
+    name = data.custom_name || data.user_name;
+    title = data.custom_title || '';
+    organization = data.custom_organization || '';
+    
+    // Generate QR code from either URL or data
+    qrDataURL = await QRCode.toDataURL(data.qr_code_url || data.qr_code_data || `https://careerlaunch.be/verify/${data.id}`);
+  } else {
+    // Old student format
+    const user = data;
+    name = user.name;
+    title = `${student.education} (${student.year})`;
+    organization = student.school;
+    about = student.about;
+    
+    // Generate QR code for student
+    qrDataURL = await QRCode.toDataURL(`https://careerlaunch.be/student/${user.id}`);
+    
+    // Prepare interests and domains lists if they exist
+    interests = [
+      student.interest_jobstudent ? 'Jobstudent' : null,
+      student.interest_stage ? 'Stage' : null,
+      student.interest_job ? 'Job' : null,
+      student.interest_connect ? 'Connecties' : null
+    ].filter(Boolean);
+    
+    domains = [
+      student.domain_data ? 'Data' : null,
+      student.domain_networking ? 'Networking' : null,
+      student.domain_ai ? 'AI' : null,
+      student.domain_software ? 'Software' : null
+    ].filter(Boolean);
+  }
 
   return `
     <html>
       <head>
         <style>
           body { font-family: Arial, sans-serif; padding: 20px; }
-          .badge { border: 2px solid #000; padding: 20px; width: 400px; }
-          .qr { margin-top: 20px; }
-          ul { padding-left: 20px; }
+          .badge { 
+            border: 2px solid #000; 
+            padding: 20px; 
+            width: 400px;
+            background-color: ${isNewFormat ? (data.background_color || '#f8f9fa') : '#ffffff'};
+            color: ${isNewFormat ? (data.text_color || '#333333') : '#000000'};
+          }
+          .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+          }
+          .logo {
+            max-height: 60px;
+          }
+          .qr { 
+            margin-top: 20px;
+            text-align: center;
+          }
+          ul { 
+            padding-left: 20px;
+            margin: 10px 0;
+          }
+          .badge-type {
+            font-style: italic;
+            color: #666;
+            margin-bottom: 10px;
+          }
         </style>
       </head>
       <body>
         <div class="badge">
-          <h2>${user.name}</h2>
-          <p><strong>${student.school}</strong> - ${student.education} (${student.year})</p>
-          <p>${student.about}</p>
+          ${isNewFormat ? `
+            <div class="header">
+              <h2>${name}</h2>
+              ${data.default_logo ? '<img src="https://careerlaunch.be/logo.png" class="logo" alt="Logo">' : ''}
+            </div>
+            <div class="badge-type">${data.template_type ? data.template_type.toUpperCase() : ''} BADGE</div>
+            ${title ? `<p><strong>${title}</strong></p>` : ''}
+            ${organization ? `<p>${organization}</p>` : ''}
+          ` : `
+            <h2>${name}</h2>
+            <p><strong>${organization}</strong> - ${title}</p>
+            ${about ? `<p>${about}</p>` : ''}
+          `}
 
-          <h4>Interesses:</h4>
-          <ul>
-            ${student.interest_jobstudent ? '<li>Jobstudent</li>' : ''}
-            ${student.interest_stage ? '<li>Stage</li>' : ''}
-            ${student.interest_job ? '<li>Job</li>' : ''}
-            ${student.interest_connect ? '<li>Connecties</li>' : ''}
-          </ul>
+          ${!isNewFormat && interests.length > 0 ? `
+            <h4>Interesses:</h4>
+            <ul>
+              ${interests.map(interest => `<li>${interest}</li>`).join('')}
+            </ul>
+          ` : ''}
 
-          <h4>Domeinen:</h4>
-          <ul>
-            ${student.domain_data ? '<li>Data</li>' : ''}
-            ${student.domain_networking ? '<li>Netwerking</li>' : ''}
-            ${student.domain_ai ? '<li>AI</li>' : ''}
-            ${student.domain_software ? '<li>Software</li>' : ''}
-          </ul>
+          ${!isNewFormat && domains.length > 0 ? `
+            <h4>Domeinen:</h4>
+            <ul>
+              ${domains.map(domain => `<li>${domain}</li>`).join('')}
+            </ul>
+          ` : ''}
 
           <div class="qr">
             <img src="${qrDataURL}" width="150" />
+            ${isNewFormat ? `<p>Scan voor verificatie</p>` : ''}
           </div>
         </div>
       </body>
