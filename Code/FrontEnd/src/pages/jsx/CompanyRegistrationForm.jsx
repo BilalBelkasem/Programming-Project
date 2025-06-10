@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import '../Css/CompanyRegistrationForm.css';
 import { useNavigate } from 'react-router-dom';
-import '../Css/ProfielBedrijven.css';
+import { Link } from 'react-router-dom';
+
+
 
 export default function CompanyRegistrationForm() {
   const navigate = useNavigate();
