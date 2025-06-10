@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 
-
 export default function CompanyRegistrationForm() {
   const navigate = useNavigate();
 
@@ -31,10 +30,19 @@ export default function CompanyRegistrationForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+  
+    // Controleer of er lege velden zijn
+    const legeVelden = Object.entries(formData).filter(([key, value]) => value.trim() === '');
+  
+    if (legeVelden.length > 0) {
+      alert('Vul alle verplichte velden in voordat je registreert.');
+      return;
+    }
+  
     console.log("Bedrijf geregistreerd:", formData);
-    // hier zou je eventueel een fetch/axios POST kunnen doen
     navigate('/profiel-bedrijf');
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className="form-container">
@@ -68,10 +76,12 @@ export default function CompanyRegistrationForm() {
         </div>
       ))}
 
-<Link to="/profiel-bedrijf" className="form-button">
+<button type="submit" className="form-button">
   Registreren
-</Link>
-      <p className="form-back">Terug</p>
+</button>
+
+<Link to="/login" className="form-back">Terug</Link>
+
     </form>
   );
 }
