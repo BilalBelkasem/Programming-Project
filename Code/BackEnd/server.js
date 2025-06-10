@@ -2,12 +2,13 @@
     const mysql = require('mysql2');
     const cors = require('cors');
     require('dotenv').config();
-
+    const protectedRoutes = require('./routes/authRoutes');
     const app = express();
     app.use(cors());
     app.use(express.json());
+    app.use('/api', protectedRoutes);
 
-    // Create MySQL connection
+    // Create MySQL connection 
     const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
