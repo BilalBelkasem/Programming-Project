@@ -1,0 +1,36 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px 20px;
+  }
+  
+  .logo {
+    height: 40px;
+  }
+  
+  .nav {
+    display: flex;
+    gap: 30px;
+    flex-grow: 1;
+    justify-content: flex-end;
+  }
+  
+  .nav-link {
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 8px 12px;
+  }
+  
+  .nav-link.active {
+    color: #d63031;
+  }
+  
+  .nav-link.highlight {
+    background-color: #d63031;
+    color: white;
+    border-radius: 6px;
+  }
