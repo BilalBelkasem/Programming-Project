@@ -288,4 +288,9 @@
   .section-title {
     font-size: 22px;
   }
+
+  .banner-section {
+    background-color: red;
+  }
+  
 }

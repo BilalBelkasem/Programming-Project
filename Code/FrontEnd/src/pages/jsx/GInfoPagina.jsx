@@ -25,7 +25,7 @@ export default function GInfoPagina() {
         </nav>
       </header>
 
-      <section className="banner-section" style={{ backgroundImage: `url(${careerBanner})` }}>
+      <section className="banner-section" style={{ backgroundImage: `url(${logo})` }}>
         <button 
           className="scroll-down-button" 
           onClick={scrollToContent}
