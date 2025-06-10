@@ -17,15 +17,17 @@ export default function CompanyProfilePage() {
 
   return (
     <div className="company-profile-wrapper">
-      <nav className="navbar">
-        <img src="/logo.png" alt="Erasmus Logo" className="logo" />
-        <ul className="nav-links">
-          <li>info</li>
-          <li>bedrijven</li>
-          <li>plattegrond</li>
-          <li>Mijn profiel</li>
-        </ul>
-      </nav>
+     <header className="header">
+        <img src={logo} alt="Erasmus Logo" className="logo" />
+        <nav className="nav">
+          <Link to="/dashboard" className="nav-link">info</Link>
+          <Link to="/bedrijven" className="nav-link">bedrijven</Link>
+          <Link to="/plattegrond" className="nav-link">plattegrond</Link>
+          <Link to="/favorieten" className="nav-link">favorieten</Link>
+          <Link to="/dashboard" className="nav-link">mijn profiel</Link>
+        </nav>
+        <div onClick={onLogout} className="logout-icon" title="Uitloggen">⇦</div>
+      </header>
 
       <div className="profile-section">
         <div className="profile-picture">PROFILE PICTURE</div>
