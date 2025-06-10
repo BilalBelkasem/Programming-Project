@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Css/LoginPagina.css';
 import { Link } from 'react-router-dom';
-import GHeader from '../../components/SharedHeader.jsx'; // Zorg dat dit pad klopt!
+import GHeader from '../../components/SharedHeader.jsx';
 
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
@@ -12,45 +12,49 @@ export default function LoginPagina({ onLogin }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Ingelogd als:', email);
-    onLogin(); // zet isLoggedIn op true in App.jsx
-    navigate('/dashboard'); // navigeer naar de gebruikerspagina
+    onLogin();
+    navigate('/dashboard');
   };
 
   return (
     <>
       <GHeader />
+      <div className="page">
+        <main className="login-container">
+          <h2 className="section-title">Welkom terug!</h2>
+          <p className="login-text">Log in om toegang te krijgen tot je dashboard.</p>
+          
+          <form className="login-form" onSubmit={handleSubmit}>
+            <div>
+              <label>Email:</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label>Wachtwoord:</label>
+              <input
+                type="password"
+                value={wachtwoord}
+                onChange={(e) => setWachtwoord(e.target.value)}
+                required
+              />
+            </div>
+            <button type="submit">Inloggen</button>
+          </form>
 
-      <div style={{ maxWidth: '400px', margin: '80px auto', textAlign: 'center' }}>
-        <h2>Login</h2>
-        <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '16px' }}>
-            <label>Email:</label><br />
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{ width: '100%', padding: '8px' }}
-            />
+          <div className="link-section">
+            <p>Heb je nog geen account?</p>
+            <Link to="/bedrijf-registratie" className="register-link">
+              Registreer je bedrijf
+            </Link>
+            <Link to="/registreer" className="client-registration-button">
+              Registreer als gebruiker
+            </Link>
           </div>
-          <div style={{ marginBottom: '16px' }}>
-            <label>Wachtwoord:</label><br />
-            <input
-              type="password"
-              value={wachtwoord}
-              onChange={(e) => setWachtwoord(e.target.value)}
-              required
-              style={{ width: '100%', padding: '8px' }}
-            />
-          </div>
-          <button type="submit" style={{ padding: '10px 20px' }}>Inloggen</button>
-        </form>
-
-        <p style={{ marginTop: '20px' }}>
-          Nog geen account?{" "}
-          <Link to="/bedrijf-registratie" style={{ color: '#d63031', fontWeight: 'bold' }}>
-            Registreer je bedrijf
-          </Link>
 
           <div className="admin-login-container">
             <p><strong>Ben je een admin?</strong></p>
@@ -58,14 +62,7 @@ export default function LoginPagina({ onLogin }) {
               Ga naar Admin Dashboard
             </Link>
           </div>
-
-          <div className="client-registration-container">
-            <p><strong>Nog geen account als student?</strong></p>
-            <Link to="/registreer" className="client-registration-button">
-              Registreer als gebruiker
-            </Link>
-          </div>
-        </p>
+        </main>
       </div>
     </>
   );
