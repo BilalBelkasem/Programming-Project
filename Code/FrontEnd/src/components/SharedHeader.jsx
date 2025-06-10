@@ -1,4 +1,5 @@
 // Bestand: components/GHeader.jsx
+
 import { Link } from 'react-router-dom';
 import logo from '../assets/logo Erasmus.png';
 import '../components/SharedHeader.css';
@@ -16,4 +17,3 @@ export default function GHeader() {
     </header>
   );
 }
-
