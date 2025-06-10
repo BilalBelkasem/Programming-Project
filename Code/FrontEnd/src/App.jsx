@@ -48,8 +48,9 @@ export default function App() {
       />
 
 
-<Route path="/plattegrond" element={<UPlatteGrond />} />
-  
+      <Route path="/plattegrond" element={<UPlatteGrond />} />
+      
+
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/studenten" element={<AdminStudent />} />
       <Route path="/admin/bedrijven" element={<AdminBedrijf />} />

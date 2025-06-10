@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Css/LoginPagina.css';
 import { Link } from 'react-router-dom';
+import GHeader from '../../components/SharedHeader.jsx'; // Zorg dat dit pad klopt!
 
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
@@ -16,52 +17,56 @@ export default function LoginPagina({ onLogin }) {
   };
 
   return (
-    
-    <div style={{ maxWidth: '400px', margin: '80px auto', textAlign: 'center' }}>
-      
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '16px' }}>
-          <label>Email:</label><br />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: '100%', padding: '8px' }}
-          />
-        </div>
-        <div style={{ marginBottom: '16px' }}>
-          <label>Wachtwoord:</label><br />
-          <input
-            type="password"
-            value={wachtwoord}
-            onChange={(e) => setWachtwoord(e.target.value)}
-            required
-            style={{ width: '100%', padding: '8px' }}
-          />
-        </div>
-        <button type="submit" style={{ padding: '10px 20px' }}>Inloggen</button>
-      </form>
-      <p style={{ marginTop: '20px' }}>
-  Nog geen account?{" "}
-  <Link to="/bedrijf-registratie" style={{ color: '#d63031', fontWeight: 'bold' }}>
-    Registreer je bedrijf
-  </Link>
-  <div className="admin-login-container">
-  <p><strong>Ben je een admin?</strong></p>
-  <Link to="/admin" className="admin-login-button">
-    Ga naar Admin Dashboard
-  </Link>
-</div>
-<div className="client-registration-container">
-  <p><strong>Nog geen account als student?</strong></p>
-  <Link to="/registreer" className="client-registration-button">
-    Registreer als gebruiker
-  </Link>
-</div>
-</p>
-    </div>
-    
+    <>
+      <GHeader />
+
+      <div style={{ maxWidth: '400px', margin: '80px auto', textAlign: 'center' }}>
+        <h2>Login</h2>
+        <form onSubmit={handleSubmit}>
+          <div style={{ marginBottom: '16px' }}>
+            <label>Email:</label><br />
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              style={{ width: '100%', padding: '8px' }}
+            />
+          </div>
+          <div style={{ marginBottom: '16px' }}>
+            <label>Wachtwoord:</label><br />
+            <input
+              type="password"
+              value={wachtwoord}
+              onChange={(e) => setWachtwoord(e.target.value)}
+              required
+              style={{ width: '100%', padding: '8px' }}
+            />
+          </div>
+          <button type="submit" style={{ padding: '10px 20px' }}>Inloggen</button>
+        </form>
+
+        <p style={{ marginTop: '20px' }}>
+          Nog geen account?{" "}
+          <Link to="/bedrijf-registratie" style={{ color: '#d63031', fontWeight: 'bold' }}>
+            Registreer je bedrijf
+          </Link>
+
+          <div className="admin-login-container">
+            <p><strong>Ben je een admin?</strong></p>
+            <Link to="/admin" className="admin-login-button">
+              Ga naar Admin Dashboard
+            </Link>
+          </div>
+
+          <div className="client-registration-container">
+            <p><strong>Nog geen account als student?</strong></p>
+            <Link to="/registreer" className="client-registration-button">
+              Registreer als gebruiker
+            </Link>
+          </div>
+        </p>
+      </div>
+    </>
   );
 }

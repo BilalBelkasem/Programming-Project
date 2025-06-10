@@ -1,5 +1,7 @@
 import React from 'react';
 import '../Css/Profielstudent';
+import IngelogdHeader from '../../components/SharedHeaderIngelogd';
+
 
 export default function StudentProfilePage() {
   const student = {
@@ -18,6 +20,9 @@ export default function StudentProfilePage() {
 
   return (
     <div className="student-profile-wrapper">
+
+      <IngelogdHeader/>
+
       <nav className="navbar">
         <img src="/logo.png" alt="Erasmus Logo" className="logo" />
         <ul className="nav-links">
