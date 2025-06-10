@@ -15,6 +15,8 @@ import AdminBadge from './pages/jsx/AdminBadge.jsx';
 import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
 import ProfielBedrijven from './pages/jsx/ProfielBedrijven.jsx';
 import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
+import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
+
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -48,14 +50,18 @@ export default function App() {
       />
 
 
-<Route path="/plattegrond" element={<UPlatteGrond />} />
+      <Route path="/plattegrond" element={<UPlatteGrond />} />
+      <Route path="/plattegrondguest" element={<GPlatteGrond/>}/> 
   
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/studenten" element={<AdminStudent />} />
       <Route path="/admin/bedrijven" element={<AdminBedrijf />} />
       <Route path="/admin/badges" element={<AdminBadge />} />
+
+      
     </Routes>
     
   );
+  
   
 }
