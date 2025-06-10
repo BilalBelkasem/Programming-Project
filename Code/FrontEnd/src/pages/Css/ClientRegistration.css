@@ -53,14 +53,12 @@
 
 .form-input:focus {
     outline: none;
-    border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .register-button {
     width: 100%;
     padding: 0.75rem;
-    background-color: #1e40af; 
     color: white;
     font-weight: 600;
     cursor: pointer;
@@ -72,7 +70,6 @@
 }
 
 .register-button:hover {
-    background-color: #1e3a8a;
     transform: translateY(-1px);
 }
 
@@ -88,11 +85,6 @@
     cursor: pointer;
     transition: color 0.2s;
 }
-
-.back-text:hover {
-    color: #1e40af; 
-}
-
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
