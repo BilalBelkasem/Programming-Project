@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../Css/ClientRegistration.css';
 import logo from '../../assets/logo Erasmus.png';
-
+import { Link } from 'react-router-dom';
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -48,7 +48,7 @@ const Register = () => {
         <input type="password" name="herhaalWachtwoord" value={form.herhaalWachtwoord} onChange={handleChange} className="form-input" required />
 
         <button type="submit" className="register-button">registreren</button>
-        <div className="back-text">terug</div>
+        <Link to="/login" className="back-text">terug</Link>
       </form>
     </div>
   );
