@@ -1,0 +1,113 @@
+.uplattegrond-wrapper {
+  background-color: #f8f8f8;
+  min-height: 100vh;
+  font-family: sans-serif;
+  padding-top: 40px;
+}
+
+/* HERGEBRUIK header layout van UBedrijven */
+.header {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 70px; /* zelfde als in UBedrijven */
+}
+
+.logo {
+  height: 50px;
+}
+
+.nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navLink {
+  color: #333;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 0;
+}
+
+.navLink:hover {
+  text-decoration: underline;
+}
+
+.main {
+  padding-top: 80px; /* iets groter dan header height */
+}
+/* KAART + LEGENDE */
+.uplattegrond-kader {
+  margin: 1rem;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* TITEL */
+.uplattegrond-title-box {
+  margin-bottom: 1rem;
+  background-color: #f0f0f0;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.uplattegrond-title {
+  margin: 0;
+  font-size: 1.8rem;
+  color: #222;
+}
+
+/* INHOUD VERDELING */
+.uplattegrond-content-box {
+  display: flex;
+  gap: 1rem;
+  height: calc(100vh - 200px);
+}
+
+/* PLATTEGROND */
+.uplattegrond-image {
+  width: 75%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+}
+
+/* LEGENDE */
+.uplattegrond-legend-box {
+  width: 25%;
+  background-color: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.legend-title {
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+  color: #333;
+}
+
+.legend-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.legend-item {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: #444;
+}
+
+.legend-number {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
