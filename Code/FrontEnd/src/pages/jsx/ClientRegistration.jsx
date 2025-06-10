@@ -3,7 +3,6 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import '../Css/ClientRegistration.css';
 import logo from '../../assets/logo Erasmus.png';
-import { Link } from 'react-router-dom';
 
 const Register = () => {
   const [form, setForm] = useState({
