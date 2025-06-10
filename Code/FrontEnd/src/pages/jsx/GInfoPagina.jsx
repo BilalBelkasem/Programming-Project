@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+
 import logo from '../../assets/logo Erasmus.png';
 import careerBanner from '../../assets/Banner C.png';
 import '../Css/GInfoPagina.css';
@@ -18,7 +19,7 @@ export default function GInfoPagina() {
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav spaced">
           <Link to="/" className="nav-link active">info</Link>
-          <Link to="/bedrijven" className="nav-link">bedrijven</Link>
+          <Link to="/" className="nav-link">bedrijven</Link>
           <Link to="/plattegrond" className="nav-link">plattegrond</Link>
           <Link to="/login" className="nav-link highlight">login/registeren</Link>
         </nav>

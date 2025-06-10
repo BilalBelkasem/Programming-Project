@@ -12,9 +12,9 @@ import CompanyRegistrationForm from './pages/jsx/CompanyRegistrationForm.jsx';
 import AdminStudent from './pages/jsx/AdminStudent.jsx';
 import AdminBedrijf from './pages/jsx/AdminBedrijf.jsx';
 import AdminBadge from './pages/jsx/AdminBadge.jsx';
-
 import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
 import ProfielBedrijven from './pages/jsx/ProfielBedrijven.jsx';
+import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,14 +38,17 @@ export default function App() {
 
       <Route
         path="/dashboard"
-        element={isLoggedIn ? <UInfoPagina onLogout={() => setIsLoggedIn(false)} /> : <Navigate to="/login" />}
+        element={isLoggedIn ? <UInfoPagina onLogout={() => setIsLoggedIn(false)} /> : <Navigate to="/bedrijven" />}
       />
+
 
       <Route
         path="/bedrijven"
         element={isLoggedIn ? <UBedrijven /> : <Navigate to="/login" />}
       />
 
+
+<Route path="/plattegrond" element={<UPlatteGrond />} />
   
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/studenten" element={<AdminStudent />} />
