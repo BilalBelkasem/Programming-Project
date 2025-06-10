@@ -88,8 +88,6 @@ export default function App() {
           setFavorieteBedrijven((prev) => prev.filter((b) => b.id !== id))}/>
       ) : (<Navigate to="/login" />)}/>
 
-      
-
     </Routes>
   );
   
