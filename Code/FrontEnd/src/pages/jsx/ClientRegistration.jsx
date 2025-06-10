@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../Css/ClientRegistration.css';
+import logo from '../../assets/logo Erasmus.png';
 
 
 const Register = () => {
@@ -27,7 +28,7 @@ const Register = () => {
 
   return (
     <div className="register-container">
-      <img src="../assets/logo Erasmus.png" alt="Erasmus Hogeschool Brussel" className="logo" />
+      <img src={logo} alt="Erasmus Logo" className="logo" />
       <h2 className="title">registreren</h2>
       <h3 className="subtitle">student</h3>
       <form onSubmit={handleSubmit} className="register-form">
