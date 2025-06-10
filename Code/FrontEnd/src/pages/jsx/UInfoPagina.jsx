@@ -15,7 +15,7 @@ export default function UInfoPagina({ onLogout }) {
           <Link to="/bedrijven" className="nav-link">bedrijven</Link>
           <Link to="/plattegrond" className="nav-link">plattegrond</Link>
           <Link to="/favorieten" className="nav-link">favorieten</Link>
-          <Link to="/dashboard" className="nav-link">mijn profiel</Link>
+          <Link to="/profiel-bedrijf" className="nav-link">mijn profiel</Link>
         </nav>
         <div onClick={onLogout} className="logout-icon" title="Uitloggen">⇦</div>
       </header>
