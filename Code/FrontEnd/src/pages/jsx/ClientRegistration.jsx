@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
 import '../Css/ClientRegistration.css';
-
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -10,26 +11,71 @@ const Register = () => {
     wachtwoord: '',
     herhaalWachtwoord: ''
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    
+    
     if (form.wachtwoord !== form.herhaalWachtwoord) {
-      alert('Wachtwoorden komen niet overeen.');
+      setError('Wachtwoorden komen niet overeen.');
       return;
     }
-    console.log('Registratiegegevens:', form);
+
+    
+    if (form.wachtwoord.length < 6) {
+      setError('Wachtwoord moet minimaal 6 tekens bevatten.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      // Transform data to match backend expectations
+      const userData = {
+        firstName: form.voornaam,
+        lastName: form.naam,
+        email: form.email,
+        password: form.wachtwoord, 
+        role: 'student' 
+      };
+
+      const response = await axios.post('http://localhost:5000/api/register', userData);
+      
+      console.log('Registratie succesvol:', response.data);
+      
+      if (response.data.token) {
+        localStorage.setItem('token', response.data.token);
+      }
+      
+      // Navigate to login page or dashboard
+      navigate('/login');
+    } catch (err) {
+      console.error('Registration error:', err);
+      setError(
+        err.response?.data?.error || 
+        'Er is een fout opgetreden bij het registreren. Probeer het later opnieuw.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="register-container">
-      <img src="../assets/logo Erasmus.png" alt="Erasmus Hogeschool Brussel" className="logo" />
+      <img src="/src/assets/logo Erasmus.png" alt="Erasmus Hogeschool Brussel" className="logo" />
       <h2 className="title">registreren</h2>
       <h3 className="subtitle">student</h3>
+      
+      {error && <div className="error-message">{error}</div>}
+      
       <form onSubmit={handleSubmit} className="register-form">
         <label className="form-label">voornaam*</label>
         <input type="text" name="voornaam" value={form.voornaam} onChange={handleChange} className="form-input" required />
@@ -46,8 +92,10 @@ const Register = () => {
         <label className="form-label">wachtwoord herhalen*</label>
         <input type="password" name="herhaalWachtwoord" value={form.herhaalWachtwoord} onChange={handleChange} className="form-input" required />
 
-        <button type="submit" className="register-button">registreren</button>
-        <div className="back-text">terug</div>
+        <button type="submit" className="register-button" disabled={loading}>
+          {loading ? 'Bezig met registreren...' : 'registreren'}
+        </button>
+        <Link to="/login" className="back-text">terug</Link>
       </form>
     </div>
   );
