@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import '../Css/LoginPagina.css';
 import { Link } from 'react-router-dom';
@@ -6,19 +7,35 @@ import { Link } from 'react-router-dom';
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
   const [wachtwoord, setWachtwoord] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Ingelogd als:', email);
-    onLogin(); // zet isLoggedIn op true in App.jsx
-    navigate('/dashboard'); // navigeer naar de gebruikerspagina
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/login', {
+        email,
+        password: wachtwoord,
+      });
+
+      // Save the token to localStorage
+      localStorage.setItem('token', response.data.token);
+
+      // Call the onLogin function and navigate to the dashboard
+      onLogin();
+      navigate('/dashboard');
+    } catch (err) {
+      if (err.response) {
+        setError(err.response.data.error || 'Something went wrong');
+      } else {
+        setError('Failed to connect to the server');
+      }
+    }
   };
 
   return (
-    
     <div style={{ maxWidth: '400px', margin: '80px auto', textAlign: 'center' }}>
-      
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '16px' }}>
@@ -41,6 +58,7 @@ export default function LoginPagina({ onLogin }) {
             style={{ width: '100%', padding: '8px' }}
           />
         </div>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
         <button type="submit" style={{ padding: '10px 20px' }}>Inloggen</button>
       </form>
       <p style={{ marginTop: '20px' }}>
