@@ -15,6 +15,7 @@ import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
 import ProfielBedrijven from './pages/jsx/ProfielBedrijven.jsx';
 import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
 import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
+import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
 
 export default function App() {
   // Persistent isLoggedIn state via localStorage
@@ -61,28 +62,16 @@ export default function App() {
         element={isLoggedIn ? <UBedrijven /> : <Navigate to="/login" />}
       />
 
-      <Route path="/plattegrond" element={<UPlatteGrond />} />
 
-      <Route
-        path="/favorieten"
-        element={
-          isLoggedIn ? (
-            <UFavorietenBedrijven
-              favorieten={favorieteBedrijven}
-              onUnsave={(id) =>
-                setFavorieteBedrijven((prev) => prev.filter((b) => b.id !== id))
-              }
-            />
-          ) : (
-            <Navigate to="/login" />
-          )
-        }
-      />
-
+<Route path="/plattegrond" element={<UPlatteGrond />} />
+  
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/studenten" element={<AdminStudent />} />
       <Route path="/admin/bedrijven" element={<AdminBedrijf />} />
       <Route path="/admin/badges" element={<AdminBadge />} />
+
+      
     </Routes>
   );
+  
 }

@@ -16,7 +16,9 @@ export default function LoginPagina({ onLogin }) {
   };
 
   return (
+    
     <div style={{ maxWidth: '400px', margin: '80px auto', textAlign: 'center' }}>
+      
       <h2>Login</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '16px' }}>
