@@ -11,7 +11,7 @@ export default function GHeader() {
       <nav className="nav spaced">
         <Link to="/" className="nav-link">info</Link>
         <Link to="/bedrijven" className="nav-link">bedrijven</Link>
-        <Link to="/plattegrond" className="nav-link">plattegrond</Link>
+        <Link to="/g-plattegrond" className="nav-link">plattegrond</Link>
         <Link to="/login" className="nav-link highlight">login/registeren</Link>
       </nav>
     </header>

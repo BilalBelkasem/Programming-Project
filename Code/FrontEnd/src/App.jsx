@@ -17,6 +17,7 @@ import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
 import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
+import UBedrijfView from './pages/jsx/UProfielBedrijfView.jsx';
 
 
 export default function App() {

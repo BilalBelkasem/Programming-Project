@@ -17,6 +17,7 @@ export default function UFavorietenBedrijven({ favorieten, onUnsave }) {
           <a href="/plattegrond" className="navLink">Plattegrond</a>
           <a href="/favorieten" className="navLink">Favorieten</a>
           <a href="/profiel-bedrijf" className="navLink">Mijn Profiel</a>
+          <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
         </nav>
       </header>
 

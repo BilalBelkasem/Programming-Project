@@ -20,16 +20,18 @@ export default function GInfoPagina() {
         <nav className="nav spaced">
           <Link to="/" className="nav-link active">info</Link>
           <Link to="/" className="nav-link">bedrijven</Link>
-          <Link to="/plattegrondguest" className="nav-link">plattegrond</Link>
+          <Link to="/g-plattegrond" className="nav-link">plattegrond</Link>
           <Link to="/login" className="nav-link highlight">login/registeren</Link>
         </nav>
       </header>
 
-      <section className="banner-section" style={{ backgroundImage: `url(${careerBanner})` }}>
+      <section className="banner-section" style={{ backgroundImage: `url(${logo})` }}>
+      <img src={careerBanner} alt="CareerLaunch banner" className="banner" />
         <button 
           className="scroll-down-button" 
           onClick={scrollToContent}
           aria-label="Scroll naar content"
+          
         >
           ⌄
         </button>
