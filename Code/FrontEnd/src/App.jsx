@@ -16,6 +16,8 @@ import ProfielBedrijven from './pages/jsx/ProfielBedrijven.jsx';
 import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
 import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
+import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
+
 
 export default function App() {
   // Persistent isLoggedIn state via localStorage
@@ -32,6 +34,11 @@ export default function App() {
     { id: 1, naam: 'CoolCompany', beschrijving: 'Innovatief softwarebedrijf' },
     { id: 2, naam: 'Techies BV', beschrijving: 'Specialist in AI-oplossingen' }
   ]);
+
+  const [favorieteStudenten, setFavorieteStudenten] = useState([
+  { id: 101, naam: 'Jelle Peeters', studierichting: 'Toegepaste Informatica' },
+  { id: 102, naam: 'Sara Jacobs', studierichting: 'Marketing' }
+]);
 
   return (
     <Routes>
@@ -61,16 +68,25 @@ export default function App() {
         path="/bedrijven"
         element={isLoggedIn ? <UBedrijven /> : <Navigate to="/login" />}
       />
-
-
-<Route path="/plattegrond" element={<UPlatteGrond />} />
-  
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/studenten" element={<AdminStudent />} />
       <Route path="/admin/bedrijven" element={<AdminBedrijf />} />
       <Route path="/admin/badges" element={<AdminBadge />} />
 
+      <Route path="/plattegrond" element={<UPlatteGrond />} />
+      <Route path="/g-plattegrond" element={<GPlatteGrond />} />
+
+
+      <Route path="/b-favorieten" element={<BFavorietenStudenten 
+          favorieten={favorieteStudenten}
+          onUnsave={(id) => setFavorieteStudenten((prev) => 
+            prev.filter((s) => s.id !== id))}/>}/>
       
+      <Route path="/favorieten" element={isLoggedIn ? (
+      <UFavorietenBedrijven favorieten={favorieteBedrijven} onUnsave={(id) =>
+          setFavorieteBedrijven((prev) => prev.filter((b) => b.id !== id))}/>
+      ) : (<Navigate to="/login" />)}/>
+
     </Routes>
   );
   
