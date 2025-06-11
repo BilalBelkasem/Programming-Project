@@ -1,0 +1,46 @@
+/* SharedHeader.css */
+
+.shared-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 12px 24px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .shared-header .logo {
+    height: 40px;
+  }
+  
+  .shared-header .nav {
+    display: flex;
+    gap: 32px;
+    margin: 0 20px;
+  }
+  
+  .shared-header .nav-link {
+    text-decoration: none;
+    color: #2d3436;
+    font-weight: bold;
+    font-size: 16px;
+    transition: color 0.2s ease-in-out;
+  }
+  
+  .shared-header .nav-link:hover {
+    color: #d63031;
+  }
+  
+  .shared-header .logout-icon {
+    cursor: pointer;
+    font-size: 20px;
+    color: #d63031;
+    padding: 6px 10px;
+    border: 1px solid #d63031;
+    border-radius: 50%;
+    transition: background 0.2s;
+  }
+  
+  .shared-header .logout-icon:hover {
+    background-color: #ffeaea;
+  }

@@ -1,7 +1,11 @@
+* {
+  box-sizing: border-box;
+}
+
 .pageWrapper {
   min-height: 100vh;
   width: 100vw;
-  background-color: #ffffff;
+  background-color: #f5f5f5;
   font-family: Arial, sans-serif;
   display: flex;
   flex-direction: column;
@@ -11,8 +15,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #f0f0f0;
+  background-color: #dcdcdc;
   padding: 10px 20px;
+  border-bottom: 2px solid #ccc;
 }
 
 .logo {
@@ -41,74 +46,101 @@
 }
 
 .main {
+  margin-top: 70px; /* ruimte voor de header */
   padding: 30px 40px;
   background-color: #ffffff;
 }
 
 .title {
   margin-bottom: 20px;
-  color: #d63031;
+  font-size: 24px;
+  color: #333;
 }
 
 .bedrijvenContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 24px;
+  justify-items: center;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .bedrijfCard {
-  width: 300px;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  background-color: #f9f9f9;
+  /*width: 300px;*/
+  aspect-ratio: 2 / 1; 
+  padding: 16px;
+  border-radius: 6px;
+  background-color: #ccc;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   position: relative;
+  text-align: center;
+  width: 100%; 
 }
 
+
 .bedrijfNaam {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
-  color: #2d3436;
-  margin-bottom: 10px;
+  color: #000;
+  margin-bottom: 8px;
 }
 
 .bedrijfBeschrijving {
   font-size: 14px;
-  text-align: center;
-  color: #636e72;
-  margin-bottom: 10px;
+  color: #000;
 }
 
 .tagContainer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: center;
-  margin-bottom: 10px;
+  display: none; /* niet zichtbaar in het mockupvoorbeeld */
 }
 
 .tag {
-  background-color: #dfe6e9;
-  color: #2d3436;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 12px;
+  display: none;
 }
 
 .likeButton {
+  width: 40px;
+  height: 40px;
+  background-color: #b2bec3;
+  color: white;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0;
   border: none;
-  color: #ffffff;
-  font-size: 18px;
-  padding: 6px 12px;
   border-radius: 6px;
   cursor: pointer;
-  background-color: #b2bec3;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+.likeButton:hover {
+  background-color: #d63031;
 }
 
 .likeButton.liked {
-  background-color: #d63031;
+  color: red;
 }
+
+.arrow {
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+}
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+

@@ -2,6 +2,7 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
 require('dotenv').config();
+const protectedRoutes = require('./routes/authRoutes');
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 app.use(express.static('public', {
   index: 'public.html'
 }));
+app.use('/api', protectedRoutes);
 
 // Create MySQL connection pool
 const pool = mysql.createPool({

@@ -1,59 +1,107 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate, Link } from 'react-router-dom';
 import '../Css/LoginPagina.css';
-import { Link } from 'react-router-dom';
+import logo from '../../assets/logo Erasmus.png';
 
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
   const [wachtwoord, setWachtwoord] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Ingelogd als:', email);
-    onLogin(); // zet isLoggedIn op true in App.jsx
-    navigate('/dashboard'); // navigeer naar de gebruikerspagina
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await axios.post('http://localhost:5000/api/login', {
+        email: email,
+        password: wachtwoord
+      });
+
+      if (response.data && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        if (onLogin) onLogin();
+        navigate('/dashboard');
+      } else {
+        setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
+      }
+    } catch (err) {
+      if (err.response) {
+        if (err.response.status === 401) {
+          setError('Ongeldige e-mail of wachtwoord.');
+        } else if (err.response.data?.error) {
+          setError(err.response.data.error);
+        } else {
+          setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
+        }
+      } else {
+        setError('Kan geen verbinding maken met de server. Controleer je internetverbinding.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '80px auto', textAlign: 'center' }}>
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '16px' }}>
-          <label>Email:</label><br />
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: '100%', padding: '8px' }}
-          />
+    <div className="page">
+      <div className="login-container">
+        <div className="logo-container">
+          <img src={logo} alt="Erasmus Logo" className="login-logo" />
         </div>
-        <div style={{ marginBottom: '16px' }}>
-          <label>Wachtwoord:</label><br />
-          <input
-            type="password"
-            value={wachtwoord}
-            onChange={(e) => setWachtwoord(e.target.value)}
-            required
-            style={{ width: '100%', padding: '8px' }}
-          />
+        <h2 className="login-title">Inloggen</h2>
+
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              placeholder="Voer je e-mailadres in"
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Wachtwoord</label>
+            <input
+              type="password"
+              id="password"
+              value={wachtwoord}
+              onChange={(e) => setWachtwoord(e.target.value)}
+              required
+              placeholder="Voer je wachtwoord in"
+            />
+          </div>
+
+          {error && <div className="error-message">{error}</div>}
+
+          <button
+            type="submit"
+            className="login-button"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Bezig...' : 'Inloggen'}
+          </button>
+        </form>
+
+        <div className="register-links">
+          <p>Nog geen account?</p>
+          <div className="register-options">
+            <Link to="/registreer" className="register-link">
+              Registreer als student
+            </Link>
+            <Link to="/bedrijf-registratie" className="register-link company">
+              Registreer je bedrijf
+            </Link>
+          </div>
         </div>
-        <button type="submit" style={{ padding: '10px 20px' }}>Inloggen</button>
-      </form>
-      <p style={{ marginTop: '20px' }}>
-  Nog geen account?{" "}
-  <Link to="/bedrijf-registratie" style={{ color: '#d63031', fontWeight: 'bold' }}>
-    Registreer je bedrijf
-  </Link>
-  <div className="admin-login-container">
-  <p><strong>Ben je een admin?</strong></p>
-  <Link to="/admin" className="admin-login-button">
-    Ga naar Admin Dashboard
-  </Link>
-</div>
-</p>
+      </div>
     </div>
-    
   );
 }
