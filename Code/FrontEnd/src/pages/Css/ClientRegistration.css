@@ -5,9 +5,9 @@
     justify-content: center;
     align-items: center;
     font-family: 'Segoe UI', Roboto, sans-serif;
-}
-
-.register-box {
+  }
+  
+  .register-box {
     background-color: white;
     padding: 2.5rem;
     border-radius: 1rem;
@@ -18,57 +18,57 @@
     flex-direction: column;
     align-items: center;
     animation: fadeIn 0.4s ease-out forwards;
-}
-
-.logo {
+  }
+  
+  .login-logo {
     width: 70px;
     margin-bottom: 1.5rem;
-}
-
-.title {
+  }
+  
+  .title {
     font-size: 1.75rem;
     font-weight: 700;
     margin-bottom: 0.3rem;
     color: #e30613;
     text-transform: capitalize;
     text-align: center;
-}
-
-.subtitle {
+  }
+  
+  .subtitle {
     font-size: 1rem;
     font-weight: 500;
     color: #6b7280;
     margin-bottom: 1.5rem;
     text-align: center;
-}
-
-.register-form {
+  }
+  
+  .register-form {
     width: 100%;
-}
-
-.form-label {
+  }
+  
+  .form-label {
     display: block;
     margin-bottom: 0.3rem;
     font-weight: 600;
     font-size: 0.9rem;
     color: #374151;
-}
-
-.form-input {
+  }
+  
+  .form-input {
     width: 100%;
     padding: 0.75rem;
     margin-bottom: 1rem;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     font-size: 1rem;
-}
-
-.form-input:focus {
+  }
+  
+  .form-input:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.register-button {
+  }
+  
+  .register-button {
     width: 100%;
     background-color: #e30613;
     color: white;
@@ -80,26 +80,26 @@
     cursor: pointer;
     margin-top: 0.5rem;
     transition: background-color 0.3s ease;
-}
-
-.register-button:hover {
+  }
+  
+  .register-button:hover {
     background-color: #c80010;
-}
-
-.back-text {
+  }
+  
+  .back-text {
     margin-top: 1rem;
     display: block;
     text-align: center;
     font-size: 0.9rem;
     color: #6b7280;
     text-decoration: none;
-}
-
-.back-text:hover {
+  }
+  
+  .back-text:hover {
     text-decoration: underline;
-}
-
-.error-message {
+  }
+  
+  .error-message {
     color: red;
     background-color: #ffe5e5;
     padding: 0.5rem 1rem;
@@ -107,14 +107,21 @@
     margin-bottom: 1rem;
     width: 100%;
     text-align: center;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.password-wrapper {
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* 👁️ Password visibility toggle */
+  .password-wrapper {
     position: relative;
     display: flex;
     align-items: center;
@@ -124,16 +131,22 @@
     padding-right: 40px;
   }
   
-  .pass-icon {
+  .pass-icon-btn {
     position: absolute;
-    right: 12px;
-    width: 22px;
-    height: 22px;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
     cursor: pointer;
-    opacity: 0.6;
+    padding: 0;
+    margin: 0;
+    color: #777;
+    opacity: 0.7;
   }
   
-  .pass-icon:hover {
+  .pass-icon-btn:hover {
+    color: #000;
     opacity: 1;
   }
   

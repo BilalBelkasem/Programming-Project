@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import '../Css/LoginPagina.css';
-import logo from '../../assets/logo Erasmus.png';
-import hideIcon from '../../assets/download.png'; 
 
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
   const [wachtwoord, setWachtwoord] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // toggle
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -21,11 +20,11 @@ export default function LoginPagina({ onLogin }) {
 
     try {
       const response = await axios.post('http://localhost:5000/api/login', {
-        email: email,
+        email,
         password: wachtwoord
       });
 
-      if (response.data && response.data.token && response.data.user) {
+      if (response.data?.token && response.data?.user) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
         if (onLogin) onLogin(response.data.user);
@@ -53,9 +52,6 @@ export default function LoginPagina({ onLogin }) {
   return (
     <div className="page">
       <div className="login-container">
-        <div className="logo-container">
-          <img src={logo} alt="Erasmus Logo" className="login-logo" />
-        </div>
         <h2 className="login-title">Inloggen</h2>
 
         <form onSubmit={handleSubmit} className="login-form">
@@ -82,22 +78,20 @@ export default function LoginPagina({ onLogin }) {
                 required
                 placeholder="Voer je wachtwoord in"
               />
-              <img
-                src={hideIcon}
-                alt="toon/verberg wachtwoord"
-                className="pass-icon"
+              <button
+                type="button"
                 onClick={() => setShowPassword(!showPassword)}
-              />
+                className="pass-icon"
+              >
+                {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+
+              </button>
             </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}
 
-          <button
-            type="submit"
-            className="login-button"
-            disabled={isLoading}
-          >
+          <button type="submit" className="login-button" disabled={isLoading}>
             {isLoading ? 'Bezig...' : 'Inloggen'}
           </button>
         </form>
@@ -105,12 +99,8 @@ export default function LoginPagina({ onLogin }) {
         <div className="register-links">
           <p>Nog geen account?</p>
           <div className="register-options">
-            <Link to="/registreer" className="register-link">
-              Registreer als student
-            </Link>
-            <Link to="/bedrijf-registratie" className="register-link company">
-              Registreer je bedrijf
-            </Link>
+            <Link to="/registreer" className="register-link">Registreer als student</Link>
+            <Link to="/bedrijf-registratie" className="register-link company">Registreer je bedrijf</Link>
             <Link to="/" className="back-button">← Terug naar startpagina</Link>
             <Link to="/admin" className="admin-button">Admin login</Link>
           </div>
