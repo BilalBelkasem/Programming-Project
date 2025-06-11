@@ -3,30 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../Css/BFavorietenBezoeker.css'
 
-export default function BFavorietenStudenten({favorieten, onUnsave }){
- const navigate = useNavigate();
+export default function BFavorietenStudenten({ favorieten, onUnsave }) {
+  const navigate = useNavigate();
 
   return (
     <div className="pageWrapper">
       <header className="header">
-              <img src={logo} alt="Erasmus Logo" className="logo" />
-      
-              <nav className="nav">
-                <a href="/dashboard" className="navLink">Info</a>
-                <a href="/bedrijven" className="navLink">Bedrijven</a>
-                <a href="/plattegrond" className="navLink">Plattegrond</a>
-                <a href="/favorieten" className="navLink">Favorieten</a>
-                <a href="/profiel-bedrijf" className="navLink">Mijn Profiel</a>
-              </nav>
-        </header>
+        <img src={logo} alt="Erasmus Logo" className="logo" />
+
+        <nav className="nav">
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/mijn-profiel" className="navLink">mijn profiel</Link>
+        </nav>
+
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+      </header>
 
       <main className="main">
         <h2 className="title">Opgeslagen studenten</h2>
         <div className="studentenContainer">
-          {studenten.length === 0 ? (
+          {favorieten.length === 0 ? (
             <p>Je hebt nog geen studenten opgeslagen.</p>
           ) : (
-            studenten.map((student) => (
+            favorieten.map((student) => (
               <div key={student.id} className="studentCard">
                 <h3 className="studentNaam">{student.naam}</h3>
                 <p className="studentBeschrijving">{student.beschrijving}</p>

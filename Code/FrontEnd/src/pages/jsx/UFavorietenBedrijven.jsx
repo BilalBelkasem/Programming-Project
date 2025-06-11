@@ -3,25 +3,34 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../css/UFavorietenBedrijven.css';
 
+console.log("UFavorietenBedrijven geladen");
+
+
 export default function UFavorietenBedrijven({ favorieten, onUnsave }) {
   const navigate = useNavigate();
-
+console.log("UFavorietenBedrijven geladen");
   return (
+    
     <div className="pageWrapper">
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
 
         <nav className="nav">
-          <a href="/dashboard" className="navLink">Info</a>
-          <a href="/bedrijven" className="navLink">Bedrijven</a>
-          <a href="/plattegrond" className="navLink">Plattegrond</a>
-          <a href="/favorieten" className="navLink">Favorieten</a>
-          <a href="/profiel-bedrijf" className="navLink">Mijn Profiel</a>
-          <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/mijn-profiel" className="navLink">mijn profiel</Link>
         </nav>
+
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
       <main className="main">
+
+<h2>Favoriete bedrijven</h2>
+
+
         <h2 className="title">Mijn favorieten</h2>
         <div className="bedrijvenContainer">
           {favorieten.length === 0 ? (
