@@ -28,9 +28,22 @@
   border-radius: 8px;
 }
 
+.admin-title-block {
+  display: flex;
+  flex-direction: column;
+  color: white;
+  font-weight: 600;
+}
+
 .admin-title {
   font-size: 22px;
   font-weight: 600;
+}
+
+.admin-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  margin-top: 2px;
 }
 
 .admin-buttons {
@@ -39,7 +52,8 @@
   gap: 20px;
 }
 
-.terug-knop, .logout-knop {
+.terug-knop,
+.logout-knop {
   background-color: #d62828;
   color: white;
   border: none;
@@ -54,7 +68,8 @@
   transition: background-color 0.3s ease;
 }
 
-.terug-knop:hover, .logout-knop:hover {
+.terug-knop:hover,
+.logout-knop:hover {
   background-color: #b51f1f;
 }
 
@@ -95,11 +110,6 @@
 
 .student-kaart:hover {
   background-color: #fcd0d0;
-}
-
-.student-info {
-  display: flex;
-  flex-direction: column;
 }
 
 .student-naam {
