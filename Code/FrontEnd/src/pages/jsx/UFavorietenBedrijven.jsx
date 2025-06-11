@@ -3,10 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../css/UFavorietenBedrijven.css';
 
+console.log("UFavorietenBedrijven geladen");
+
+
 export default function UFavorietenBedrijven({ favorieten, onUnsave }) {
   const navigate = useNavigate();
-
+console.log("UFavorietenBedrijven geladen");
   return (
+    
     <div className="pageWrapper">
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
@@ -22,6 +26,10 @@ export default function UFavorietenBedrijven({ favorieten, onUnsave }) {
       </header>
 
       <main className="main">
+
+<h2>Favoriete bedrijven</h2>
+
+
         <h2 className="title">Mijn favorieten</h2>
         <div className="bedrijvenContainer">
           {favorieten.length === 0 ? (

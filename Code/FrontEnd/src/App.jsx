@@ -35,6 +35,8 @@ export default function App() {
   useEffect(() => {
     if (user) {
       localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
     }
   }, [user]);
 
@@ -71,7 +73,6 @@ export default function App() {
             <UInfoPagina onLogout={() => {
               setIsLoggedIn(false);
               setUser(null);
-              localStorage.removeItem('user');
             }} />
           ) : (
             <Navigate to="/bedrijven" />
@@ -90,11 +91,6 @@ export default function App() {
 
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
-
-      <Route path="/b-favorieten" element={<BFavorietenStudenten 
-          favorieten={favorieteStudenten}
-          onUnsave={(id) => setFavorieteStudenten((prev) => 
-            prev.filter((s) => s.id !== id))}/>}/>
 
       <Route path="/favorieten" element={
         isLoggedIn && user?.role === 'student' ? (
