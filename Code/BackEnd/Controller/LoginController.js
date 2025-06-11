@@ -47,10 +47,14 @@ const login = async (req, res) => {
       
       res.json({
         token,
-        user: { message: 'Login successful', token },
+        user: {
+        id: user.id,
+        email: user.email,
         name: user.voornaam || null,
         role: user.role
+              }
       });
+
     });
   } catch (error) {
     console.error('Login error:', error);
