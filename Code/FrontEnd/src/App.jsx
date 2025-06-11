@@ -18,7 +18,7 @@ import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
 import UBedrijfView from './pages/jsx/UProfielBedrijfView.jsx';
-
+import Bedrijveninfo from './pages/jsx/bedrijveninfopagina.jsx'
 
 export default function App() {
   // Persistent isLoggedIn state via localStorage
@@ -76,7 +76,7 @@ export default function App() {
 
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
-
+      <Route path="/BedrijfInfo" element={<Bedrijveninfo />} />
 
       <Route path="/b-favorieten" element={<BFavorietenStudenten 
           favorieten={favorieteStudenten}
