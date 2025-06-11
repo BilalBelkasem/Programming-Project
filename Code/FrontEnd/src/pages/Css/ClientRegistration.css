@@ -1,54 +1,66 @@
-.register-container {
+.register-page {
+    background-color: #f8fafc;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+.register-box {
+    background-color: white;
+    padding: 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: #f8fafc;
-    padding: 2rem;
-    font-family: 'Segoe UI', Roboto, sans-serif; 
+    animation: fadeIn 0.4s ease-out forwards;
+}
+
+.logo {
+    width: 70px;
+    margin-bottom: 1.5rem;
 }
 
 .title {
     font-size: 1.75rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
-
-    text-transform: capitalize; 
+    margin-bottom: 0.3rem;
+    color: #e30613;
+    text-transform: capitalize;
+    text-align: center;
 }
 
 .subtitle {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 2rem;
+    font-size: 1rem;
+    font-weight: 500;
     color: #6b7280;
+    margin-bottom: 1.5rem;
+    text-align: center;
 }
 
 .register-form {
     width: 100%;
-    max-width: 24rem;
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .form-label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
     font-weight: 600;
-    color: #374151;
     font-size: 0.9rem;
+    color: #374151;
 }
 
 .form-input {
     width: 100%;
     padding: 0.75rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     font-size: 1rem;
-    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .form-input:focus {
@@ -58,75 +70,46 @@
 
 .register-button {
     width: 100%;
-    padding: 0.75rem;
+    background-color: #e30613;
     color: white;
     font-weight: 600;
-    cursor: pointer;
+    padding: 0.75rem;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
-    transition: all 0.3s ease;
+    cursor: pointer;
     margin-top: 0.5rem;
+    transition: background-color 0.3s ease;
 }
 
 .register-button:hover {
-    transform: translateY(-1px);
-}
-
-.register-button:active {
-    transform: translateY(0);
+    background-color: #c80010;
 }
 
 .back-text {
-    margin-top: 1.5rem;
+    margin-top: 1rem;
+    display: block;
     text-align: center;
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     color: #6b7280;
-    cursor: pointer;
-    transition: color 0.2s;
+    text-decoration: none;
+}
+
+.back-text:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: red;
+    background-color: #ffe5e5;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    width: 100%;
+    text-align: center;
 }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
-}
-
-.register-form {
-    animation: fadeIn 0.4s ease-out forwards;
-}
-.register-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: #f8fafc;
-    padding: 2rem;
-    font-family: 'Segoe UI', Roboto, sans-serif;
-}
-
-.title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: #e30613; 
-    text-transform: capitalize;
-}
-
-.subtitle {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 2rem;
-    color: #6b7280;
-}
-
-.back-text:hover {
-    color: #6b7280; 
-    text-decoration: underline; 
-    text-underline-offset: 3px; 
-}
-.logo {
-    width: 60px; /* of elke gewenste grootte in pixels */
-    height: 60px; /* behoud aspect ratio */
-    margin-bottom: 2rem; /* ruimte onder de logo */
 }
