@@ -114,7 +114,7 @@ export default function CompanyRegistrationForm() {
       </div>
 
       <button type="submit" className="form-button">Registreren</button>
-      <Link to="/login" className="form-back">Terug</Link>
+      <Link to="/login" className="form-back">← Terug</Link>
     </form>
   );
 }

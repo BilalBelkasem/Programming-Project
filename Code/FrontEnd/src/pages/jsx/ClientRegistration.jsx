@@ -91,7 +91,7 @@ const Register = () => {
           <input type="password" name="herhaalWachtwoord" value={form.herhaalWachtwoord} onChange={handleChange} className="form-input" required />
 
           <button type="submit" className="register-button">registreren</button>
-          <Link to="/login" className="back-text">terug</Link>
+          <Link to="/login" className="back-text">← terug</Link>
         </form>
       </div>
     </div>
