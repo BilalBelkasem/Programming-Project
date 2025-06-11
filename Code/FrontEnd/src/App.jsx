@@ -65,10 +65,10 @@ export default function App() {
         }
       />
 
-      <Route
-        path="/bedrijven"
+      <Route path="/bedrijven"
         element={isLoggedIn ? <UBedrijven /> : <Navigate to="/login" />}
       />
+      
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/studenten" element={<AdminStudent />} />
       <Route path="/admin/bedrijven" element={<AdminBedrijf />} />
