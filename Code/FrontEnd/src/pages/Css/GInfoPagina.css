@@ -92,62 +92,59 @@
 
 /* BANNER SECTION ENHANCEMENTS */
 .banner-section {
-  background-size: cover;
-  background-position: center;
-  height: 100vh;
-  min-height: 600px;
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: auto;
   margin-top: 69px;
+  padding: 0;
+  overflow: visible; /* Changed from hidden to visible */
+  display: block;
+  background-color: transparent;
+}
+
+.banner {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .scroll-down-button {
   position: absolute;
-  bottom: 50px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(255, 255, 255, 0.9);
   border: none;
-  color: white;
+  color: #d63031;
   font-size: 28px;
-  width: 55px;
-  height: 55px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.4s ease;
-  animation: pulse 2s infinite;
-}
-
-.scroll-down-button:hover {
-  background: rgba(214, 48, 49, 0.9);
-  transform: translateX(-50%) translateY(5px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-@keyframes pulse {
-  0% { transform: translateX(-50%) scale(1); }
-  50% { transform: translateX(-50%) scale(1.1); }
-  100% { transform: translateX(-50%) scale(1); }
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 100;
 }
 
 /* MAIN CONTENT UPGRADES */
 .main {
-  padding: 80px 5% 100px;
+  padding: 0;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .text-block {
-  background: linear-gradient(135deg, #ffffff 0%, #f9f9f9 100%);
-  border-radius: 20px;
-  padding: 50px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-  max-width: 1000px;
-  margin: 0 auto;
-  border: 1px solid #eee;
+  background: white;
+  border: 1px solid #eaeaea;
+  border-radius: 0;
+  padding: 40px;
+  margin-top: -20px;
+  position: relative;
 }
 
 .intro {
@@ -272,8 +269,9 @@
   }
   
   .banner-section {
-    height: 60vh;
-    min-height: 400px;
+    height: auto;
+    min-height: auto;
+    margin-top: 69px; /* Keep consistent with desktop */
   }
   
   .text-block {
@@ -288,9 +286,4 @@
   .section-title {
     font-size: 22px;
   }
-
-  .banner-section {
-    background-color: red;
-  }
-  
 }

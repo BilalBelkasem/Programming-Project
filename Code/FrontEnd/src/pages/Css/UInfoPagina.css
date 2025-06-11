@@ -43,6 +43,10 @@
   .main {
     padding: 30px 40px;
     background-color: #ffffff;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 1200px;
+    margin: 0 auto;
   }
   
   .title {
@@ -53,8 +57,10 @@
   .banner {
     width: 100%;
     height: auto;
+    max-width: 100%;
     border-radius: 10px;
     margin-bottom: 30px;
+    object-fit: contain;
   }
   
   .text-block {

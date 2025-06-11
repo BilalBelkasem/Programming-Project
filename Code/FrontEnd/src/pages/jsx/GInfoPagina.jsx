@@ -25,13 +25,12 @@ export default function GInfoPagina() {
         </nav>
       </header>
 
-      <section className="banner-section" style={{ backgroundImage: `url(${logo})` }}>
-      <img src={careerBanner} alt="CareerLaunch banner" className="banner" />
+      <section className="banner-section">
+        <img src={careerBanner} alt="CareerLaunch banner" className="banner" />
         <button 
           className="scroll-down-button" 
           onClick={scrollToContent}
           aria-label="Scroll naar content"
-          
         >
           ⌄
         </button>
