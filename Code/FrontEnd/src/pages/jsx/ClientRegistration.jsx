@@ -24,14 +24,12 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
-    
+
     if (form.wachtwoord !== form.herhaalWachtwoord) {
       setError('Wachtwoorden komen niet overeen.');
       return;
     }
 
-    
     if (form.wachtwoord.length < 6) {
       setError('Wachtwoord moet minimaal 6 tekens bevatten.');
       return;
@@ -39,29 +37,27 @@ const Register = () => {
 
     try {
       setLoading(true);
-      // Transform data to match backend expectations
       const userData = {
         firstName: form.voornaam,
         lastName: form.naam,
         email: form.email,
-        password: form.wachtwoord, 
-        role: 'student' 
+        password: form.wachtwoord,
+        role: 'student'
       };
 
       const response = await axios.post('http://localhost:5000/api/register', userData);
-      
+
       console.log('Registratie succesvol:', response.data);
-      
+
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
-      
-      // Navigate to login page or dashboard
+
       navigate('/login');
     } catch (err) {
       console.error('Registration error:', err);
       setError(
-        err.response?.data?.error || 
+        err.response?.data?.error ||
         'Er is een fout opgetreden bij het registreren. Probeer het later opnieuw.'
       );
     } finally {
@@ -70,32 +66,34 @@ const Register = () => {
   };
 
   return (
-    <div className="register-container">
-      <img src={logo} alt="Erasmus Logo" className="logo" />
-      <h2 className="title">registreren</h2>
-      <h3 className="subtitle">student</h3>
-      
-      {error && <div className="error-message">{error}</div>}
-      
-      <form onSubmit={handleSubmit} className="register-form">
-        <label className="form-label">voornaam*</label>
-        <input type="text" name="voornaam" value={form.voornaam} onChange={handleChange} className="form-input" required />
+    <div className="register-page">
+      <div className="register-box">
+        <img src={logo} alt="Erasmus Logo" className="login-logo" />
+        <h2 className="title">Registreren</h2>
+        <h3 className="subtitle">student</h3>
 
-        <label className="form-label">naam*</label>
-        <input type="text" name="naam" value={form.naam} onChange={handleChange} className="form-input" required />
+        {error && <div className="error-message">{error}</div>}
 
-        <label className="form-label">email*</label>
-        <input type="email" name="email" value={form.email} onChange={handleChange} className="form-input" required />
+        <form onSubmit={handleSubmit} className="register-form">
+          <label className="form-label">voornaam*</label>
+          <input type="text" name="voornaam" value={form.voornaam} onChange={handleChange} className="form-input" required />
 
-        <label className="form-label">wachtwoord*</label>
-        <input type="password" name="wachtwoord" value={form.wachtwoord} onChange={handleChange} className="form-input" required />
+          <label className="form-label">naam*</label>
+          <input type="text" name="naam" value={form.naam} onChange={handleChange} className="form-input" required />
 
-        <label className="form-label">wachtwoord herhalen*</label>
-        <input type="password" name="herhaalWachtwoord" value={form.herhaalWachtwoord} onChange={handleChange} className="form-input" required />
+          <label className="form-label">email*</label>
+          <input type="email" name="email" value={form.email} onChange={handleChange} className="form-input" required />
 
-        <button type="submit" className="register-button">registreren</button>
-        <Link to="/login" className="back-text">terug</Link>
-      </form>
+          <label className="form-label">wachtwoord*</label>
+          <input type="password" name="wachtwoord" value={form.wachtwoord} onChange={handleChange} className="form-input" required />
+
+          <label className="form-label">wachtwoord herhalen*</label>
+          <input type="password" name="herhaalWachtwoord" value={form.herhaalWachtwoord} onChange={handleChange} className="form-input" required />
+
+          <button type="submit" className="register-button">registreren</button>
+          <Link to="/login" className="back-text">terug</Link>
+        </form>
+      </div>
     </div>
   );
 };
