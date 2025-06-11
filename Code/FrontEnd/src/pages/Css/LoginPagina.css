@@ -135,3 +135,17 @@ input:focus {
   color: #b02525;
   text-decoration: underline;
 }
+.admin-button {
+  padding: 10px;
+  background-color: #111;
+  color: white;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.admin-button:hover {
+  background-color: #333;
+  transform: scale(1.03);
+}
