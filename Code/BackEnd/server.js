@@ -1,46 +1,76 @@
-import dotenv from 'dotenv';
-import express from 'express';
-import mysql from 'mysql2';
-import cors from 'cors';
-import protectedRoutes from './routes/authRoutes.js';
-
-// Laad de .env variabelen
-dotenv.config();
+const express = require('express');
+const mysql = require('mysql2/promise');
+const cors = require('cors');
+require('dotenv').config();
+const protectedRoutes = require('./routes/authRoutes');
 
 const app = express();
 
 // Middleware
+app.use((req, res, next) => {
+  console.log(`Incoming request: ${req.method} ${req.url}`);
+  next();
+});
+
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public', {
+  index: 'public.html'
+}));
 app.use('/api', protectedRoutes);
 
-// Debug: toon welke waarden geladen zijn uit .env
-console.log("Config geladen uit .env:", {
+// Create MySQL connection pool
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  socketPath: process.env.DB_SOCKET
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-// MySQL connectie via socket (MAMP)
-const db = mysql.createConnection({
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  socketPath: process.env.DB_SOCKET // Geen host/port nodig bij socket
+// Make the pool available to routes
+app.use((req, res, next) => {
+  req.db = pool;
+  next();
 });
 
-// Verbind met database
-db.connect((err) => {
-  if (err) {
-    console.error('❌ Fout bij verbinden met database:', err.message);
-    return;
+// Routes
+const studentRoutes = require('./students');
+const badgeRoutes = require('./badge');
+
+// Mount routes
+app.use('/api/students', studentRoutes);
+app.use('/api/badges', badgeRoutes); // All badge routes will be under /api/badges
+
+// Test routes
+app.get('/api/test-direct', (req, res) => {
+  res.send('Direct route works!');
+});
+
+app.get('/api/users', async (req, res) => {
+  try {
+    const [users] = await req.db.query('SELECT id, name FROM users WHERE role = "student"');
+    res.json(users);
+  } catch (err) {
+    console.error('Users route error:', err);
+    res.status(500).json({ error: err.message });
   }
-  console.log('✅ Verbonden met MySQL database via socket.');
 });
 
-// Start de server
-const PORT = process.env.PORT || 5000;
+app.get('/', (req, res) => {
+  res.send('Server is up and running!');
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Server error:', err.stack);
+  res.status(500).send('Something broke!');
+});
+
+// Start server
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server draait op poort ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
