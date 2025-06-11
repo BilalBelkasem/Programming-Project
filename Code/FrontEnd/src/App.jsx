@@ -18,6 +18,8 @@ import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
 import UBedrijfView from './pages/jsx/UProfielBedrijfView.jsx';
+import Bedrijveninfo from './pages/jsx/bedrijveninfopagina.jsx'
+
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -92,35 +94,18 @@ export default function App() {
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
 
-      <Route path="/mijn-profiel" element={
-        isLoggedIn && user?.role === 'student' ? (
-          <ProfielStudent />
-        ) : isLoggedIn && user?.role === 'bedrijf' ? (
-          <ProfielBedrijven />
-        ) : (
-          <Navigate to="/login" />
-        )
-      } />
+      <Route path="/BedrijfInfo" element={<Bedrijveninfo />} />
 
-      <Route path="/favorieten" element={
-        isLoggedIn && user?.role === 'student' ? (
-          <UFavorietenBedrijven 
-            favorieten={favorieteBedrijven}
-            onUnsave={(id) =>
-              setFavorieteBedrijven((prev) => prev.filter((b) => b.id !== id))
-            }
-          />
-        ) : isLoggedIn && user?.role === 'bedrijf' ? (
-          <BFavorietenStudenten
-            favorieten={favorieteStudenten}
-            onUnsave={(id) =>
-              setFavorieteStudenten((prev) => prev.filter((s) => s.id !== id))
-            }
-          />
-        ) : (
-          <Navigate to="/login" />
-        )
-      } />
+      <Route path="/b-favorieten" element={<BFavorietenStudenten 
+          favorieten={favorieteStudenten}
+          onUnsave={(id) => setFavorieteStudenten((prev) => 
+            prev.filter((s) => s.id !== id))}/>}/>
+      
+      <Route path="/favorieten" element={isLoggedIn ? (
+      <UFavorietenBedrijven favorieten={favorieteBedrijven} onUnsave={(id) =>
+          setFavorieteBedrijven((prev) => prev.filter((b) => b.id !== id))}/>
+      ) : (<Navigate to="/login" />)}/>
+
     </Routes>
   );
 }
