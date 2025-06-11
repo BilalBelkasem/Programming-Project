@@ -42,78 +42,116 @@ async function renderBadgeHTML(data, student = null) {
   }
 
   return `
-    <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
-          .badge { 
-            border: 2px solid #000; 
-            padding: 20px; 
-            width: 400px;
-            background-color: ${isNewFormat ? (data.background_color || '#f8f9fa') : '#ffffff'};
-            color: ${isNewFormat ? (data.text_color || '#333333') : '#000000'};
-          }
-          .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-          }
-          .logo {
-            max-height: 30px;
-          }
-          .qr { 
-            margin-top: 20px;
-            text-align: center;
-          }
-          ul { 
-            padding-left: 20px;
-            margin: 10px 0;
-          }
-          .badge-type {
-            font-style: italic;
-            color: #666;
-            margin-bottom: 10px;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="badge">
-          ${isNewFormat ? `
-            <div class="header">
-            ${data.default_logo ? `<img src="${process.env.BASE_URL || 'http://localhost:3000'}/assets/default-logo.png" class="logo" alt="Logo">` : ''}            </div>
-              <h2>${name}</h2>
-            <div class="badge-type">${data.template_type ? data.template_type.toUpperCase() : ''} BADGE</div>
+  <html>
+    <head>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          padding: 20px;
+        }
+        .keycord-hole {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 10px;
+        }
+        .hole {
+          width: 10px;
+          height: 10px;
+          background-color: black;
+          border-radius: 50%;
+        }
+        .badge {
+          border: 2px solid #000;
+          padding: 30px;
+          width: 450px;
+          background-color: #ffffff;
+          color: #000000;
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          margin-bottom: 30px;
+        }
+        .logo {
+          max-height: 25px;
+          margin-right: 20px;
+        }
+        .content {
+          text-align: center;
+        }
+        .content h2 {
+          margin: 0 0 10px 0;
+        }
+        .content p {
+          margin: 5px 0;
+        }
+        .badge-type {
+          font-style: italic;
+          color: red;
+          margin-top: 20px;
+          font-weight: bold;
+        }
+        .qr {
+          margin-top: 30px;
+          text-align: center;
+        }
+        ul {
+          padding-left: 20px;
+          margin: 10px 0;
+          text-align: left;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="badge">
+        <div class="keycord-hole">
+          <div class="hole"></div>
+        </div>
+
+        ${isNewFormat ? `
+          <div class="header">
+            ${data.default_logo ? `<img src="${process.env.BASE_URL || 'http://localhost:3000'}/assets/default-logo.png" class="logo" alt="Logo">` : ''}
+          </div>
+          <div class="content">
+            <h2>${name}</h2>
             ${title ? `<p><strong>${title}</strong></p>` : ''}
             ${organization ? `<p>${organization}</p>` : ''}
-          ` : `
-            <h2>${name}</h2>
-            <p><strong>${organization}</strong> - ${title}</p>
-            ${about ? `<p>${about}</p>` : ''}
-          `}
-
-          ${!isNewFormat && interests.length > 0 ? `
-            <h4>Interesses:</h4>
-            <ul>
-              ${interests.map(interest => `<li>${interest}</li>`).join('')}
-            </ul>
-          ` : ''}
-
-          ${!isNewFormat && domains.length > 0 ? `
-            <h4>Domeinen:</h4>
-            <ul>
-              ${domains.map(domain => `<li>${domain}</li>`).join('')}
-            </ul>
-          ` : ''}
-
-          <div class="qr">
-            <img src="${qrDataURL}" width="150" />
-            ${isNewFormat ? `<p>Scan voor verificatie</p>` : ''}
+            <div class="badge-type">${data.template_type ? data.template_type.toUpperCase() : ''} BADGE</div>
           </div>
+        ` : `
+          <h2 style="text-align: center;">${name}</h2>
+          <p style="text-align: center;"><strong>${organization}</strong> - ${title}</p>
+          ${about ? `<p style="text-align: center;">${about}</p>` : ''}
+        `}
+
+        ${!isNewFormat && interests.length > 0 ? `
+          <h4 style="text-align: left;">Interesses:</h4>
+          <ul>
+            ${interests.map(interest => `<li>${interest}</li>`).join('')}
+          </ul>
+        ` : ''}
+
+        ${!isNewFormat && domains.length > 0 ? `
+          <h4 style="text-align: left;">Domeinen:</h4>
+          <ul>
+            ${domains.map(domain => `<li>${domain}</li>`).join('')}
+          </ul>
+        ` : ''}
+
+        <div class="qr">
+          <img src="${qrDataURL}" width="150" />
+          ${isNewFormat ? `<p>Scan voor het bekijken van het profiel</p>` : ''}
         </div>
-      </body>
-    </html>
-  `;
+      </div>
+    </body>
+  </html>
+`;
+
+
+
+
+
 }
 
 module.exports = renderBadgeHTML;
