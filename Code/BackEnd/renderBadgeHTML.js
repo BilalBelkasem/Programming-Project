@@ -3,7 +3,7 @@ const QRCode = require('qrcode');
 async function renderBadgeHTML(data, student = null) {
   // Determine if we're receiving new badge assignment format or old student format
   const isNewFormat = data.badge_id !== undefined;
-  
+
   let qrDataURL, name, title, organization, school, interests, domains, about;
 
   if (isNewFormat) {
@@ -11,7 +11,7 @@ async function renderBadgeHTML(data, student = null) {
     name = data.custom_name || data.user_name;
     title = data.custom_title || '';
     organization = data.custom_organization || '';
-    
+
     // Generate QR code from either URL or data
     qrDataURL = await QRCode.toDataURL(data.qr_code_url || data.qr_code_data || `https://careerlaunch.be/verify/${data.id}`);
   } else {
@@ -21,10 +21,10 @@ async function renderBadgeHTML(data, student = null) {
     title = `${student.education} (${student.year})`;
     organization = student.school;
     about = student.about;
-    
+
     // Generate QR code for student
     qrDataURL = await QRCode.toDataURL(`https://careerlaunch.be/student/${user.id}`);
-    
+
     // Prepare interests and domains lists if they exist
     interests = [
       student.interest_jobstudent ? 'Jobstudent' : null,
@@ -32,7 +32,7 @@ async function renderBadgeHTML(data, student = null) {
       student.interest_job ? 'Job' : null,
       student.interest_connect ? 'Connecties' : null
     ].filter(Boolean);
-    
+
     domains = [
       student.domain_data ? 'Data' : null,
       student.domain_networking ? 'Networking' : null,
@@ -60,7 +60,7 @@ async function renderBadgeHTML(data, student = null) {
             margin-bottom: 20px;
           }
           .logo {
-            max-height: 60px;
+            max-height: 30px;
           }
           .qr { 
             margin-top: 20px;
@@ -81,9 +81,8 @@ async function renderBadgeHTML(data, student = null) {
         <div class="badge">
           ${isNewFormat ? `
             <div class="header">
+            ${data.default_logo ? `<img src="${process.env.BASE_URL || 'http://localhost:3000'}/assets/default-logo.png" class="logo" alt="Logo">` : ''}            </div>
               <h2>${name}</h2>
-              ${data.default_logo ? '<img src="https://careerlaunch.be/logo.png" class="logo" alt="Logo">' : ''}
-            </div>
             <div class="badge-type">${data.template_type ? data.template_type.toUpperCase() : ''} BADGE</div>
             ${title ? `<p><strong>${title}</strong></p>` : ''}
             ${organization ? `<p>${organization}</p>` : ''}
