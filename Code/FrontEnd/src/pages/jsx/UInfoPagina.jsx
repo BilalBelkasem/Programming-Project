@@ -5,19 +5,24 @@ import careerBanner from '../../assets/Banner C.png';
 import '../Css/UInfoPagina.css';
 
 export default function UInfoPagina({ onLogout }) {
+  const handleLogout = () => {
+    onLogout(); 
+  };
+
   return (
     <div className="page-wrapper">
       {/* Header */}
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
+
         <nav className="nav">
-          <Link to="/dashboard" className="nav-link">info</Link>
-          <Link to="/bedrijven" className="nav-link">bedrijven</Link>
-          <Link to="/plattegrond" className="nav-link">plattegrond</Link>
-          <Link to="/favorieten" className="nav-link">favorieten</Link>
-          <Link to="/profiel-bedrijf" className="nav-link">mijn profiel</Link>
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/mijn-profiel" className="nav-link">mijn profiel</Link>
         </nav>
-        <div onClick={onLogout} className="logout-icon" title="Uitloggen">⇦</div>
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
       {/* Info Content */}

@@ -12,6 +12,7 @@ import AdminBedrijf from './pages/jsx/AdminBedrijf.jsx';
 import AdminBadge from './pages/jsx/AdminBadge.jsx';
 import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
 import ProfielBedrijven from './pages/jsx/ProfielBedrijven.jsx';
+import ProfielStudent from './pages/jsx/ProfielStudent.jsx';
 import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
 import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
@@ -64,7 +65,6 @@ export default function App() {
 
       <Route path="/bedrijf-registratie" element={<CompanyRegistrationForm />} />
       <Route path="/registreer" element={<ClientRegistration />} />
-      <Route path="/profiel-bedrijf" element={<ProfielBedrijven />} />
 
       <Route
         path="/dashboard"
@@ -91,6 +91,16 @@ export default function App() {
 
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
+
+      <Route path="/mijn-profiel" element={
+        isLoggedIn && user?.role === 'student' ? (
+          <ProfielStudent />
+        ) : isLoggedIn && user?.role === 'bedrijf' ? (
+          <ProfielBedrijven />
+        ) : (
+          <Navigate to="/login" />
+        )
+      } />
 
       <Route path="/favorieten" element={
         isLoggedIn && user?.role === 'student' ? (
