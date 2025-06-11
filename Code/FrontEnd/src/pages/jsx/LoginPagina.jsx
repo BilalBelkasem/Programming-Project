@@ -23,6 +23,7 @@ export default function LoginPagina({ onLogin }) {
       });
 
       if (response.data && response.data.token && response.data.user) {
+        console.log('Login response:', response.data);
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
 

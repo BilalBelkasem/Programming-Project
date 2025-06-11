@@ -16,13 +16,14 @@ console.log("UFavorietenBedrijven geladen");
         <img src={logo} alt="Erasmus Logo" className="logo" />
 
         <nav className="nav">
-          <a href="/dashboard" className="navLink">Info</a>
-          <a href="/bedrijven" className="navLink">Bedrijven</a>
-          <a href="/plattegrond" className="navLink">Plattegrond</a>
-          <a href="/favorieten" className="navLink">Favorieten</a>
-          <a href="/profiel-bedrijf" className="navLink">Mijn Profiel</a>
-          <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/mijn-profiel" className="navLink">mijn profiel</Link>
         </nav>
+
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
       <main className="main">

@@ -50,13 +50,13 @@ const handleLogout = () => {
     <div className="pageWrapper">
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
-        
+
         <nav className="nav">
           <Link to="/dashboard" className="navLink">Info</Link>
           <Link to="/bedrijven" className="navLink">Bedrijven</Link>
           <Link to="/plattegrond" className="navLink">Plattegrond</Link>
           <Link to="/favorieten" className="navLink">Favorieten</Link>
-          <Link to="/profiel-bedrijf" className="navLink">Mijn Profiel</Link>
+          <Link to="/mijn-profiel" className="navLink">mijn profiel</Link>
         </nav>
 
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
