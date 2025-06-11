@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import plattegrondImg from "../../assets/plattegrond.png";
 import logo from "../../assets/logo Erasmus.png";
-import "../Css/UPlatteGrond.css";
+import "../Css/GPlatteGrond.css";
 
 const legendItems = [
   { id: 1, naam: "TechNova" },
