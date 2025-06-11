@@ -22,36 +22,24 @@ export default function LoginPagina({ onLogin }) {
         password: wachtwoord
       });
 
-      console.log('Login response:', response);
-
-      // Only proceed if we have a valid token
       if (response.data && response.data.token) {
         localStorage.setItem('token', response.data.token);
-        
-        // Call the onLogin callback if provided
-        if (onLogin) {
-          onLogin();
-        }
-        
+        if (onLogin) onLogin();
         navigate('/dashboard');
       } else {
-        // If no token in response, show an error
         setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
       }
     } catch (err) {
-      console.error('Login error:', err);
-      
-      // Display appropriate error messages based on the error
       if (err.response) {
         if (err.response.status === 401) {
           setError('Ongeldige e-mail of wachtwoord.');
-        } else if (err.response.data && err.response.data.error) {
+        } else if (err.response.data?.error) {
           setError(err.response.data.error);
         } else {
           setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
         }
       } else {
-        setError('Kan geen verbinding maken met de server. Controleer uw internetverbinding.');
+        setError('Kan geen verbinding maken met de server. Controleer je internetverbinding.');
       }
     } finally {
       setIsLoading(false);
@@ -59,13 +47,13 @@ export default function LoginPagina({ onLogin }) {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-box">
+    <div className="page">
+      <div className="login-container">
         <div className="logo-container">
           <img src={logo} alt="Erasmus Logo" className="login-logo" />
         </div>
         <h2 className="login-title">Inloggen</h2>
-        
+
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
             <label htmlFor="email">Email</label>
@@ -75,11 +63,10 @@ export default function LoginPagina({ onLogin }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="form-control"
-              placeholder="Voer je email in"
+              placeholder="Voer je e-mailadres in"
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">Wachtwoord</label>
             <input
@@ -88,22 +75,21 @@ export default function LoginPagina({ onLogin }) {
               value={wachtwoord}
               onChange={(e) => setWachtwoord(e.target.value)}
               required
-              className="form-control"
               placeholder="Voer je wachtwoord in"
             />
           </div>
-          
+
           {error && <div className="error-message">{error}</div>}
-          
-          <button 
-            type="submit" 
+
+          <button
+            type="submit"
             className="login-button"
             disabled={isLoading}
           >
             {isLoading ? 'Bezig...' : 'Inloggen'}
           </button>
         </form>
-        
+
         <div className="register-links">
           <p>Nog geen account?</p>
           <div className="register-options">
