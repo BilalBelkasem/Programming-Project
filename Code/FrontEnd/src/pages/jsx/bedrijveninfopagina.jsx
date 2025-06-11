@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-import '../Css/bedrijveninfopagina.css'
+import '../Css/bedrijveninfopagina.css';
 
 export default function UBedrijven({ onLogout }) {
   const [likedCompanies, setLikedCompanies] = useState([]);
@@ -47,7 +47,7 @@ export default function UBedrijven({ onLogout }) {
 
         <nav className="nav-links">
           <Link to="/" className="nav-btn info">info</Link>
-          <Link to="/BedrijfInfo" className="nav-btn">bedrijven</Link>
+          <Link to="/BedrijfInfo" className="nav-btn bedrijven-actief">bedrijven</Link>
           <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
           <Link to="/login" className="login-btn">login/registeren</Link>
         </nav>

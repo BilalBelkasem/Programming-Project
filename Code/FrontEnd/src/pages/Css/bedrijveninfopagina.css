@@ -1,3 +1,4 @@
+
 .navbar {
 display: flex;
 align-items: center;
@@ -98,4 +99,3 @@ color: #888;
 .likeButton.liked {
     color: red;
 }
-  
