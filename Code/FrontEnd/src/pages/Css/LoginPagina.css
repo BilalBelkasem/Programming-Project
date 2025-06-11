@@ -120,3 +120,18 @@ input:focus {
 .register-link:hover {
   background-color: #b02525;
 }
+
+.back-button {
+  display: inline-block;
+  margin-top: 25px;
+  color: #d63031;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.back-button:hover {
+  color: #b02525;
+  text-decoration: underline;
+}
