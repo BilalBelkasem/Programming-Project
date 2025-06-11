@@ -1,24 +1,30 @@
-
 import React, { useState } from 'react';
 import logo from '../../assets/logo Erasmus.png';
 import '../../pages/Css/AdminStudent.css';
 import { FaSignOutAlt, FaTrash, FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
-const studentenData = [
-  { id: 1, naam: 'Marwan Amakran', school: 'EHB' },
-  { id: 2, naam: 'Aymen Bounasnaa', school: 'EHB' },
-  { id: 3, naam: 'Denis Bujorean', school: 'EHB' }
-];
-
 export default function AdminStudent() {
   const [zoekterm, setZoekterm] = useState('');
+  const [studenten, setStudenten] = useState([
+    { id: 1, naam: 'Marwan Amakran', school: 'EHB' },
+    { id: 2, naam: 'Aymen Bounasnaa', school: 'EHB' },
+    { id: 3, naam: 'Denis Bujorean', school: 'EHB' }
+  ]);
+
   const navigate = useNavigate();
 
   const handleLogout = () => navigate('/');
   const handleBack = () => navigate('/admin');
 
-  const gefilterdeStudenten = studentenData.filter(student =>
+  const handleVerwijder = (id, naam) => {
+    const bevestiging = window.confirm(`Ben je zeker dat je ${naam} wilt verwijderen?`);
+    if (bevestiging) {
+      setStudenten(prev => prev.filter(student => student.id !== id));
+    }
+  };
+
+  const gefilterdeStudenten = studenten.filter(student =>
     student.naam.toLowerCase().includes(zoekterm.toLowerCase())
   );
 
@@ -29,14 +35,16 @@ export default function AdminStudent() {
           <img src={logo} alt="logo" className="admin-logo" />
           <span className="admin-title">admin</span>
         </div>
-       <div className="admin-buttons">
-        <div className="back-wrapper" onClick={handleBack}>
-        <FaArrowLeft className="back-icon" />
-        <span className="back-text">Terug</span>
-        </div>
-  <FaSignOutAlt className="logout-icon" onClick={handleLogout} />
-</div>
+        <div className="admin-buttons">
+          <button className="terug-knop" onClick={handleBack}>
+            <FaArrowLeft className="back-icon" />
+            Terug
+          </button>
+          <button className="logout-knop" onClick={handleLogout}>
+        <FaSignOutAlt />
+</button>
 
+        </div>
       </header>
 
       <div className="zoekbalk-wrapper">
@@ -56,7 +64,10 @@ export default function AdminStudent() {
               <p className="student-naam">{student.naam}</p>
               <p className="student-school">{student.school}</p>
             </div>
-            <FaTrash className="verwijder-icon" />
+            <FaTrash
+              className="verwijder-icon"
+              onClick={() => handleVerwijder(student.id, student.naam)}
+            />
           </div>
         ))}
       </div>
