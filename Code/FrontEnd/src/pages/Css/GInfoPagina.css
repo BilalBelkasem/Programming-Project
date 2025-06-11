@@ -90,22 +90,39 @@
   display: none;
 }
 
-/* BANNER SECTION ENHANCEMENTS */
+/* BANNER SECTION – Compact & Responsive */
 .banner-section {
-  background-size: cover;
-  background-position: center;
-  height: 100vh;
-  min-height: 600px;
-  position: relative;
   display: flex;
-  align-items: center;
   justify-content: center;
-  margin-top: 69px;
+  align-items: center;
+  padding-top: 130px;
+  padding-bottom: 30px;
+  background-color: transparent;
+}
+
+.banner-wrapper {
+  position: relative; /* belangrijk! */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 1000px;
+  width: 90%;
+  margin: 0 auto 40px auto;
+}
+
+.custom-banner {
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  object-fit: contain;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
 }
 
 .scroll-down-button {
-  position: absolute;
-  bottom: 50px;
+  position: fixed; /* Belangrijk: vast op het scherm */
+  bottom: 100px;     /* 30px van onderkant scherm */
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.7);
@@ -121,7 +138,20 @@
   justify-content: center;
   transition: all 0.4s ease;
   animation: pulse 2s infinite;
+  z-index: 9999; /* boven alles zichtbaar */
 }
+
+.custom-banner:hover {
+  transform: scale(1.015);
+}
+.scroll-down-button {
+  bottom: 20px;
+  width: 45px;
+  height: 45px;
+  font-size: 22px;
+}
+
+
 
 .scroll-down-button:hover {
   background: rgba(214, 48, 49, 0.9);
@@ -246,12 +276,6 @@
     gap: 15px;
   }
   
-  .banner-section {
-    margin-top: 120px;
-    height: 70vh;
-    min-height: 500px;
-  }
-  
   .text-block {
     padding: 30px;
   }
@@ -270,11 +294,7 @@
   .nav-link.highlight {
     padding: 6px 15px;
   }
-  
-  .banner-section {
-    height: 60vh;
-    min-height: 400px;
-  }
+
   
   .text-block {
     padding: 25px 20px;
@@ -287,10 +307,6 @@
   
   .section-title {
     font-size: 22px;
-  }
-
-  .banner-section {
-    background-color: red;
   }
   
 }
