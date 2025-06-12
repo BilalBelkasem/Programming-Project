@@ -1,44 +1,66 @@
-.navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 40px;
-    background-color: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  
-  .logo {
-    height: 40px;
-  }
-  
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-  }
-  
-  .nav-btn {
-    font-weight: bold;
-    color: #2c2c2c;
-    text-decoration: none;
-  }
-  
-  .nav-btn.info {
-    background-color: #fbeaea;
-    color: #d12828;
-    padding: 8px 16px;
-    border-radius: 50px;
-  }
-  
-  .login-btn {
-    background-color: #d12828;
-    color: white;
-    font-weight: bold;
-    padding: 10px 20px;
-    border-radius: 50px;
-    text-decoration: none;
-  }
-  
+/* HEADER CONTAINER */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f9f9f9;
+  padding: 20px 60px;
+}
+
+/* LOGO */
+.logo {
+  height: auto;
+  max-height: 80px;
+  object-fit: contain;
+}
+
+/* NAVIGATION LINKS */
+.nav-links {
+  display: flex;
+  gap: 40px; /* ruimte tussen knoppen */
+  align-items: center;
+  margin-right: 200px;
+}
+
+/* ALGEMENE KNOPSTIJL */
+.nav-btn {
+  text-decoration: none;
+  color: black;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 16px;
+  border-radius: 6px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* ACTIEVE KNOP */
+.nav-btn.active {
+  background-color: #C8102E;
+  color: white;
+  border-radius: 20px;
+}
+
+/* HOVER (enkel op niet-actieve knoppen) */
+.nav-btn:not(.active):hover {
+  color: #C8102E;
+}
+
+/* HOVER-ONDERLIJNING */
+.nav-btn:not(.active)::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  left: 0;
+  bottom: 0;
+  background-color: #C8102E;
+  transition: width 0.3s ease;
+}
+
+.nav-btn:not(.active):hover::after {
+  width: 100%;
+}
   .main {
     padding: 40px;
   }

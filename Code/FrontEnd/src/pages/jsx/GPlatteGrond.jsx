@@ -25,12 +25,12 @@ export default function GPlatteGrond({ onLogout }) {
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
 
-        <nav className="nav">
-          <Link to="/" className="navLinsk">Info</Link>
-          <Link to="/Gbedrijveninfo" className="navLink">Bedrijven</Link>
-          <Link to="/g-plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/login" className="nav-link highlight">login/registeren</Link>
-        </nav>
+        <nav className="nav-links">
+  <Link to="/" className="nav-btn">info</Link>
+  <Link to="/Gbedrijveninfo" className="nav-btn">bedrijven</Link>
+  <Link to="/g-plattegrond" className="nav-btn active">plattegrond</Link>
+  <Link to="/login" className="nav-btn">login/registeren</Link>
+</nav>
       </header>
 
       {/* Inhoud */}
