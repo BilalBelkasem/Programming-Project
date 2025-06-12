@@ -46,11 +46,11 @@ export default function UBedrijven({ onLogout }) {
         <img src={logo} alt="Erasmus Logo" className="logo" />
 
         <nav className="nav-links">
-          <Link to="/" className="nav-btn info">info</Link>
-          <Link to="/BedrijfInfo" className="nav-btn bedrijven-actief">bedrijven</Link>
-          <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
-          <Link to="/login" className="login-btn">login/registeren</Link>
-        </nav>
+  <Link to="/" className="nav-btn">info</Link>
+  <Link to="/Gbedrijveninfo" className="nav-btn active">bedrijven</Link>
+  <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
+  <Link to="/login" className="nav-btn">login/registeren</Link>
+</nav>
       </header>
 
       <main className="main">
