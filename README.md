@@ -8,7 +8,7 @@ In dit project gaan we een website maken waar studenten en bedrijven zich kunnen
 
 ### 1. Clone the repository
 
-```bash
+
 git clone https://github.com/BilalBelkasem/Programming-Project.git
 cd Programming-Project
 
