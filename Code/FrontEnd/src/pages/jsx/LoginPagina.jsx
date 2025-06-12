@@ -78,14 +78,13 @@ export default function LoginPagina({ onLogin }) {
                 required
                 placeholder="Voer je wachtwoord in"
               />
-              <button
-                type="button"
+              <div
                 onClick={() => setShowPassword(!showPassword)}
                 className="pass-icon"
               >
-                {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+               {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+              </div>
 
-              </button>
             </div>
           </div>
 
