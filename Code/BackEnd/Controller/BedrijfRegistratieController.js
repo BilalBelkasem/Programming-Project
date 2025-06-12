@@ -2,7 +2,40 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 
+const multer = require('multer');
+const path = require('path');
+
+// Multer configuratie
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/logos/'); // map waar logo's worden opgeslagen
+  },
+  filename: function (req, file, cb) {
+    // Unieke naam, bijvoorbeeld tijd + originele extensie
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = /jpeg|jpg|png|gif/;
+  const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+  const mimetype = allowedTypes.test(file.mimetype);
+  if (extname && mimetype) {
+    cb(null, true);
+  } else {
+    cb(new Error('Alleen afbeeldingen zijn toegestaan!'));
+  }
+};
+
+const upload = multer({ storage, fileFilter }).single('logo'); // 'logo' is de fieldname
+
 exports.registerCompany = async (req, res) => {
+   upload(req, res, async function (err) {
+    if (err) {
+      // Fout bij upload
+      return res.status(400).json({ error: err.message });
+    }
+
   try {
     const {
       email,
@@ -25,6 +58,11 @@ exports.registerCompany = async (req, res) => {
     if (!email || !password || !company_name || !booth_contact_name) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
+
+    const logoFilename = req.file ? req.file.filename : null;
+      if (req.file && !req.file.filename) {
+        return res.status(400).json({ error: 'Probleem met het uploaden van het logo' });
+      }
 
     db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
       if (err) return res.status(500).json({ error: 'Database error: ' + err.message });
@@ -54,7 +92,7 @@ exports.registerCompany = async (req, res) => {
             street, postal_code, city,
             booth_contact_name, booth_contact_email,
             invoice_contact_name, invoice_contact_email,
-            po_number, vat_number
+            po_number, vat_number , logo
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
@@ -63,7 +101,7 @@ exports.registerCompany = async (req, res) => {
           street, postal_code, city,
           booth_contact_name, booth_contact_email,
           invoice_contact_name, invoice_contact_email,
-          po_number, vat_number
+          po_number, vat_number, logoFilename
         ];
 
         db.query(companySql, values, (err2) => {
@@ -90,7 +128,8 @@ exports.registerCompany = async (req, res) => {
       });
     });
 
-  } catch (error) {
+    } catch (error) {
     res.status(500).json({ error: 'Server error: ' + error.message });
   }
-};
+  }); // sluit upload()
+}; // sluit exports.registerCompany

@@ -8,37 +8,49 @@ export default function CompanyRegistrationForm() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: '',
-    phone: '',
+     email: '',
+    phone_number: '',
     password: '',
-    companyName: '',
+    company_name: '',
     website: '',
     sector: '',
-    beursContactName: '',
+    booth_contact_name: '',
     street: '',
     city: '',
-    postcode: '',
-    beursContactEmail: '',
-    invoiceContactName: '',
-    invoiceContactEmail: '',
-    vatNumber: '',
+    postal_code: '',
+    booth_contact_email: '',
+    invoice_contact_name: '',
+    invoice_contact_email: '',
+    vat_number: '',
     logo: null,
   });
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name === 'logo') {
-      setFormData({ ...formData, [name]: files[0] }); 
-    } else {
-      setFormData({ ...formData, [name]: value }); 
+    const { name, files, value } = e.target;
+
+  if (name === 'logo') {
+    const file = files[0];
+    if (file) {
+      const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+      if (file.size > maxSize) {
+        alert('Het logo mag maximaal 2MB zijn.');
+        return; // Stoppen als te groot
+      }
+      setFormData({ ...formData, logo: file });
     }
+  } else {
+    setFormData({ ...formData, [name]: value });
+  }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const legeVelden = Object.entries(formData).filter(
-      ([_, value]) => value === '' || value === null
+      ([key, value]) => {
+        if (key === 'logo') return false;
+        return value === '' || value === null 
+      }
     );
 
     if (legeVelden.length > 0) {
@@ -80,34 +92,40 @@ export default function CompanyRegistrationForm() {
       <h2 className="form-title">Registreren bedrijf</h2>
 
       {[
-        { label: 'E-mailadres', name: 'email' },
-        { label: 'Telefoonnummer', name: 'phone' },
-        { label: 'Wachtwoord', name: 'password' },
-        { label: 'Bedrijfsnaam', name: 'companyName' },
-        { label: 'Website of LinkedIn pagina van uw bedrijf', name: 'website' },
-        { label: 'Naam Contactpersoon vertegenwoordigers beurs', name: 'beursContactName' },
-        { label: 'Straat', name: 'street' },
-        { label: 'Gemeente', name: 'city' },
-        { label: 'Postcode', name: 'postcode' },
-        { label: 'Email Contactpersoon vertegenwoordigers beurs', name: 'beursContactEmail' },
-        { label: 'Naam Contactpersoon facturatie', name: 'invoiceContactName' },
-        { label: 'E-mailadres Contactpersoon facturatie', name: 'invoiceContactEmail' },
-        { label: 'BTW-nummer', name: 'vatNumber' },
+          { label: 'E-mailadres', name: 'email' },
+          { label: 'Telefoonnummer', name: 'phone_number' },
+          { label: 'Wachtwoord', name: 'password' },
+          { label: 'Bedrijfsnaam', name: 'company_name' },
+          { label: 'Website of LinkedIn pagina van uw bedrijf', name: 'website' },
+          { label: 'Naam Contactpersoon vertegenwoordigers beurs', name: 'booth_contact_name' },
+          { label: 'Straat', name: 'street' },
+          { label: 'Gemeente', name: 'city' },
+          { label: 'Postcode', name: 'postal_code' },
+          { label: 'Email Contactpersoon vertegenwoordigers beurs', name: 'booth_contact_email' },
+          { label: 'Naam Contactpersoon facturatie', name: 'invoice_contact_name' },
+          { label: 'E-mailadres Contactpersoon facturatie', name: 'invoice_contact_email' },
+          { label: 'BTW-nummer', name: 'vat_number' },
       ].map((field) => (
         <div key={field.name} className="form-group">
-          <label htmlFor={field.name}>{field.label}</label>
+          <label htmlFor={field.name}>{field.label} <span style={{ color: 'red' }}>*</span></label>
           <input
-            type="text"
+            type={
+              field.name === 'password' ? 'password' : 
+              field.name.includes('email') ? 'email' :
+              field.name === 'phone_number' ? 'tel' :
+              'text'
+            }
             id={field.name}
             name={field.name}
             value={formData[field.name]}
             onChange={handleChange}
           />
+
         </div>
       ))}
 
       <div className="form-group">
-        <label htmlFor="sector">Sector waarbinnen het bedrijf actief is:</label>
+        <label htmlFor="sector">Sector waarbinnen het bedrijf actief is:<span style={{ color: 'red' }}>*</span></label>
         <select
           id="sector"
           name="sector"
