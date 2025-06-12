@@ -30,6 +30,12 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+console.log('Connecting to MySQL with:');
+console.log('Host:', process.env.DB_HOST);
+console.log('User:', process.env.DB_USER);
+console.log('Password:', process.env.DB_PASSWORD);
+console.log('Database:', process.env.DB_NAME);
+
 // Make the pool available to routes
 app.use((req, res, next) => {
   req.db = pool;
