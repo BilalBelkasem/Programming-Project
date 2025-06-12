@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-import '../Css/UFavorietenBedrijvenFix.css';
+import '../Css/UFavorietenBedrijven.css';
 
 export default function UFavorietenBedrijven({ favorieten = [], onUnsave, onLogout }) {
   const navigate = useNavigate();
@@ -37,14 +37,12 @@ export default function UFavorietenBedrijven({ favorieten = [], onUnsave, onLogo
               <div key={bedrijf.id} className="bedrijfCard">
                 <h3 className="bedrijfNaam">{bedrijf.naam}</h3>
                 <p className="bedrijfBeschrijving">{bedrijf.beschrijving}</p>
-                <div className="actieKnoppen">
-                  <button
-                    onClick={() => onUnsave(bedrijf.id)}
-                    className="actionButton"
-                  >
-                    Verwijder
-                  </button>
-                </div>
+                <button
+                  onClick={() => onUnsave(bedrijf.id)}
+                  className="actionButton"
+                >
+                  Verwijder
+                </button>
               </div>
             ))
           )}

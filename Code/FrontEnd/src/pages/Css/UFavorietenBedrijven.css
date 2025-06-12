@@ -74,15 +74,15 @@
 .bedrijfCard {
   width: 100%;
   aspect-ratio: 2 / 1;
-  background-color: #ccc;
-  border-radius: 8px;
+  background-color: #f2f2f2;
+  border-radius: 12px;
   padding: 20px;
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .bedrijfNaam {
@@ -98,23 +98,17 @@
   margin-bottom: 16px;
 }
 
-.actieKnoppen {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-}
-
 .actionButton {
-  background-color: #e74c3c;
-  color: white;
+  background-color: #e74c3c !important; /* Fel rood */
+  color: white !important;
   font-size: 14px;
   border: none;
   border-radius: 6px;
-  padding: 6px 12px;
+  padding: 8px 16px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .actionButton:hover {
-  background-color: #c0392b;
+  background-color: #c0392b !important; /* Donkerder rood */
 }
