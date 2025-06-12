@@ -91,8 +91,8 @@
 }
 
 .info-banner {
-  width: 70%;          /* groter in breedte (was 60%) */
-  height: 400px;       /* iets lager dan 500px voor balans */
+  width: 90%;          /* groter in breedte (was 60%) */
+  height: 600px;       /* iets lager dan 500px voor balans */
   overflow: hidden;
   background-color: #f9f9f9;
   border-radius: 10px;
@@ -110,7 +110,7 @@
 .info-lines .line {
   height: 1px;
   background-color: black;
-  margin: 20px 0;
+  margin: 5px 0;
   transform: rotate(-0.3deg);
   text-align: center;
 }
@@ -121,7 +121,7 @@
   background-color: #f9f9f9;
   display: flex;
   justify-content: center;
-  padding: 60px 0;
+  padding: 0px 0;
 }
 
 .footer-content {
