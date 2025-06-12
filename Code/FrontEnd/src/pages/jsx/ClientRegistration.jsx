@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react'; // 👁️ icônes intégrées
 import '../Css/ClientRegistration.css';
 import logo from '../../assets/logo Erasmus.png';
 
@@ -12,8 +13,11 @@ const Register = () => {
     wachtwoord: '',
     herhaalWachtwoord: ''
   });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // 👁️ toggle
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -46,16 +50,12 @@ const Register = () => {
       };
 
       const response = await axios.post('http://localhost:5000/api/register', userData);
-
-      console.log('Registratie succesvol:', response.data);
-
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
       }
 
       navigate('/login');
     } catch (err) {
-      console.error('Registration error:', err);
       setError(
         err.response?.data?.error ||
         'Er is een fout opgetreden bij het registreren. Probeer het later opnieuw.'
@@ -85,12 +85,37 @@ const Register = () => {
           <input type="email" name="email" value={form.email} onChange={handleChange} className="form-input" required />
 
           <label className="form-label">wachtwoord*</label>
-          <input type="password" name="wachtwoord" value={form.wachtwoord} onChange={handleChange} className="form-input" required />
+          <div className="password-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="wachtwoord"
+              value={form.wachtwoord}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="pass-icon-btn"
+            >
+              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+            </button>
+          </div>
 
           <label className="form-label">wachtwoord herhalen*</label>
-          <input type="password" name="herhaalWachtwoord" value={form.herhaalWachtwoord} onChange={handleChange} className="form-input" required />
+          <input
+            type="password"
+            name="herhaalWachtwoord"
+            value={form.herhaalWachtwoord}
+            onChange={handleChange}
+            className="form-input"
+            required
+          />
 
-          <button type="submit" className="register-button">registreren</button>
+          <button type="submit" className="register-button" disabled={loading}>
+            {loading ? "Even geduld..." : "registreren"}
+          </button>
           <Link to="/login" className="back-text">← terug</Link>
         </form>
       </div>

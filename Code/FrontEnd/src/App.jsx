@@ -19,6 +19,7 @@ import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx";
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
 import UBedrijfView from './pages/jsx/UProfielBedrijfView.jsx';
 import Bedrijveninfo from './pages/jsx/bedrijveninfopagina.jsx'
+import Gbedrijveninfo from './pages/jsx/Gbedrijveninfopagina.jsx'
 
 
 export default function App() {
@@ -90,11 +91,10 @@ export default function App() {
       <Route path="/admin/studenten" element={<AdminStudent />} />
       <Route path="/admin/bedrijven" element={<AdminBedrijf />} />
       <Route path="/admin/badges" element={<AdminBadge />} />
-
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
-
       <Route path="/BedrijfInfo" element={<Bedrijveninfo />} />
+      <Route path="/Gbedrijveninfo" element={<Gbedrijveninfo />} />
 
       <Route path="/b-favorieten" element={<BFavorietenStudenten 
           favorieten={favorieteStudenten}
