@@ -1,140 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Career Launch Badge System</title> 
-    <link rel="stylesheet" href="assets/public.css"
-    
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Career Launch Badge System</title>
+  <link rel="stylesheet" href="assets/public.css" />
 </head>
 <body>
-    <div class="header">
-        <h1>Career Launch Badge System</h1>
+  <div class="header">
+    <img src="assets/default-logo.png" alt="Erasmus logo" />
+    <h1>Career Launch Badge System</h1>
+  </div>
+
+  <div class="tab-buttons">
+    <button class="tab-btn active" onclick="openTab('studentTab')">Student Badges</button>
+    <button class="tab-btn" onclick="openTab('assignTab')">Assign Badges</button>
+    <button class="tab-btn" onclick="openTab('manageTab')">Manage Badges</button>
+  </div>
+
+  <div class="container">
+    <!-- Student Badges Tab -->
+    <div id="studentTab" class="tab active">
+      <div class="control-panel">
+        <h2>Generate Student Badge</h2>
+        <select id="studentSelect">
+          <option value="">Loading students...</option>
+        </select>
+        <button id="generateStudentBtn">Generate PDF Badge</button>
+        <div class="loading-container" id="studentLoading">
+          <div class="loading"></div>
+          <span>Generating badge...</span>
+        </div>
+        <div id="studentBadgePreview" class="preview-container"></div>
+      </div>
     </div>
 
-    <div class="tab-buttons">
-        <button class="tab-btn active" onclick="openTab('studentTab')">Student Badges</button>
-        <button class="tab-btn" onclick="openTab('assignTab')">Assign Badges</button>
-        <button class="tab-btn" onclick="openTab('manageTab')">Manage Badges</button>
+    <!-- Assign Badges Tab -->
+    <div id="assignTab" class="tab">
+      <div class="control-panel">
+        <h2>Assign New Badge</h2>
+        <form id="assignForm">
+          <label>Recipient:</label>
+          <select id="userSelect"><option>Loading users...</option></select>
+          <label>Badge Type:</label>
+          <select id="badgeSelect"><option>Loading badge templates...</option></select>
+          <label>Custom Name (optional):</label>
+          <input type="text" id="customName" />
+          <label>Custom Title (optional):</label>
+          <input type="text" id="customTitle" />
+          <label>Custom Organization (optional):</label>
+          <input type="text" id="customOrg" />
+          <button type="submit">Assign Badge</button>
+          <div class="loading-container" id="assignLoading">
+            <div class="loading"></div>
+            <span>Assigning badge...</span>
+          </div>
+        </form>
+      </div>
+
+      <div class="badge-display">
+        <h2>Assigned Badges</h2>
+        <select id="userBadgeSelect"><option>Select user to view badges</option></select>
+        <button id="loadBadgesBtn">Load Badges</button>
+        <div class="loading-container" id="badgesLoading">
+          <div class="loading"></div>
+          <span>Loading badges...</span>
+        </div>
+        <div id="badgeContainer" class="badge-container"></div>
+      </div>
     </div>
 
-    <div class="container">
-        <!-- Student Badges Tab -->
-        <div id="studentTab" class="tab active">
-            <div class="control-panel">
-                <h2>Generate Student Badge</h2>
-                <select id="studentSelect">
-                    <option value="">Loading students...</option>
-                </select>
-                <button id="generateStudentBtn">Generate PDF Badge</button>
-                <div class="loading-container" id="studentLoading">
-                    <div class="loading"></div>
-                    <span>Generating badge...</span>
-                </div>
-                <div id="studentBadgePreview" class="preview-container"></div>
-            </div>
-        </div>
-
-        <!-- Assign Badges Tab -->
-        <div id="assignTab" class="tab">
-            <div class="control-panel">
-                <h2>Assign New Badge</h2>
-                <form id="assignForm">
-                    <label>Recipient:</label>
-                    <select id="userSelect">
-                        <option value="">Loading users...</option>
-                    </select>
-                    
-                    <label>Badge Type:</label>
-                    <select id="badgeSelect">
-                        <option value="">Loading badge templates...</option>
-                    </select>
-                    
-                    <label>Custom Name (optional):</label>
-                    <input type="text" id="customName">
-                    
-                    <label>Custom Title (optional):</label>
-                    <input type="text" id="customTitle">
-                    
-                    <label>Custom Organization (optional):</label>
-                    <input type="text" id="customOrg">
-                    
-                    <button type="submit">Assign Badge</button>
-                    <div class="loading-container" id="assignLoading">
-                        <div class="loading"></div>
-                        <span>Assigning badge...</span>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="badge-display">
-                <h2>Assigned Badges</h2>
-                <select id="userBadgeSelect">
-                    <option value="">Select user to view badges</option>
-                </select>
-                <button id="loadBadgesBtn">Load Badges</button>
-                <div class="loading-container" id="badgesLoading">
-                    <div class="loading"></div>
-                    <span>Loading badges...</span>
-                </div>
-                
-                <div id="badgeContainer" class="badge-container"></div>
-            </div>
-        </div>
-
-        <!-- Manage Badges Tab -->
-        <div id="manageTab" class="tab">
-            <div class="control-panel">
-                <h2>Badge Templates</h2>
-                <div id="badgeTemplatesList" class="badge-container"></div>
-            </div>
-        </div>
+    <!-- Manage Badges Tab -->
+    <div id="manageTab" class="tab">
+      <div class="control-panel">
+        <h2>Badge Templates</h2>
+        <div id="badgeTemplatesList" class="badge-container"></div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        // Tab navigation
-        function openTab(tabId) {
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
+  <script>
+    // Tab navigation
+    function openTab(tabId) {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
 
-        // Loading state management
-        function setLoading(elementId, isLoading) {
-            const loader = document.getElementById(elementId);
-            loader.style.display = isLoading ? 'flex' : 'none';
-        }
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
 
-        // Load all students
-        async function loadStudents() {
-            const select = document.getElementById('studentSelect');
-            try {
-                setLoading('studentLoading', true);
-                select.disabled = true;
-                
-                const response = await fetch('/api/students');
-                if (!response.ok) throw new Error('Failed to load students');
-                
-                const students = await response.json();
-                select.innerHTML = '<option value="">Select a student</option>';
-                
-                students.forEach(student => {
-                    const option = new Option(student.name, student.id);
-                    select.add(option);
-                });
-            } catch (error) {
-                console.error('Error loading students:', error);
-                select.innerHTML = '<option value="">Error loading students</option>';
-            } finally {
-                select.disabled = false;
-                setLoading('studentLoading', false);
-            }
-        }
+      const targetTab = document.getElementById(tabId);
+      if (targetTab) {
+        targetTab.classList.add('active');
+      }
+
+      const index = ['studentTab', 'assignTab', 'manageTab'].indexOf(tabId);
+      if (index !== -1) {
+        document.querySelectorAll('.tab-btn')[index].classList.add('active');
+      }
+    }
+  </script>
+
+  <script>
+    // Loading state management
+    function setLoading(elementId, isLoading) {
+      const loader = document.getElementById(elementId);
+      loader.style.display = isLoading ? 'flex' : 'none';
+    }
+
+    // Load all students
+    async function loadStudents() {
+      const select = document.getElementById('studentSelect');
+      try {
+        setLoading('studentLoading', true);
+        select.disabled = true;
+
+        const response = await fetch('/api/students');
+        if (!response.ok) throw new Error('Failed to load students');
+
+        const students = await response.json();
+        select.innerHTML = '<option value="">Select a student</option>';
+
+        students.forEach(student => {
+          const option = new Option(student.name, student.id);
+          select.add(option);
+        });
+      } catch (error) {
+        console.error('Error loading students:', error);
+        select.innerHTML = '<option value="">Error loading students</option>';
+      } finally {
+        select.disabled = false;
+        setLoading('studentLoading', false);
+      }
+    }
 
         // Generate student badge PDF
         async function generateStudentBadge() {
