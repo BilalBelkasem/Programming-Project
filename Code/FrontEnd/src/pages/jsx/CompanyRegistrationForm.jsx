@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../Css/CompanyRegistrationForm.css';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
+import axios from 'axios';
 
 export default function CompanyRegistrationForm() {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ export default function CompanyRegistrationForm() {
   const [formData, setFormData] = useState({
     email: '',
     phone: '',
+    password: '',
     companyName: '',
     website: '',
     sector: '',
@@ -32,8 +34,9 @@ export default function CompanyRegistrationForm() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const legeVelden = Object.entries(formData).filter(
       ([_, value]) => value === '' || value === null
     );
@@ -43,8 +46,29 @@ export default function CompanyRegistrationForm() {
       return;
     }
 
-    console.log("Bedrijf geregistreerd:", formData);
-    navigate('/profiel-bedrijf');
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) => {
+      data.append(key, value);
+    });
+
+    try {
+      const response = await axios.post(
+        'http://localhost:5000/api/register-company',
+        data,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      alert('Bedrijf succesvol geregistreerd!');
+      console.log('Response:', response.data);
+      navigate('/profiel-bedrijf');
+    } catch (err) {
+      console.error('Registratie mislukt:', err.response?.data || err);
+      alert('Registratie mislukt.');
+    }
   };
 
   return (
@@ -58,6 +82,7 @@ export default function CompanyRegistrationForm() {
       {[
         { label: 'E-mailadres', name: 'email' },
         { label: 'Telefoonnummer', name: 'phone' },
+        { label: 'Wachtwoord', name: 'password' },
         { label: 'Bedrijfsnaam', name: 'companyName' },
         { label: 'Website of LinkedIn pagina van uw bedrijf', name: 'website' },
         { label: 'Naam Contactpersoon vertegenwoordigers beurs', name: 'beursContactName' },
