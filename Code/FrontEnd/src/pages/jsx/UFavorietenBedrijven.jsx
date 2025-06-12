@@ -1,16 +1,16 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-import '../css/UFavorietenBedrijven.css';
+import '../Css/UFavorietenBedrijvenFix.css';
 
-console.log("UFavorietenBedrijven geladen");
-
-
-export default function UFavorietenBedrijven({ favorieten, onUnsave }) {
+export default function UFavorietenBedrijven({ favorieten = [], onUnsave, onLogout }) {
   const navigate = useNavigate();
-console.log("UFavorietenBedrijven geladen");
+
+  const handleLogout = () => {
+    if (onLogout) onLogout();
+  };
+
   return (
-    
     <div className="pageWrapper">
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
@@ -19,7 +19,7 @@ console.log("UFavorietenBedrijven geladen");
           <Link to="/dashboard" className="navLink">Info</Link>
           <Link to="/bedrijven" className="navLink">Bedrijven</Link>
           <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/UFavorietenBedrijven" className="navLink">Favorieten</Link>
           <Link to="/mijn-profiel" className="navLink">mijn profiel</Link>
         </nav>
 
@@ -27,16 +27,13 @@ console.log("UFavorietenBedrijven geladen");
       </header>
 
       <main className="main">
-
-<h2>Favoriete bedrijven</h2>
-
-
         <h2 className="title">Mijn favorieten</h2>
+
         <div className="bedrijvenContainer">
-          {favorieten.length === 0 ? (
+          {Array.isArray(favorieten) && favorieten.length === 0 ? (
             <p>Je hebt nog geen favoriete bedrijven.</p>
           ) : (
-            favorieten.map((bedrijf) => (
+            Array.isArray(favorieten) && favorieten.map((bedrijf) => (
               <div key={bedrijf.id} className="bedrijfCard">
                 <h3 className="bedrijfNaam">{bedrijf.naam}</h3>
                 <p className="bedrijfBeschrijving">{bedrijf.beschrijving}</p>
@@ -46,12 +43,6 @@ console.log("UFavorietenBedrijven geladen");
                     className="actionButton"
                   >
                     Verwijder
-                  </button>
-                  <button
-                    onClick={() => navigate(`/bedrijven/${bedrijf.id}`)}
-                    className="actionButton secondary"
-                  >
-                    Ga naar pagina
                   </button>
                 </div>
               </div>

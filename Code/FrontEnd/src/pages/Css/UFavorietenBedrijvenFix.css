@@ -3,10 +3,9 @@
 }
 
 .pageWrapper {
-  min-height: 100vh;
-  width: 100vw;
-  background-color: #f5f5f5;
   font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
@@ -39,6 +38,10 @@
   padding: 8px 12px;
 }
 
+.navLink:hover {
+  color: #007bff;
+}
+
 .logoutIcon {
   font-size: 24px;
   color: #000000;
@@ -52,37 +55,38 @@
 }
 
 .title {
-  margin-bottom: 20px;
   font-size: 24px;
+  margin-bottom: 20px;
   color: #333;
+  text-align: center;
 }
 
 .bedrijvenContainer {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 24px;
   justify-items: center;
-  max-width: 1000px;
-  margin: 0 auto;
   width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .bedrijfCard {
+  width: 100%;
   aspect-ratio: 2 / 1;
-  padding: 16px;
-  border-radius: 6px;
   background-color: #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
   text-align: center;
-  width: 100%;
 }
 
 .bedrijfNaam {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   color: #000;
   margin-bottom: 8px;
@@ -91,30 +95,26 @@
 .bedrijfBeschrijving {
   font-size: 14px;
   color: #000;
+  margin-bottom: 16px;
 }
 
-.likeButton {
-  width: 40px;
-  height: 40px;
-  background-color: #b2bec3;
-  color: white;
-  font-size: 20px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.actieKnoppen {
   position: absolute;
   top: 8px;
   right: 8px;
 }
 
-.likeButton:hover {
-  background-color: #d63031;
+.actionButton {
+  background-color: #e74c3c;
+  color: white;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.likeButton.liked {
-  color: red;
+.actionButton:hover {
+  background-color: #c0392b;
 }

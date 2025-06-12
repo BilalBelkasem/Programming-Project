@@ -21,7 +21,6 @@ import UBedrijfView from './pages/jsx/UProfielBedrijfView.jsx';
 import Bedrijveninfo from './pages/jsx/bedrijveninfopagina.jsx'
 import Gbedrijveninfo from './pages/jsx/Gbedrijveninfopagina.jsx'
 
-
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return localStorage.getItem('isLoggedIn') === 'true';
@@ -44,15 +43,52 @@ export default function App() {
     }
   }, [user]);
 
-  const [favorieteBedrijven, setFavorieteBedrijven] = useState([
-    { id: 1, naam: 'CoolCompany', beschrijving: 'Innovatief softwarebedrijf' },
-    { id: 2, naam: 'Techies BV', beschrijving: 'Specialist in AI-oplossingen' }
-  ]);
+  // Centraal gedefinieerde bedrijvenlijst
+  const bedrijvenLijst = [
+    {
+      id: 1,
+      naam: 'CoolCompany',
+      beschrijving: 'Innovatief softwarebedrijf',
+      tags: ['Software', 'Innovatie'],
+    },
+    {
+      id: 2,
+      naam: 'Techies BV',
+      beschrijving: 'Specialist in AI-oplossingen',
+      tags: ['AI', 'Data'],
+    },
+    {
+      id: 3,
+      naam: 'NextGen IT',
+      beschrijving: 'IT-diensten voor onderwijs',
+      tags: ['IT', 'Onderwijs'],
+    },
+    {
+      id: 4,
+      naam: 'colruyt',
+      beschrijving: 'onderhoud van alle systemen',
+      tags: ['Retail', 'Systemen'],
+    }
+  ];
 
+  const [favorieteBedrijven, setFavorieteBedrijven] = useState([]);
   const [favorieteStudenten, setFavorieteStudenten] = useState([
     { id: 101, naam: 'Jelle Peeters', studierichting: 'Toegepaste Informatica' },
     { id: 102, naam: 'Sara Jacobs', studierichting: 'Marketing' }
   ]);
+
+  const toggleLike = (id) => {
+    setFavorieteBedrijven((prev) =>
+      prev.some((b) => b.id === id)
+        ? prev.filter((b) => b.id !== id)
+        : [...prev, bedrijvenLijst.find((b) => b.id === id)]
+    );
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUser(null);
+  };
 
   return (
     <Routes>
@@ -73,20 +109,29 @@ export default function App() {
         path="/dashboard"
         element={
           isLoggedIn ? (
-            <UInfoPagina onLogout={() => {
-              setIsLoggedIn(false);
-              setUser(null);
-            }} />
+            <UInfoPagina onLogout={handleLogout} />
           ) : (
             <Navigate to="/bedrijven" />
           )
         }
       />
 
-      <Route path="/bedrijven"
-        element={isLoggedIn ? <UBedrijven /> : <Navigate to="/login" />}
+      <Route
+        path="/bedrijven"
+        element={
+          isLoggedIn ? (
+            <UBedrijven
+              bedrijven={bedrijvenLijst}
+              likedCompanies={favorieteBedrijven}
+              toggleLike={toggleLike}
+              onLogout={handleLogout}
+            />
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
       />
-      
+
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/studenten" element={<AdminStudent />} />
       <Route path="/admin/bedrijven" element={<AdminBedrijf />} />
@@ -96,16 +141,47 @@ export default function App() {
       <Route path="/BedrijfInfo" element={<Bedrijveninfo />} />
       <Route path="/Gbedrijveninfo" element={<Gbedrijveninfo />} />
 
-      <Route path="/b-favorieten" element={<BFavorietenStudenten 
-          favorieten={favorieteStudenten}
-          onUnsave={(id) => setFavorieteStudenten((prev) => 
-            prev.filter((s) => s.id !== id))}/>}/>
-      
-      <Route path="/favorieten" element={isLoggedIn ? (
-      <UFavorietenBedrijven favorieten={favorieteBedrijven} onUnsave={(id) =>
-          setFavorieteBedrijven((prev) => prev.filter((b) => b.id !== id))}/>
-      ) : (<Navigate to="/login" />)}/>
+      <Route
+        path="/UFavorietenBedrijven"
+        element={
+          <UFavorietenBedrijven
+            favorieten={favorieteBedrijven}
+            onUnsave={(id) =>
+              setFavorieteBedrijven((prev) => prev.filter((b) => b.id !== id))
+            }
+            onLogout={handleLogout}
+          />
+        }
+      />
 
+      <Route
+        path="/b-favorieten"
+        element={
+          <BFavorietenStudenten
+            favorieten={favorieteStudenten}
+            onUnsave={(id) =>
+              setFavorieteStudenten((prev) => prev.filter((s) => s.id !== id))
+            }
+          />
+        }
+      />
+
+      <Route
+        path="/favorieten"
+        element={
+          isLoggedIn ? (
+            <UFavorietenBedrijven
+              favorieten={favorieteBedrijven}
+              onUnsave={(id) =>
+                setFavorieteBedrijven((prev) => prev.filter((b) => b.id !== id))
+              }
+              onLogout={handleLogout}
+            />
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
+      />
     </Routes>
   );
 }
