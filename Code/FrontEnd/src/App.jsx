@@ -95,6 +95,7 @@ export default function App() {
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
       <Route path="/BedrijfInfo" element={<Bedrijveninfo />} />
       <Route path="/Gbedrijveninfo" element={<Gbedrijveninfo />} />
+      <Route path="/UFavorietenBedrijven" element={<UFavorietenBedrijven />} />
 
       <Route path="/b-favorieten" element={<BFavorietenStudenten 
           favorieten={favorieteStudenten}
