@@ -1,9 +1,7 @@
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-import '../css/UFavorietenBedrijven.css';
-
-console.log("UFavorietenBedrijven geladen");
+import '../Css/UFavorietenBedrijvenFix.css';
 
 export default function UFavorietenBedrijven({ favorieten = [], onUnsave, onLogout }) {
   const navigate = useNavigate();
@@ -45,12 +43,6 @@ export default function UFavorietenBedrijven({ favorieten = [], onUnsave, onLogo
                     className="actionButton"
                   >
                     Verwijder
-                  </button>
-                  <button
-                    onClick={() => navigate(`/bedrijven/${bedrijf.id}`)}
-                    className="actionButton secondary"
-                  >
-                    Ga naar pagina
                   </button>
                 </div>
               </div>
