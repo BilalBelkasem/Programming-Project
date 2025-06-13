@@ -2,12 +2,13 @@ const express = require('express');
 const router = express.Router();
 
 //  Middleware
-const authenticateToken = require('../middleware/authMiddleware');
+const {authenticateToken, isAdmin, isCompany, isStudent } = require('../middleware/authMiddleware');
 
 //  Controllers
 const LoginController = require('../Controller/LoginController');
 const StudentRegistratieController = require('../Controller/StudentRegistratieController');
 const BedrijfRegistratieController = require('../Controller/BedrijfRegistratieController');
+const studentAdmin = require('../Controller/StudentAdmin');
 
 //  PUBLIC ROUTES
 router.post('/register', StudentRegistratieController.register);           
@@ -16,6 +17,7 @@ router.post('/login', LoginController.login);
 
 //  PROTECTED ROUTES
 router.get('/protected', authenticateToken, StudentRegistratieController.getProtectedData);
+router.get('/studenten', authenticateToken, studentAdmin.getAllStudents);
 
 //  You can now safely add more protected routes like:
 router.get('/profile', authenticateToken, (req, res) => {
