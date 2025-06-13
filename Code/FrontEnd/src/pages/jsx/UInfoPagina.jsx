@@ -1,11 +1,9 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import careerBanner from '../../assets/Banner C.png';
 import '../Css/UInfoPagina.css';
 
-const location = useLocation();
-const currentPath = location.pathname;
 export default function UInfoPagina({ onLogout }) {
   const handleLogout = () => {
     onLogout(); 
@@ -17,12 +15,13 @@ export default function UInfoPagina({ onLogout }) {
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
 
-        <nav className="nav-links">
-  <Link to="/" className={`nav-btn ${currentPath === '/' ? 'active' : ''}`}>info</Link>
-  <Link to="/Gbedrijveninfo" className={`nav-btn ${currentPath === '/Gbedrijveninfo' ? 'active' : ''}`}>bedrijven</Link>
-  <Link to="/g-plattegrond" className={`nav-btn ${currentPath === '/g-plattegrond' ? 'active' : ''}`}>plattegrond</Link>
-  <Link to="/login" className={`nav-btn ${currentPath === '/login' ? 'active' : ''}`}>login/registeren</Link>
-</nav>
+        <nav className="nav">
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/UFavorietenBedrijven" className="navLink">Favorieten</Link>
+          <Link to="/mijn-profiel" className="nav-link">mijn profiel</Link>
+        </nav>
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
