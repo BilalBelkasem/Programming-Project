@@ -1,221 +1,115 @@
 body {
-    background-color: #f2f2f2;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
-  
-.student-profile-wrapper {
-    padding: 20px;
-}
-  
-.navbar {
-    background: #d9d9d9;
-    display: flex;
-    align-items: center;
-    padding: 10px 20px;
-}
-  
-.logo {
-    height: 40px;
-    margin-right: auto;
-}
-  
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 30px;
-    font-weight: bold;
-}
-  
-.profile-section {
-    text-align: center;
-    margin-top: 30px;
-}
-  
-.profile-picture {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-  
-.profile-picture img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 5px;
-}
-  
-.note {
-    font-size: 12px;
-    color: #444;
-    margin-bottom: 30px;
-}
-  
-.profile-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    max-width: 700px;
-    margin: 0 auto;
-    text-align: left;
-}
-  
-.field, .full-width-field {
-    display: flex;
-    flex-direction: column;
-}
-  
-.full-width-field {
-    grid-column: span 2;
-}
-  
-.value {
-    background: #ddd;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 4px;
-}
-  
-.student-info {
-    max-width: 800px;
-    margin: 40px auto;
-}
-  
-.section {
-    margin-bottom: 30px;
-}
-  
-.section label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 8px;
-}
-  
-.textarea {
-    background: #ccc;
-    padding: 15px;
-    min-height: 100px;
-    border-radius: 4px;
-}
-  
-.checkbox-group {
-    background: #ccc;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    border-radius: 4px;
+  background-color: #f2f2f2;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-body {
-    background-color: #f2f2f2;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+.student-profile {
+  padding: 20px;
 }
-  
-.student-profile-wrapper {
-    padding: 20px;
-}
-  
+
 .navbar {
-    background: #d9d9d9;
-    display: flex;
-    align-items: center;
-    padding: 10px 20px;
+  background: #d9d9d9;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
 }
-  
-  .logo {
-    height: 40px;
-    margin-right: auto;
-  }
-  
-  .nav-links {
-    list-style: none;
-    display: flex;
-    gap: 30px;
-    font-weight: bold;
-  }
-  
-  .profile-section {
-    text-align: center;
-    margin-top: 30px;
-  }
-  
-  .profile-picture {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .profile-picture img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 5px;
-  }
-  
-  .note {
-    font-size: 12px;
-    color: #444;
-    margin-bottom: 30px;
-  }
-  
-  .profile-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    max-width: 700px;
-    margin: 0 auto;
-    text-align: left;
-  }
-  
-  .field, .full-width-field {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .full-width-field {
-    grid-column: span 2;
-  }
-  
-  .value {
-    background: #ddd;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 4px;
-  }
-  
-  .student-info {
-    max-width: 800px;
-    margin: 40px auto;
-  }
-  
-  .section {
-    margin-bottom: 30px;
-  }
-  
-  .section label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 8px;
-  }
-  
-  .textarea {
-    background: #ccc;
-    padding: 15px;
-    min-height: 100px;
-    border-radius: 4px;
-  }
-  
-  .checkbox-group {
-    background: #ccc;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    border-radius: 4px;
-  }
+
+.logo {
+  height: 40px;
+  margin-right: auto;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.profile-picture {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.profile-picture img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 2px solid #aaa;
+}
+
+.profile-picture input {
+  margin-bottom: 5px;
+}
+
+.note {
+  font-size: 12px;
+  color: #444;
+  text-align: center;
+  margin: 10px 0 30px;
+}
+
+.form-grid {
+  display: flex;
+  gap: 40px;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.left, .right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+input, select, textarea {
+  background: #ddd;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 160px;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.section label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.confirm-btn {
+  background-color: #444;
+  color: white;
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 40px;
+}
+
+.confirm-btn:hover {
+  background-color: #333;
+}
