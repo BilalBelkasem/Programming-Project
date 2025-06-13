@@ -3,33 +3,55 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-}
+  }
   
-.student-profile-wrapper {
-    padding: 20px;
-}
+  .page-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
   
-.navbar {
-    background: #d9d9d9;
+  .header {
+    background-color: #d9d9d9;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 10px 20px;
-}
+  }
   
-.logo {
+  .logo {
     height: 40px;
-    margin-right: auto;
-}
+  }
   
-.nav-links {
-    list-style: none;
+  .nav {
     display: flex;
     gap: 30px;
     font-weight: bold;
-}
+  }
   
-.profile-section {
-    margin-top: 100px;
+  .navLink {
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .logoutIcon {
+    cursor: pointer;
+    font-size: 24px;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    padding: 40px;
+  }
+  
+  /* Linkerkant met profiel en form */
+  .profile-left {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   
   .profile-picture {
@@ -37,17 +59,10 @@ body {
     height: 200px;
     border-radius: 50%;
     overflow: hidden;
-    margin: 0 auto;
-    margin-top: 50px; /* ruimte onder de header */
-    margin-bottom: 50px;
-    background-color: #ddd; /* grijze achtergrond */
+    background-color: #ddd;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
-  }
-  .student-profile-grid {
-    margin-top: 50px;
     margin-bottom: 20px;
   }
   
@@ -58,64 +73,76 @@ body {
     border-radius: 50%;
   }
   
-.note {
-    font-size: 12px;
-    color: #444;
-    margin-bottom: 30px;
-}
+  .upload-btn {
+    margin-top: 10px;
+  }
   
-.profile-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    max-width: 700px;
-    margin: 0 auto;
-    text-align: left;
-}
-  
-.field, .full-width-field {
+  .form-grid {
     display: flex;
     flex-direction: column;
-}
+    width: 100%;
+    align-items: center;
+  }
   
-.full-width-field {
-    grid-column: span 2;
-}
+  .left,
+  .right {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
   
-.value {
-    background: #ddd;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 4px;
-}
-  
-.student-info {
-    max-width: 800px;
-    margin: 40px auto;
-}
-  
-.section {
-    margin-bottom: 30px;
-}
-  
-.section label {
+  .left label,
+  .right label,
+  .section label {
     font-weight: bold;
-    display: block;
-    margin-bottom: 8px;
-}
+    margin-top: 10px;
+    margin-bottom: 4px;
+  }
   
-.textarea {
-    background: #ccc;
-    padding: 15px;
-    min-height: 100px;
+  .left input,
+  .right input,
+  .left select,
+  .right select,
+  textarea,
+  input {
+    padding: 10px;
     border-radius: 4px;
-}
+    border: 1px solid #ccc;
+    background-color: #e0e0e0;
+  }
   
-.checkbox-group {
-    background: #ccc;
-    padding: 15px;
+  /* Rechterzijde met about */
+  .profile-right {
+    width: 50%;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    border-radius: 4px;
-}
+    gap: 20px;
+    justify-content: flex-start;
+  }
+  
+  .section {
+    margin-bottom: 20px;
+  }
+  
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    resize: vertical;
+  }
+  
+  .confirm-btn {
+    padding: 10px 20px;
+    background-color: #c62828;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 20px;
+    align-self: flex-start;
+  }
+  
+  .confirm-btn:hover {
+    background-color: #b71c1c;
+  }

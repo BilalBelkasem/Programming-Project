@@ -1,147 +1,99 @@
-/* ========== PAGINA STRUCTUUR ========== */
-
 .page-wrapper {
-  min-height: 100vh;
-  width: 100vw;
-  background-color: #ffffff;
-  font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ========== HEADER ========== */
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #f0f0f0;
-  padding: 10px 20px;
-}
-
-.logo {
-  height: 40px;
-}
-
-/* NAVIGATIE: linkjes mooi spreiden en stylen */
-.nav {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 60px; /* ruimte tussen knoppen */
-  margin: 0 40px;
-}
-
-/* BASISSTIJL NAV-LINK */
-.nav-link {
-  text-decoration: none;
-  color: #000000;
-  font-weight: bold;
-  font-size: 16px;
-  padding: 8px 12px;
-  border-radius: 6px;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-/* ACTIEVE KNOP (ROOD) */
-.nav-link.active {
-  background-color: #C8102E;
-  color: white;
-  border-radius: 20px;
-}
-
-/* HOVER-EFFECT voor niet-actieve knoppen */
-.nav-link:not(.active):hover {
-  color: #C8102E;
-}
-
-/* HOVER-ONDERLIJNING (alleen bij niet-actieve knoppen) */
-.nav-link:not(.active)::after {
-  content: "";
-  position: absolute;
-  width: 0%;
-  height: 2px;
-  left: 0;
-  bottom: 0;
-  background-color: #C8102E;
-  transition: width 0.3s ease;
-}
-
-.nav-link:not(.active):hover::after {
-  width: 100%;
-}
-
-/* UITLOG-ICOON */
-.logout-icon {
-  font-size: 24px;
-  color: #000000;
-  cursor: pointer;
-}
-
-/* ========== MAIN ========== */
-
-.main {
-  padding: 30px 40px;
-  background-color: #ffffff;
-  width: 100%;
-  box-sizing: border-box;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* TITEL */
-.title {
-  margin-bottom: 20px;
-  color: #d63031;
-}
-
-/* BANNER */
-.banner {
-  width: 100%;
-  height: auto;
-  max-width: 100%;
-  border-radius: 10px;
-  margin-bottom: 30px;
-  object-fit: contain;
-}
-
-/* BLOKKEN */
-.text-block {
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  background-color: #ffffff;
-}
-
-/* TEKST */
-.text {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #2d3436;
-  margin-bottom: 16px;
-}
-
-/* SUBTITELS */
-.subtitle {
-  font-size: 18px;
-  font-weight: bold;
-  margin-top: 20px;
-  margin-bottom: 10px;
-  color: #2d3436;
-}
-
-/* LIJSTEN */
-.list {
-  padding-left: 20px;
-  font-size: 16px;
-  line-height: 1.6;
-  color: #2d3436;
-}
-
-/* CONTACT */
-.contact {
-  margin-top: 30px;
-  font-size: 16px;
-  color: #2d3436;
-}
+    min-height: 100vh;
+    width: 100vw;
+    background-color: #ffffff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f0f0f0;
+    padding: 10px 20px;
+  }
+  
+  .logo {
+    height: 40px;
+  }
+  
+  .nav {
+    display: flex;
+    justify-content: space-evenly;
+    flex-grow: 1;
+    margin: 0 40px;
+  }
+  
+  .nav-link {
+    text-decoration: none;
+    color: #000000;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 8px 12px;
+  }
+  
+  .logout-icon {
+    font-size: 24px;
+    color: #000000;
+    cursor: pointer;
+  }
+  
+  .main {
+    padding: 30px 40px;
+    background-color: #ffffff;
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .title {
+    margin-bottom: 20px;
+    color: #d63031;
+  }
+  
+  .banner {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    object-fit: contain;
+  }
+  
+  .text-block {
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    background-color: #ffffff;
+  }
+  
+  .text {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #2d3436;
+    margin-bottom: 16px;
+  }
+  
+  .subtitle {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #2d3436;
+  }
+  
+  .list {
+    padding-left: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #2d3436;
+  }
+  
+  .contact {
+    margin-top: 30px;
+    font-size: 16px;
+    color: #2d3436;
+  }
