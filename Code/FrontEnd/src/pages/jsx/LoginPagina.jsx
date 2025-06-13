@@ -22,9 +22,12 @@ export default function LoginPagina({ onLogin }) {
         password: wachtwoord
       });
 
-      if (response.data && response.data.token) {
+      if (response.data && response.data.token && response.data.user) {
+        console.log('Login response:', response.data);
         localStorage.setItem('token', response.data.token);
-        if (onLogin) onLogin();
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+
+        if (onLogin) onLogin(response.data.user); // Geef user object door
         navigate('/dashboard');
       } else {
         setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
@@ -99,6 +102,10 @@ export default function LoginPagina({ onLogin }) {
             <Link to="/bedrijf-registratie" className="register-link company">
               Registreer je bedrijf
             </Link>
+            <Link to="/" className="back-button">← Terug naar startpagina</Link>
+            <Link to="/admin" className="admin-button">
+  Admin login
+</Link>
           </div>
         </div>
       </div>
