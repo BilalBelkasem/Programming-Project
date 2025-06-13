@@ -2,141 +2,296 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Career Launch Badge System</title>
-  <link rel="stylesheet" href="assets/public.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Launch Badge System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+        }
+
+        .control-panel {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge-display {
+            flex: 2;
+        }
+
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .badge-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            margin-bottom: 15px;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .tab {
+            display: none;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: #eee;
+            border: none;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .preview-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-container {
+            display: none;
+            align-items: center;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="header">
-    <img src="assets/default-logo.png" alt="Erasmus logo" />
-    <h1>Career Launch Badge System</h1>
-  </div>
+    <div class="header">
+        <h1>Career Launch Badge System</h1>
+    </div>
 
     <div class="tab-buttons">
         <button class="tab-btn active" onclick="openTab('studentTab')">Student Badges</button>
-        <button class="tab-btn" onclick="openTab('assignTab')">Assign Badges</button>
-        <button class="tab-btn" onclick="openTab('manageTab')">Manage Badges</button>
+        <button class="tab-btn" onclick="openTab('bedrijvenTab')">Bedrijven Badges</button>
     </div>
 
-  <div class="container">
-    <!-- Student Badges Tab -->
-    <div id="studentTab" class="tab active">
-      <div class="control-panel">
-        <h2>Generate Student Badge</h2>
-        <select id="studentSelect">
-          <option value="">Loading students...</option>
-        </select>
-        <button id="generateStudentBtn">Generate PDF Badge</button>
-        <div class="loading-container" id="studentLoading">
-          <div class="loading"></div>
-          <span>Generating badge...</span>
-        </div>
-        <div id="studentBadgePreview" class="preview-container"></div>
-      </div>
-    </div>
-
-        <!-- Assign Badges Tab -->
-        <div id="assignTab" class="tab">
+    <div class="container">
+        <!-- Student Badges Tab -->
+        <div id="studentTab" class="tab active">
             <div class="control-panel">
-                <h2>Assign New Badge</h2>
-                <form id="assignForm">
-                    <label>Recipient:</label>
-                    <select id="userSelect">
-                        <option value="">Loading users...</option>
-                    </select>
-                    
-                    <label>Badge Type:</label>
-                    <select id="badgeSelect">
-                        <option value="">Loading badge templates...</option>
-                    </select>
-                    
-                    <label>Custom Name (optional):</label>
-                    <input type="text" id="customName">
-                    
-                    <label>Custom Title (optional):</label>
-                    <input type="text" id="customTitle">
-                    
-                    <label>Custom Organization (optional):</label>
-                    <input type="text" id="customOrg">
-                    
-                    <button type="submit">Assign Badge</button>
-                    <div class="loading-container" id="assignLoading">
-                        <div class="loading"></div>
-                        <span>Assigning badge...</span>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="badge-display">
-                <h2>Assigned Badges</h2>
-                <select id="userBadgeSelect">
-                    <option value="">Select user to view badges</option>
+                <h2>Generate Student Badge</h2>
+                <select id="studentSelect">
+                    <option value="">Loading students...</option>
                 </select>
-                <button id="loadBadgesBtn">Load Badges</button>
-                <div class="loading-container" id="badgesLoading">
+                <button id="generateStudentBtn">Generate PDF Badge</button>
+                <div class="loading-container" id="studentLoading">
                     <div class="loading"></div>
-                    <span>Loading badges...</span>
+                    <span>Generating badge...</span>
                 </div>
-                
-                <div id="badgeContainer" class="badge-container"></div>
+                <div id="studentBadgePreview" class="preview-container"></div>
             </div>
         </div>
 
-        <!-- Manage Badges Tab -->
-        <div id="manageTab" class="tab">
+
+        <!-- Bedrijven Badges Tab -->
+        <div id="bedrijvenTab" class="tab">
             <div class="control-panel">
-                <h2>Badge Templates</h2>
-                <div id="badgeTemplatesList" class="badge-container"></div>
+                <h2>Generate Organisation Badge</h2>
+                <select id="bedrijfSelect">
+                    <option value="">Loading organisations...</option>
+                </select>
+                <button id="generateBedrijfBtn">Generate PDF Badge</button>
+                <div class="loading-container" id="bedrijfLoading">
+                    <div class="loading"></div>
+                    <span>Generating badge...</span>
+                </div>
+                <div id="bedrijfBadgePreview" class="preview-container"></div>
             </div>
         </div>
-    </div>
 
-    <script>
-        // Tab navigation
-        function openTab(tabId) {
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-
-        // Loading state management
-        function setLoading(elementId, isLoading) {
-            const loader = document.getElementById(elementId);
-            loader.style.display = isLoading ? 'flex' : 'none';
-        }
-
-        // Load all students
-        async function loadStudents() {
-            const select = document.getElementById('studentSelect');
-            try {
-                setLoading('studentLoading', true);
-                select.disabled = true;
-                
-                const response = await fetch('/api/students');
-                if (!response.ok) throw new Error('Failed to load students');
-                
-                const students = await response.json();
-                select.innerHTML = '<option value="">Select a student</option>';
-                
-                students.forEach(student => {
-                    const option = new Option(student.name, student.id);
-                    select.add(option);
+        <script>
+            // Tab navigation
+            function openTab(tabId) {
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
                 });
-            } catch (error) {
-                console.error('Error loading students:', error);
-                select.innerHTML = '<option value="">Error loading students</option>';
-            } finally {
-                select.disabled = false;
-                setLoading('studentLoading', false);
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.getElementById(tabId).classList.add('active');
+                event.currentTarget.classList.add('active');
             }
-        }
+
+            // Loading state management
+            function setLoading(elementId, isLoading) {
+                const loader = document.getElementById(elementId);
+                loader.style.display = isLoading ? 'flex' : 'none';
+            }
+
+            // Load all students
+            async function loadStudents() {
+                const select = document.getElementById('studentSelect');
+                try {
+                    setLoading('studentLoading', true);
+                    select.disabled = true;
+
+                    const response = await fetch('/api/students');
+                    if (!response.ok) throw new Error('Failed to load students');
+
+                    const students = await response.json();
+                    select.innerHTML = '<option value="">Select a student</option>';
+
+                    students.forEach(student => {
+                        const option = new Option(student.name, student.id);
+                        select.add(option);
+                    });
+                } catch (error) {
+                    console.error('Error loading students:', error);
+                    select.innerHTML = '<option value="">Error loading students</option>';
+                } finally {
+                    select.disabled = false;
+                    setLoading('studentLoading', false);
+                }
+            }
+            async function loadOrganisations() {
+                const select = document.getElementById('bedrijfSelect');
+                try {
+                    setLoading('bedrijfLoading', true);
+                    select.disabled = true;
+                    const response = await fetch('/api/companies');
+                    if (!response.ok) throw new Error('Failed to load organisations');
+                    const data = await response.json();
+                    select.innerHTML = '<option value="">Select an organisation</option>';
+                    data.forEach(org => {
+                        const label = org.company_name;
+                        const value = org.user_id;
+                        if (label && value) {
+                            const option = new Option(label, value);
+                            select.add(option);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error loading organisations:', error);
+                    select.innerHTML = '<option value="">Error loading organisations</option>';
+                } finally {
+                    select.disabled = false;
+                    setLoading('bedrijfLoading', false);
+                }
+            }
+
+            async function generateBedrijfBadge() {
+                const orgId = document.getElementById('bedrijfSelect').value;
+                if (!orgId) return alert('Please select an organisation');
+                try {
+                    setLoading('bedrijfLoading', true);
+                    const response = await fetch(`/api/badges/badge-pdf/company/${orgId}`);
+                    if (!response.ok) throw new Error('Badge generation failed');
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const preview = document.getElementById('bedrijfBadgePreview');
+                    preview.innerHTML = `
+            <embed src="${url}" type="application/pdf" width="100%" height="500px" />
+            <a href="${url}" download="organisation_badge_${orgId}.pdf" class="download-btn">
+                Download Badge
+            </a>
+        `;
+                } catch (error) {
+                    console.error('Error generating organisation badge:', error);
+                    alert('Failed to generate badge. Please try again.');
+                } finally {
+                    setLoading('bedrijfLoading', false);
+                }
+            }
+
 
             // Generate student badge PDF
             async function generateStudentBadge() {

@@ -16,14 +16,16 @@ app.use(express.static('public', {
   index: 'public.html'
 }));
 
-app.use('/api', protectedRoutes); // je andere API routes
-
-const db = mysql.createConnection({
+// Maak connection pool aan
+const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT
+  port: process.env.DB_PORT,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
 console.log('Connecting to MySQL with:');
@@ -32,9 +34,9 @@ console.log('User:', process.env.DB_USER);
 console.log('Password:', process.env.DB_PASSWORD);
 console.log('Database:', process.env.DB_NAME);
 
-// Make the pool available to routes
+// Zet pool op elke request
 app.use((req, res, next) => {
-  req.db = pool;
+  req.db = pool.promise(); // gebruik async/await compatible pool
   next();
 });
 
@@ -44,8 +46,7 @@ app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
 
-
-
+// Users ophalen
 app.get('/api/users', async (req, res) => {
   try {
     const [users] = await req.db.query('SELECT id, name FROM users WHERE role = "student"');
@@ -54,70 +55,49 @@ app.get('/api/users', async (req, res) => {
     console.error('Users route error:', err);
     res.status(500).json({ error: err.message });
   }
-  console.log('Connected to MySQL database.');
 });
 
-// Route om studenten met school op te halen uit join van users en students_details
-app.get('/api/studenten', (req, res) => {
+// Studentgegevens ophalen (users + school via JOIN)
+app.get('/api/studenten', async (req, res) => {
   const sql = `
     SELECT users.id, users.name AS naam, students_details.school
     FROM users
     JOIN students_details ON students_details.user_id = users.id
   `;
 
-  db.query(sql, (err, result) => {
-    if (err) {
-      console.error('Fout bij ophalen studenten:', err);
-      return res.status(500).json({ error: err.message });
-    }
+  try {
+    const [result] = await req.db.query(sql);
     res.json(result);
-  });
+  } catch (err) {
+    console.error('Fout bij ophalen studenten:', err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// DELETE endpoint met transaction voor veilig verwijderen van user + details
-app.delete('/api/studenten/:id', (req, res) => {
+// Student verwijderen met transaction
+app.delete('/api/studenten/:id', async (req, res) => {
   const studentId = req.params.id;
   console.log(`DELETE request ontvangen voor student id: ${studentId}`);
 
-  db.beginTransaction(err => {
-    if (err) {
-      console.error('Fout bij starten transaction:', err);
-      return res.status(500).json({ error: 'Fout bij starten database transaction' });
-    }
+  const conn = await pool.promise().getConnection();
+  try {
+    await conn.beginTransaction();
 
-    const deleteDetailsSql = 'DELETE FROM students_details WHERE user_id = ?';
-    db.query(deleteDetailsSql, [studentId], (err) => {
-      if (err) {
-        console.error('Fout bij verwijderen student details:', err);
-        return db.rollback(() => {
-          res.status(500).json({ error: 'Fout bij verwijderen student details: ' + err.message });
-        });
-      }
-      console.log(`Student details verwijderd voor user_id: ${studentId}`);
+    await conn.query('DELETE FROM students_details WHERE user_id = ?', [studentId]);
+    console.log(`Student details verwijderd voor user_id: ${studentId}`);
 
-      const deleteUserSql = 'DELETE FROM users WHERE id = ?';
-      db.query(deleteUserSql, [studentId], (err2, result) => {
-        if (err2) {
-          console.error('Fout bij verwijderen student:', err2);
-          return db.rollback(() => {
-            res.status(500).json({ error: 'Fout bij verwijderen student: ' + err2.message });
-          });
-        }
+    await conn.query('DELETE FROM users WHERE id = ?', [studentId]);
 
-        db.commit(commitErr => {
-          if (commitErr) {
-            console.error('Fout bij commit van transaction:', commitErr);
-            return db.rollback(() => {
-              res.status(500).json({ error: 'Fout bij commit van transaction' });
-            });
-          }
-
-          console.log(`User met id ${studentId} succesvol verwijderd.`);
-          res.json({ message: 'Student succesvol verwijderd' });
-        });
-      });
-    });
-  });
+    await conn.commit();
+    console.log(`User met id ${studentId} succesvol verwijderd.`);
+    res.json({ message: 'Student succesvol verwijderd' });
+  } catch (err) {
+    await conn.rollback();
+    console.error('Fout bij verwijderen student:', err);
+    res.status(500).json({ error: err.message });
+  } finally {
+    conn.release();
+  }
 });
 
 const PORT = process.env.PORT || 5000;
