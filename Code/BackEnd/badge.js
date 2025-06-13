@@ -90,9 +90,5 @@ router.get('/badge-pdf/company/:userId', async (req, res) => {
   }
 });
 
-// Optional test route
-router.get('/test', (req, res) => {
-  res.send('Badge router works!');
-});
 
 module.exports = router;
