@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react'; // 👁️ icônes intégrées
+import { Eye, EyeOff } from 'lucide-react';
 import '../Css/ClientRegistration.css';
 import logo from '../../assets/logo Erasmus.png';
 
@@ -16,7 +16,7 @@ const Register = () => {
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // 👁️ toggle
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -41,6 +41,8 @@ const Register = () => {
 
     try {
       setLoading(true);
+
+      // Let op: hier de velden aangepast naar backend verwachte namen
       const userData = {
         firstName: form.voornaam,
         lastName: form.naam,
@@ -49,13 +51,14 @@ const Register = () => {
         role: 'student'
       };
 
+
       const response = await axios.post('http://localhost:5000/api/register', userData);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-      }
+
+      console.log('Registratie succesvol:', response.data);
 
       navigate('/login');
     } catch (err) {
+      console.error('Registratiefout:', err);
       setError(
         err.response?.data?.error ||
         'Er is een fout opgetreden bij het registreren. Probeer het later opnieuw.'
@@ -94,13 +97,12 @@ const Register = () => {
               className="form-input"
               required
             />
-            <button
-              type="button"
+            <div
               onClick={() => setShowPassword(!showPassword)}
               className="pass-icon-btn"
             >
               {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-            </button>
+            </div>
           </div>
 
           <label className="form-label">wachtwoord herhalen*</label>
@@ -114,7 +116,7 @@ const Register = () => {
           />
 
           <button type="submit" className="register-button" disabled={loading}>
-            {loading ? "Even geduld..." : "registreren"}
+            {loading ? 'Bezig...' : 'registreren'}
           </button>
           <Link to="/login" className="back-text">← terug</Link>
         </form>
