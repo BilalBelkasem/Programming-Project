@@ -29,15 +29,18 @@ body {
 }
   
 .profile-section {
-    text-align: center;
-    margin-top: 30px;
-}
+    margin-top: 100px;
+  }
   
-.profile-picture {
+  .profile-picture {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
+    margin-top: 100px; /* verhoog deze waarde indien nodig */
+  }
+  .student-profile-grid {
+    margin-top: 100px;
+  }
   
 .profile-picture img {
     width: 120px;
@@ -108,114 +111,3 @@ body {
     gap: 10px;
     border-radius: 4px;
 }
-
-body {
-    background-color: #f2f2f2;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-}
-  
-.student-profile-wrapper {
-    padding: 20px;
-}
-  
-.navbar {
-    background: #d9d9d9;
-    display: flex;
-    align-items: center;
-    padding: 10px 20px;
-}
-  
-  .logo {
-    height: 40px;
-    margin-right: auto;
-  }
-  
-  .nav-links {
-    list-style: none;
-    display: flex;
-    gap: 30px;
-    font-weight: bold;
-  }
-  
-  .profile-section {
-    text-align: center;
-    margin-top: 30px;
-  }
-  
-  .profile-picture {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .profile-picture img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 5px;
-  }
-  
-  .note {
-    font-size: 12px;
-    color: #444;
-    margin-bottom: 30px;
-  }
-  
-  .profile-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    max-width: 700px;
-    margin: 0 auto;
-    text-align: left;
-  }
-  
-  .field, .full-width-field {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .full-width-field {
-    grid-column: span 2;
-  }
-  
-  .value {
-    background: #ddd;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 4px;
-  }
-  
-  .student-info {
-    max-width: 800px;
-    margin: 40px auto;
-  }
-  
-  .section {
-    margin-bottom: 30px;
-  }
-  
-  .section label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 8px;
-  }
-  
-  .textarea {
-    background: #ccc;
-    padding: 15px;
-    min-height: 100px;
-    border-radius: 4px;
-  }
-  
-  .checkbox-group {
-    background: #ccc;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    border-radius: 4px;
-  }
