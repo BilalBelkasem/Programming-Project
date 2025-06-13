@@ -53,15 +53,8 @@ export default function UFavorietenBedrijven({ onLogout }) {
           ) : (
             favorieten.map((bedrijf) => (
               <div key={bedrijf.id} className="bedrijfCard">
-                <h3 className="bedrijfNaam">{bedrijf.company_name}</h3>
-                <p className="bedrijfBeschrijving">{bedrijf.sector}</p>
-                {bedrijf.tags && (
-                  <div className="tagContainer">
-                    {bedrijf.tags.map((tag, index) => (
-                      <span key={index} className="tag">{tag}</span>
-                    ))}
-                  </div>
-                )}
+                <h3 className="bedrijfNaam">{bedrijf.naam}</h3>
+                <p className="bedrijfBeschrijving">{bedrijf.beschrijving}</p>
                 <button
                   onClick={() => verwijderFavoriet(bedrijf.id)}
                   className="actionButton"

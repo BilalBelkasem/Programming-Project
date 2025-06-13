@@ -13,37 +13,32 @@ exports.addFavoriet = async (req, res) => {
     res.status(500).json({ error: 'Fout bij toevoegen favoriet', details: err.message });
   }
 };
-
 exports.getFavorieten = async (req, res) => {
-  const student_id = req.params.studentId;
-
-  try {
-    const [rows] = await db.execute(
-      `SELECT 
-         c.id, 
-         c.company_name AS naam, 
-         c.sector AS beschrijving, 
-         c.tags
-       FROM favorites f
-       JOIN companies_details c ON f.company_id = c.id
-       WHERE f.student_id = ?`,
-      [student_id]
-    );
-
-    const bedrijven = rows.map(b => ({
-      ...b,
-      tags: typeof b.tags === 'string' ? b.tags.split(',') : []
-    }));
-
-    res.json(bedrijven);
-  } catch (err) {
-    console.error('SQL-fout bij ophalen favorieten:', err);
-    res.status(500).json({
-      error: 'Fout bij ophalen favorieten',
-      details: err.message
-    });
-  }
-};
+    const student_id = req.params.studentId;
+  
+    try {
+      const [rows] = await db.execute(
+        `SELECT 
+           c.id, 
+           c.company_name AS naam, 
+           c.sector AS beschrijving
+         FROM favorites f
+         JOIN companies_details c ON f.company_id = c.id
+         WHERE f.student_id = ?`,
+        [student_id]
+      );
+  
+      res.json(rows);
+    } catch (err) {
+      console.error('SQL-fout bij ophalen favorieten:', err);
+      res.status(500).json({
+        error: 'Fout bij ophalen favorieten',
+        details: err.message
+      });
+    }
+  };
+  
+  
 
 exports.deleteFavoriet = async (req, res) => {
   const { student_id } = req.query;

@@ -55,11 +55,6 @@ export default function UBedrijven({ onLogout }) {
             <div key={bedrijf.id} className="bedrijfCard">
               <h3 className="bedrijfNaam">{bedrijf.company_name}</h3>
               <p className="bedrijfBeschrijving">{bedrijf.sector}</p>
-              <div className="tagContainer">
-                {bedrijf.tags?.map((tag, index) => (
-                  <span key={index} className="tag">{tag}</span>
-                ))}
-              </div>
               <button
                 onClick={() => likeBedrijf(bedrijf.id)}
                 className="likeButton"

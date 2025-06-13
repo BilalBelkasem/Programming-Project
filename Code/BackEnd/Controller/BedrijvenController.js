@@ -2,18 +2,27 @@ const db = require('../config/db');
 
 exports.getBedrijven = async (req, res) => {
   try {
-    const [rows] = await db.execute(
-      'SELECT id, company_name AS naam, sector AS beschrijving,FROM companies_details'
-    );
+    const [rows, fields] = await db.execute(
+        'SELECT id, company_name, sector FROM companies_details'
+      );
+      
 
-    const bedrijven = rows.map(b => ({
-      ...b,
-      tags: typeof b.tags === 'string' ? b.tags.split(',') : []
-    }));
+    console.log("✅ Resultaat van de database:", rows); // logging
 
-    res.json(bedrijven);
+    if (!Array.isArray(rows)) {
+      console.error("❌ rows is geen array! Inhoud:", rows);
+      return res.status(500).json({
+        error: 'Fout: data is geen array',
+        details: rows
+      });
+    }
+
+    res.json(rows);
   } catch (err) {
     console.error('Fout bij ophalen bedrijven:', err);
-    res.status(500).json({ error: 'Fout bij ophalen bedrijven', details: err.message });
+    res.status(500).json({
+      error: 'Fout bij ophalen bedrijven',
+      details: err.message
+    });
   }
 };
