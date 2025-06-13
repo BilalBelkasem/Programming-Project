@@ -37,6 +37,8 @@ const Register = () => {
 
     try {
       setLoading(true);
+
+      // Let op: hier de velden aangepast naar backend verwachte namen
       const userData = {
         firstName: form.voornaam,
         lastName: form.naam,
@@ -45,17 +47,14 @@ const Register = () => {
         role: 'student'
       };
 
+
       const response = await axios.post('http://localhost:5000/api/register', userData);
 
       console.log('Registratie succesvol:', response.data);
 
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-      }
-
       navigate('/login');
     } catch (err) {
-      console.error('Registration error:', err);
+      console.error('Registratiefout:', err);
       setError(
         err.response?.data?.error ||
         'Er is een fout opgetreden bij het registreren. Probeer het later opnieuw.'
@@ -90,7 +89,9 @@ const Register = () => {
           <label className="form-label">wachtwoord herhalen*</label>
           <input type="password" name="herhaalWachtwoord" value={form.herhaalWachtwoord} onChange={handleChange} className="form-input" required />
 
-          <button type="submit" className="register-button">registreren</button>
+          <button type="submit" className="register-button" disabled={loading}>
+            {loading ? 'Bezig...' : 'registreren'}
+          </button>
           <Link to="/login" className="back-text">← terug</Link>
         </form>
       </div>

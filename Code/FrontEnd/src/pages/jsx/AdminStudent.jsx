@@ -1,30 +1,53 @@
-import React, { useState } from 'react';
-import logo from '../../assets/logo Erasmus.png'; // Let op spatie in bestandsnaam
+import React, { useEffect, useState } from 'react';
+import logo from '../../assets/logo Erasmus.png';
 import '../../pages/Css/AdminStudent.css';
 import { FaTrash, FaArrowLeft, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function AdminStudent() {
   const [zoekterm, setZoekterm] = useState('');
-  const [studenten, setStudenten] = useState([
-    { id: 1, naam: 'Marwan Amakran', school: 'EHB' },
-    { id: 2, naam: 'Aymen Bounasnaa', school: 'EHB' },
-    { id: 3, naam: 'Denis Bujorean', school: 'EHB' }
-  ]);
+  const [studenten, setStudenten] = useState([]);
 
   const navigate = useNavigate();
 
   const handleLogout = () => navigate('/');
   const handleBack = () => navigate('/admin');
 
+  // Studenten ophalen van backend
+  const laadStudenten = () => {
+    axios.get('http://localhost:5000/api/studenten')
+      .then(res => {
+        setStudenten(res.data);
+        console.log('Data van backend:', res.data);
+      })
+      .catch(err => {
+        console.error('Fout bij ophalen studenten:', err);
+      });
+  };
+
+  useEffect(() => {
+    laadStudenten();
+  }, []);
+
   const handleVerwijder = (id, naam) => {
     if (window.confirm(`Ben je zeker dat je ${naam} wilt verwijderen?`)) {
-      setStudenten(prev => prev.filter(student => student.id !== id));
+      // DELETE request naar backend
+      axios.delete(`http://localhost:5000/api/studenten/${id}`)
+        .then(() => {
+          // Alleen verwijderen uit frontend als backend succes gaf
+          setStudenten(prev => prev.filter(student => student.id !== id));
+        })
+        .catch(err => {
+          console.error('Fout bij verwijderen student:', err);
+          alert('Verwijderen is mislukt. Probeer later opnieuw.');
+        });
     }
   };
 
+  // Filter veilig met fallback voor naam
   const gefilterdeStudenten = studenten.filter(student =>
-    student.naam.toLowerCase().includes(zoekterm.toLowerCase())
+    (student.naam || '').toLowerCase().includes(zoekterm.toLowerCase())
   );
 
   return (
