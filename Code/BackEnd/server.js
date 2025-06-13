@@ -46,10 +46,7 @@ app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
 
-// Test routes
-app.get('/api/test-direct', (req, res) => {
-  res.send('Direct route works!');
-});
+
 
 app.get('/api/users', async (req, res) => {
   try {
