@@ -7,11 +7,23 @@ import axios from 'axios';
 export default function UBedrijven({ onLogout }) {
   const navigate = useNavigate();
   const [bedrijven, setBedrijven] = useState([]);
+  const [favorieten, setFavorieten] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/bedrijven')
-      .then(res => setBedrijven(res.data))
-      .catch(err => console.error('Fout bij ophalen bedrijven:', err));
+    const fetchData = async () => {
+      try {
+        const bedrijvenRes = await axios.get('http://localhost:5000/api/bedrijven');
+        setBedrijven(bedrijvenRes.data);
+
+        const user = JSON.parse(localStorage.getItem('user'));
+        const favorietenRes = await axios.get(`http://localhost:5000/api/favorieten/${user.id}`);
+        const geliketeIds = favorietenRes.data.map((bedrijf) => bedrijf.id);
+        setFavorieten(geliketeIds);
+      } catch (err) {
+        console.error('Fout bij ophalen:', err);
+      }
+    };
+    fetchData();
   }, []);
 
   const handleLogout = () => {
@@ -19,18 +31,23 @@ export default function UBedrijven({ onLogout }) {
     navigate("/login");
   };
 
-  const likeBedrijf = async (bedrijfId) => {
+  const toggleLike = async (bedrijfId) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const isFavoriet = favorieten.includes(bedrijfId);
+
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
-
-      await axios.post('http://localhost:5000/api/favorieten', {
-        student_id: user.id,
-        company_id: bedrijfId
-      });
-
-      alert('Bedrijf toegevoegd aan favorieten');
-    } catch (error) {
-      console.error('Fout bij liken:', error);
+      if (isFavoriet) {
+        await axios.delete(`http://localhost:5000/api/favorieten/${bedrijfId}?student_id=${user.id}`);
+        setFavorieten(prev => prev.filter(id => id !== bedrijfId));
+      } else {
+        await axios.post('http://localhost:5000/api/favorieten', {
+          student_id: user.id,
+          company_id: bedrijfId
+        });
+        setFavorieten(prev => [...prev, bedrijfId]);
+      }
+    } catch (err) {
+      console.error('Fout bij togglen van favoriet:', err);
     }
   };
 
@@ -56,8 +73,8 @@ export default function UBedrijven({ onLogout }) {
               <h3 className="bedrijfNaam">{bedrijf.company_name}</h3>
               <p className="bedrijfBeschrijving">{bedrijf.sector}</p>
               <button
-                onClick={() => likeBedrijf(bedrijf.id)}
-                className="likeButton"
+                onClick={() => toggleLike(bedrijf.id)}
+                className={`likeButton ${favorieten.includes(bedrijf.id) ? 'liked' : ''}`}
               >
                 ♥
               </button>

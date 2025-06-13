@@ -94,27 +94,22 @@
 }
 
 .likeButton {
-  width: 40px;
-  height: 40px;
-  background-color: #b2bec3;
-  color: white;
-  font-size: 20px;
+  background: none;
   border: none;
-  border-radius: 6px;
+  font-size: 24px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  color: #999; /* grijs hartje als niet geliket */
+  transition: color 0.3s ease;
   position: absolute;
   top: 8px;
   right: 8px;
 }
 
 .likeButton:hover {
-  background-color: #d63031;
+  color: #d63031; /* rood bij hover */
 }
 
+/* ❤️ Als het bedrijf geliket is */
 .likeButton.liked {
-  color: red;
+  color: red; /* rood als geliket */
 }
