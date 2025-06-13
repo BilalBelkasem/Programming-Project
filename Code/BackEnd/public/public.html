@@ -67,7 +67,7 @@
         select {
             margin-bottom: 15px;
             padding: 10px;
-            width: 100%;
+            width: 90%;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
@@ -151,7 +151,10 @@
             align-items: center;
             margin-top: 10px;
         }
-      
+      .preview-container {
+  display: none; /* hide by default */
+}
+
     </style>
 </head>
 
@@ -311,6 +314,8 @@
                 Download Badge
             </a>
         `;
+        preview.style.display = 'block';
+
                 } catch (error) {
                     console.error('Error generating organisation badge:', error);
                     alert('Failed to generate badge. Please try again.');
@@ -345,6 +350,8 @@
                 Download Badge
             </a>
         `;
+        preview.style.display = 'block';
+
                 } catch (error) {
                     console.error('Error generating badge:', error);
                     alert('Failed to generate badge. Please try again.');
