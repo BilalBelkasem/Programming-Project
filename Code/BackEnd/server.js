@@ -2,7 +2,12 @@ const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
 require('dotenv').config();
+
+// Route imports
 const protectedRoutes = require('./routes/authRoutes');
+const companiesRoutes = require('./companies');
+const studentRoutes = require('./students');
+const badgeRoutes = require('./badge');
 
 const app = express();
 
@@ -17,7 +22,6 @@ app.use(express.json());
 app.use(express.static('public', {
   index: 'public.html'
 }));
-app.use('/api', protectedRoutes);
 
 // Create MySQL connection pool
 const pool = mysql.createPool({
@@ -42,13 +46,11 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes
-const studentRoutes = require('./students');
-const badgeRoutes = require('./badge');
-
 // Mount routes
+app.use('/api', protectedRoutes);
+app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
-app.use('/api/badges', badgeRoutes); // All badge routes will be under /api/badges
+app.use('/api/badges', badgeRoutes);
 
 // Test routes
 app.get('/api/test-direct', (req, res) => {
