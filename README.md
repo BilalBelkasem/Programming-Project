@@ -16,6 +16,9 @@ cd Programming-Project
 ### 2. install backend (express)
 cd Code/BackEnd
 npm install
+npm install multer ( If there is a problem about module, go pacckage.json in depedencies you will see type = module delete this and it will work.)
+npm install pupeteer
+npm install qrcode
 
 ### 3. Install Frontend (React + Vite)
 cd ../FrontEnd
