@@ -151,6 +151,7 @@
             align-items: center;
             margin-top: 10px;
         }
+      
     </style>
 </head>
 
@@ -169,9 +170,8 @@
         <div id="studentTab" class="tab active">
             <div class="control-panel">
                 <h2>Generate Student Badge</h2>
-                <select id="studentSelect">
-                    <option value="">Loading students...</option>
-                </select>
+                <input type="text" id="studentSearch" placeholder="Zoek student op naam" list="studentSuggestions" />
+                <datalist id="studentSuggestions"></datalist>
                 <button id="generateStudentBtn">Generate PDF Badge</button>
                 <div class="loading-container" id="studentLoading">
                     <div class="loading"></div>
@@ -186,9 +186,10 @@
         <div id="bedrijvenTab" class="tab">
             <div class="control-panel">
                 <h2>Generate Organisation Badge</h2>
-                <select id="bedrijfSelect">
-                    <option value="">Loading organisations...</option>
-                </select>
+                <input type="text" id="bedrijfSearch" placeholder="Search organisation by name..."
+                    list="bedrijfSuggestions" />
+                <datalist id="bedrijfSuggestions"></datalist>
+
                 <button id="generateBedrijfBtn">Generate PDF Badge</button>
                 <div class="loading-container" id="bedrijfLoading">
                     <div class="loading"></div>
@@ -218,59 +219,85 @@
             }
 
             // Load all students
+            let studentMap = new Map();
+
             async function loadStudents() {
-                const select = document.getElementById('studentSelect');
+                const input = document.getElementById('studentSearch');
+                const datalist = document.getElementById('studentSuggestions');
+
                 try {
                     setLoading('studentLoading', true);
-                    select.disabled = true;
+                    input.disabled = true;
 
                     const response = await fetch('/api/students');
                     if (!response.ok) throw new Error('Failed to load students');
-
                     const students = await response.json();
-                    select.innerHTML = '<option value="">Select a student</option>';
+
+                    datalist.innerHTML = '';
+                    studentMap.clear();
 
                     students.forEach(student => {
-                        const option = new Option(student.name, student.id);
-                        select.add(option);
+                        const option = document.createElement('option');
+                        option.value = student.name;
+                        datalist.appendChild(option);
+                        studentMap.set(student.name, student.id);
                     });
+
                 } catch (error) {
                     console.error('Error loading students:', error);
-                    select.innerHTML = '<option value="">Error loading students</option>';
+                    datalist.innerHTML = '<option>Error loading</option>';
                 } finally {
-                    select.disabled = false;
+                    input.disabled = false;
                     setLoading('studentLoading', false);
                 }
             }
+
+            const input = document.getElementById('bedrijfSearch');
+            const datalist = document.getElementById('bedrijfSuggestions');
+            let bedrijfMap = new Map();
+
             async function loadOrganisations() {
-                const select = document.getElementById('bedrijfSelect');
                 try {
                     setLoading('bedrijfLoading', true);
-                    select.disabled = true;
+                    input.disabled = true;
+
                     const response = await fetch('/api/companies');
                     if (!response.ok) throw new Error('Failed to load organisations');
+
                     const data = await response.json();
-                    select.innerHTML = '<option value="">Select an organisation</option>';
+                    datalist.innerHTML = '';
+                    bedrijfMap.clear();
+
                     data.forEach(org => {
                         const label = org.company_name;
                         const value = org.user_id;
                         if (label && value) {
-                            const option = new Option(label, value);
-                            select.add(option);
+                            const option = document.createElement('option');
+                            option.value = label;
+                            datalist.appendChild(option);
+                            bedrijfMap.set(label, value);
+
                         }
                     });
                 } catch (error) {
                     console.error('Error loading organisations:', error);
-                    select.innerHTML = '<option value="">Error loading organisations</option>';
+                    datalist.innerHTML = '<option>Error loading</option>';
                 } finally {
-                    select.disabled = false;
+                    input.disabled = false;
                     setLoading('bedrijfLoading', false);
                 }
             }
 
+
             async function generateBedrijfBadge() {
-                const orgId = document.getElementById('bedrijfSelect').value;
-                if (!orgId) return alert('Please select an organisation');
+                const input = document.getElementById('bedrijfSearch');
+                const orgId = bedrijfMap.get(input.value);
+
+                if (!orgId) {
+                    alert('Please select a valid organisation from the list');
+                    return;
+                }
+
                 try {
                     setLoading('bedrijfLoading', true);
                     const response = await fetch(`/api/badges/badge-pdf/company/${orgId}`);
@@ -295,26 +322,29 @@
 
             // Generate student badge PDF
             async function generateStudentBadge() {
-                const studentId = document.getElementById('studentSelect').value;
-                if (!studentId) return alert('Please select a student');
+                const input = document.getElementById('studentSearch');
+                const studentId = studentMap.get(input.value);
+
+                if (!studentId) {
+                    alert('Please select a valid student from the list');
+                    return;
+                }
 
                 try {
                     setLoading('studentLoading', true);
                     const response = await fetch(`/api/badges/badge-pdf/student/${studentId}`);
-
                     if (!response.ok) throw new Error('Badge generation failed');
 
                     const blob = await response.blob();
                     const url = URL.createObjectURL(blob);
 
-                    // Show preview
                     const preview = document.getElementById('studentBadgePreview');
                     preview.innerHTML = `
-                <embed src="${url}" type="application/pdf" width="100%" height="500px" />
-                <a href="${url}" download="student_badge_${studentId}.pdf" class="download-btn">
-                    Download Badge
-                </a>
-            `;
+            <embed src="${url}" type="application/pdf" width="100%" height="500px" />
+            <a href="${url}" download="student_badge_${studentId}.pdf" class="download-btn">
+                Download Badge
+            </a>
+        `;
                 } catch (error) {
                     console.error('Error generating badge:', error);
                     alert('Failed to generate badge. Please try again.');
@@ -322,6 +352,7 @@
                     setLoading('studentLoading', false);
                 }
             }
+
 
 
 
