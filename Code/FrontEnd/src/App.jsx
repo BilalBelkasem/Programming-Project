@@ -20,6 +20,7 @@ import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
 import UBedrijfView from './pages/jsx/UProfielBedrijfView.jsx';
 import Bedrijveninfo from './pages/jsx/bedrijveninfopagina.jsx'
 import Gbedrijveninfo from './pages/jsx/Gbedrijveninfopagina.jsx'
+import StudentProfiel from './pages/jsx/Studentprofiel.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -140,6 +141,7 @@ export default function App() {
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
       <Route path="/BedrijfInfo" element={<Bedrijveninfo />} />
       <Route path="/Gbedrijveninfo" element={<Gbedrijveninfo />} />
+      <Route path="/Studentprofiel" element={<StudentProfiel />} />
 
       <Route
         path="/UFavorietenBedrijven"
