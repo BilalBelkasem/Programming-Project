@@ -41,6 +41,8 @@ const Register = () => {
 
     try {
       setLoading(true);
+
+      // Let op: hier de velden aangepast naar backend verwachte namen
       const userData = {
         firstName: form.voornaam,
         lastName: form.naam,
@@ -49,13 +51,14 @@ const Register = () => {
         role: 'student'
       };
 
+
       const response = await axios.post('http://localhost:5000/api/register', userData);
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-      }
+
+      console.log('Registratie succesvol:', response.data);
 
       navigate('/login');
     } catch (err) {
+      console.error('Registratiefout:', err);
       setError(
         err.response?.data?.error ||
         'Er is een fout opgetreden bij het registreren. Probeer het later opnieuw.'
@@ -113,7 +116,7 @@ const Register = () => {
           />
 
           <button type="submit" className="register-button" disabled={loading}>
-            {loading ? "Even geduld..." : "registreren"}
+            {loading ? 'Bezig...' : 'registreren'}
           </button>
           <Link to="/login" className="back-text">← terug</Link>
         </form>
