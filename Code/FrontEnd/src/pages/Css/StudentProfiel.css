@@ -33,22 +33,30 @@ body {
   }
   
   .profile-picture {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto;
+    margin-top: 50px; /* ruimte onder de header */
+    margin-bottom: 50px;
+    background-color: #ddd; /* grijze achtergrond */
     display: flex;
-    flex-direction: column;
     align-items: center;
-    margin-top: 100px; /* verhoog deze waarde indien nodig */
+    justify-content: center;
+    flex-direction: column;
   }
   .student-profile-grid {
-    margin-top: 100px;
+    margin-top: 50px;
+    margin-bottom: 20px;
   }
   
-.profile-picture img {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
+  .profile-picture img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    margin-bottom: 5px;
-}
+    border-radius: 50%;
+  }
   
 .note {
     font-size: 12px;
