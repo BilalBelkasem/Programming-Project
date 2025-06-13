@@ -18,7 +18,7 @@ export default function LoginPagina({ onLogin }) {
 
     try {
       const response = await axios.post('http://localhost:5000/api/login', {
-        email: email,
+        email,
         password: wachtwoord
       });
 
@@ -27,8 +27,16 @@ export default function LoginPagina({ onLogin }) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
 
-        if (onLogin) onLogin(response.data.user); // Geef user object door
-        navigate('/dashboard');
+        if (onLogin) onLogin(response.data.user);
+
+        const role = response.data.user.role;
+        if (role === 'admin') {
+          navigate('/admin');
+        } else if (role === 'student' || role === 'bedrijf') {
+          navigate('/mijn-profiel');
+        } else {
+          navigate('/');
+        }
       } else {
         setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
       }
@@ -84,11 +92,7 @@ export default function LoginPagina({ onLogin }) {
 
           {error && <div className="error-message">{error}</div>}
 
-          <button
-            type="submit"
-            className="login-button"
-            disabled={isLoading}
-          >
+          <button type="submit" className="login-button" disabled={isLoading}>
             {isLoading ? 'Bezig...' : 'Inloggen'}
           </button>
         </form>
@@ -103,9 +107,7 @@ export default function LoginPagina({ onLogin }) {
               Registreer je bedrijf
             </Link>
             <Link to="/" className="back-button">← Terug naar startpagina</Link>
-            <Link to="/admin" className="admin-button">
-  Admin login
-</Link>
+            <Link to="/admin" className="admin-button">Admin login</Link>
           </div>
         </div>
       </div>
