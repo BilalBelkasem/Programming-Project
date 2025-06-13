@@ -3,13 +3,14 @@ const mysql = require('mysql2');
 const cors = require('cors');
 require('dotenv').config();
 
-const protectedRoutes = require('./routes/authRoutes'); // jouw bestaande routes
+// ✅ Corrigeerd pad (want je zit al in /BackEnd)
+const protectedRoutes = require('./routes/authRoutes');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/api', protectedRoutes); // je andere API routes
+app.use('/api', protectedRoutes); // API routes
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -27,7 +28,7 @@ db.connect((err) => {
   console.log('Connected to MySQL database.');
 });
 
-// Route om studenten met school op te halen uit join van users en students_details
+// Studenten ophalen
 app.get('/api/studenten', (req, res) => {
   const sql = `
     SELECT users.id, users.name AS naam, students_details.school
@@ -44,7 +45,7 @@ app.get('/api/studenten', (req, res) => {
   });
 });
 
-// DELETE endpoint met transaction voor veilig verwijderen van user + details
+// Studenten verwijderen
 app.delete('/api/studenten/:id', (req, res) => {
   const studentId = req.params.id;
   console.log(`DELETE request ontvangen voor student id: ${studentId}`);
@@ -63,7 +64,6 @@ app.delete('/api/studenten/:id', (req, res) => {
           res.status(500).json({ error: 'Fout bij verwijderen student details: ' + err.message });
         });
       }
-      console.log(`Student details verwijderd voor user_id: ${studentId}`);
 
       const deleteUserSql = 'DELETE FROM users WHERE id = ?';
       db.query(deleteUserSql, [studentId], (err2, result) => {
