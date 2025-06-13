@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Launch Badge System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f2f2f2;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+        }
+
+        .header {
+            background-color: #e60028;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 30px;
+        }
+
+        .control-panel {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge-display {
+            flex: 2;
+        }
+
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .badge-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input,
+        select {
+            margin-bottom: 15px;
+            padding: 10px;
+            width: 90%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #20bcb4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #cc0024;
+        }
+
+        .tab {
+            display: none;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: #eee;
+            border: none;
+            cursor: pointer;
+        }
+
+        .tab-btn.active {
+            background: #e60028;
+            color: white;
+        }
+
+        .preview-container {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-container {
+            display: none;
+            align-items: center;
+            margin-top: 10px;
+        }
+      .preview-container {
+  display: none; /* hide by default */
+}
+
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Career Launch Badge Systeem</h1>
+    </div>
+
+    <div class="tab-buttons">
+        <button class="tab-btn active" onclick="openTab('studentTab')">Student Badges</button>
+        <button class="tab-btn" onclick="openTab('bedrijvenTab')">Bedrijven Badges</button>
+    </div>
+
+    <div class="container">
+        <!-- Student Badges Tab -->
+        <div id="studentTab" class="tab active">
+            <div class="control-panel">
+                <h2>Maak Student Badge</h2>
+                <input type="text" id="studentSearch" placeholder="Zoek student op naam" list="studentSuggestions" />
+                <datalist id="studentSuggestions"></datalist>
+                <button id="generateStudentBtn">Maak PDF Badge</button>
+                <div class="loading-container" id="studentLoading">
+                    <div class="loading"></div>
+                    <span>Generating badge...</span>
+                </div>
+                <div id="studentBadgePreview" class="preview-container"></div>
+            </div>
+        </div>
+
+
+        <!-- Bedrijven Badges Tab -->
+        <div id="bedrijvenTab" class="tab">
+            <div class="control-panel">
+                <h2>Maak Bedrijf Badge</h2>
+                <input type="text" id="bedrijfSearch" placeholder="Zoek bedrijf op naam"
+                    list="bedrijfSuggestions" />
+                <datalist id="bedrijfSuggestions"></datalist>
+
+                <button id="generateBedrijfBtn">Maak PDF Badge</button>
+                <div class="loading-container" id="bedrijfLoading">
+                    <div class="loading"></div>
+                    <span>Generating badge...</span>
+                </div>
+                <div id="bedrijfBadgePreview" class="preview-container"></div>
+            </div>
+        </div>
+
+        <script>
+            // Tab navigation
+            function openTab(tabId) {
+                document.querySelectorAll('.tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.getElementById(tabId).classList.add('active');
+                event.currentTarget.classList.add('active');
+            }
+
+            // Loading state management
+            function setLoading(elementId, isLoading) {
+                const loader = document.getElementById(elementId);
+                loader.style.display = isLoading ? 'flex' : 'none';
+            }
+
+            // Load all students
+            let studentMap = new Map();
+
+            async function loadStudents() {
+                const input = document.getElementById('studentSearch');
+                const datalist = document.getElementById('studentSuggestions');
+
+                try {
+                    setLoading('studentLoading', true);
+                    input.disabled = true;
+
+                    const response = await fetch('/api/students');
+                    if (!response.ok) throw new Error('Failed to load students');
+                    const students = await response.json();
+
+                    datalist.innerHTML = '';
+                    studentMap.clear();
+
+                    students.forEach(student => {
+                        const option = document.createElement('option');
+                        option.value = student.name;
+                        datalist.appendChild(option);
+                        studentMap.set(student.name, student.id);
+                    });
+
+                } catch (error) {
+                    console.error('Error loading students:', error);
+                    datalist.innerHTML = '<option>Error loading</option>';
+                } finally {
+                    input.disabled = false;
+                    setLoading('studentLoading', false);
+                }
+            }
+
+            const input = document.getElementById('bedrijfSearch');
+            const datalist = document.getElementById('bedrijfSuggestions');
+            let bedrijfMap = new Map();
+
+            async function loadOrganisations() {
+                try {
+                    setLoading('bedrijfLoading', true);
+                    input.disabled = true;
+
+                    const response = await fetch('/api/companies');
+                    if (!response.ok) throw new Error('Failed to load organisations');
+
+                    const data = await response.json();
+                    datalist.innerHTML = '';
+                    bedrijfMap.clear();
+
+                    data.forEach(org => {
+                        const label = org.company_name;
+                        const value = org.user_id;
+                        if (label && value) {
+                            const option = document.createElement('option');
+                            option.value = label;
+                            datalist.appendChild(option);
+                            bedrijfMap.set(label, value);
+
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error loading organisations:', error);
+                    datalist.innerHTML = '<option>Error loading</option>';
+                } finally {
+                    input.disabled = false;
+                    setLoading('bedrijfLoading', false);
+                }
+            }
+
+
+            async function generateBedrijfBadge() {
+                const input = document.getElementById('bedrijfSearch');
+                const orgId = bedrijfMap.get(input.value);
+
+                if (!orgId) {
+                    alert('Please select a valid organisation from the list');
+                    return;
+                }
+
+                try {
+                    setLoading('bedrijfLoading', true);
+                    const response = await fetch(`/api/badges/badge-pdf/company/${orgId}`);
+                    if (!response.ok) throw new Error('Badge generation failed');
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const preview = document.getElementById('bedrijfBadgePreview');
+                    preview.innerHTML = `
+            <embed src="${url}" type="application/pdf" width="100%" height="500px" />
+            <a href="${url}" download="organisation_badge_${orgId}.pdf" class="download-btn">
+                Download Badge
+            </a>
+        `;
+        preview.style.display = 'block';
+
+                } catch (error) {
+                    console.error('Error generating organisation badge:', error);
+                    alert('Failed to generate badge. Please try again.');
+                } finally {
+                    setLoading('bedrijfLoading', false);
+                }
+            }
+
+
+            // Generate student badge PDF
+            async function generateStudentBadge() {
+                const input = document.getElementById('studentSearch');
+                const studentId = studentMap.get(input.value);
+
+                if (!studentId) {
+                    alert('Please select a valid student from the list');
+                    return;
+                }
+
+                try {
+                    setLoading('studentLoading', true);
+                    const response = await fetch(`/api/badges/badge-pdf/student/${studentId}`);
+                    if (!response.ok) throw new Error('Badge generation failed');
+
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+
+                    const preview = document.getElementById('studentBadgePreview');
+                    preview.innerHTML = `
+            <embed src="${url}" type="application/pdf" width="100%" height="500px" />
+            <a href="${url}" download="student_badge_${studentId}.pdf" class="download-btn">
+                Download Badge
+            </a>
+        `;
+        preview.style.display = 'block';
+
+                } catch (error) {
+                    console.error('Error generating badge:', error);
+                    alert('Failed to generate badge. Please try again.');
+                } finally {
+                    setLoading('studentLoading', false);
+                }
+            }
+
+
+
+
+            // Load users for assignment
+            async function loadUsers() {
+                const userSelect = document.getElementById('userSelect');
+                const badgeUserSelect = document.getElementById('userBadgeSelect');
+
+                try {
+                    const response = await fetch('/api/users');
+                    const users = await response.json();
+
+                    [userSelect, badgeUserSelect].forEach(select => {
+                        select.innerHTML = '<option value="">Select a user</option>';
+                        users.forEach(user => {
+                            const option = new Option(user.name, user.id);
+                            select.add(option);
+                        });
+                    });
+                } catch (error) {
+                    console.error('Error loading users:', error);
+                    userSelect.innerHTML = '<option value="">Error loading users</option>';
+                    badgeUserSelect.innerHTML = '<option value="">Error loading users</option>';
+                }
+            }
+
+            // Assign new badge
+            async function assignBadge(event) {
+                event.preventDefault();
+
+                const userId = document.getElementById('userSelect').value;
+                const badgeId = document.getElementById('badgeSelect').value;
+                const customName = document.getElementById('customName').value;
+                const customTitle = document.getElementById('customTitle').value;
+                const customOrg = document.getElementById('customOrg').value;
+
+                if (!userId || !badgeId) return alert('Please select user and badge type');
+
+                try {
+                    setLoading('assignLoading', true);
+                    const response = await fetch('/api/badges/assign', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId, badgeId, customName, customTitle, customOrg })
+                    });
+
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || 'Failed to assign badge');
+
+                    alert('Badge assigned successfully!');
+                    document.getElementById('assignForm').reset();
+                    loadUserBadges();
+                } catch (error) {
+                    console.error('Error assigning badge:', error);
+                    alert(error.message || 'Failed to assign badge');
+                } finally {
+                    setLoading('assignLoading', false);
+                }
+            }
+
+            // Load badges for user
+            async function loadUserBadges() {
+                const userId = document.getElementById('userBadgeSelect').value;
+                if (!userId) return;
+
+                const container = document.getElementById('badgeContainer');
+                try {
+                    setLoading('badgesLoading', true);
+                    container.innerHTML = '';
+
+                    const response = await fetch(`/api/badges/user/${userId}`);
+                    const badges = await response.json();
+
+                    if (badges.length === 0) {
+                        container.innerHTML = '<p>No badges assigned to this user</p>';
+                        return;
+                    }
+
+                    for (const badge of badges) {
+                        const badgeResponse = await fetch(`/api/badges/${badge.id}/html`);
+                        const badgeHtml = await badgeResponse.text();
+
+                        const badgeItem = document.createElement('div');
+                        badgeItem.className = 'badge-item';
+                        badgeItem.innerHTML = badgeHtml;
+
+                        const downloadBtn = document.createElement('button');
+                        downloadBtn.textContent = 'Download PDF';
+                        downloadBtn.onclick = () => downloadBadgePDF(badge.id);
+                        badgeItem.appendChild(downloadBtn);
+
+                        container.appendChild(badgeItem);
+                    }
+                } catch (error) {
+                    console.error('Error loading badges:', error);
+                    container.innerHTML = '<p>Error loading badges</p>';
+                } finally {
+                    setLoading('badgesLoading', false);
+                }
+            }
+
+            // Download badge as PDF
+            async function downloadBadgePDF(badgeId) {
+                try {
+                    window.open(`/api/badges/badge-pdf/${badgeId}`, '_blank');
+                } catch (error) {
+                    console.error('Error downloading badge:', error);
+                    alert('Failed to download badge');
+                }
+            }
+
+            // Preview badge template
+            async function previewBadgeTemplate(badgeId) {
+                try {
+                    const response = await fetch(`/api/badges/${badgeId}/html`);
+                    const badgeHtml = await response.text();
+
+                    const previewWindow = window.open('', '_blank');
+                    previewWindow.document.write(badgeHtml);
+                    previewWindow.document.close();
+                } catch (error) {
+                    console.error('Error previewing template:', error);
+                    alert('Failed to preview badge template');
+                }
+            }
+
+            // Initialize
+            document.addEventListener('DOMContentLoaded', () => {
+                // Event listeners
+                document.getElementById('generateStudentBtn').addEventListener('click', generateStudentBadge);
+
+                document.getElementById('generateBedrijfBtn').addEventListener('click', generateBedrijfBadge);
+
+                // Load initial data
+                loadStudents();
+
+
+                loadOrganisations();
+            });
+        </script>
+
+</body>
+
+</html>
