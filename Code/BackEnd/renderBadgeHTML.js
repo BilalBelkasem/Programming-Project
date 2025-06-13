@@ -109,7 +109,7 @@ async function renderBadgeHTML(data, student = null) {
     <div class="keycord-hole"></div>
 
     <div class="header">
-      <img src="http://localhost:3000/assets/default-logo.png" class="logo" alt="Logo" />
+      <img src="http://localhost:5000/assets/default-logo.png" class="logo" alt="Logo" />
       <h2 class="name">${name}</h2>
     </div>
 

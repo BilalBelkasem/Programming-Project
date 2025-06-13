@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import logo from '../../assets/logo Erasmus.png';
 import '../Css/ProfielStudent.css';
 
 export default function ProfielStudent() {
@@ -14,7 +15,7 @@ export default function ProfielStudent() {
     about: '',
     lookingFor: '',
     domain: '',
-    profilePicture: null
+    profilePicture: null,
   });
 
   const handleChange = (e) => {
@@ -25,45 +26,56 @@ export default function ProfielStudent() {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData(prev => ({ ...prev, profilePicture: URL.createObjectURL(file) }));
+      setFormData(prev => ({
+        ...prev,
+        profilePicture: URL.createObjectURL(file),
+      }));
     }
   };
 
   const handleSubmit = () => {
     alert('Wijzigingen bevestigd!');
-    // Hier zou je eventueel een API-call doen naar een backend.
+  };
+
+  const handleLogout = () => {
+    alert('Uitgelogd');
+    // Voeg hier logout-logica toe
   };
 
   return (
-    <div className="student-profile">
-      <nav className="navbar">
-        <img src="/logo.png" alt="Erasmus Logo" className="logo" />
-        <ul className="nav-links">
-          <li>info</li>
-          <li>bedrijven</li>
-          <li>plattegrond</li>
-          <li>Mijn profiel</li>
-        </ul>
-      </nav>
+    <div className="page-wrapper">
+      <header className="header">
+        <img src={logo} alt="Erasmus Logo" className="logo" />
+
+        <nav className="nav">
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
+        </nav>
+
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+      </header>
 
       <div className="container">
         <div className="profile-picture">
           <img
             src={formData.profilePicture || '/profile.jpg'}
             alt="Profile"
+            className="circle"
           />
-          <input type="file" accept="image/*" onChange={handleImageUpload} />
-          <p>(optioneel)</p>
+          <input type="file" accept="image/*" onChange={handleImageUpload} className="upload-btn" />
         </div>
-
-        <p className="note">alles wat je hier invult is zichtbaar voor bedrijven die je QR Code scannen</p>
 
         <div className="form-grid">
           <div className="left">
             <label>Naam</label>
             <input name="name" value={formData.name} onChange={handleChange} />
+
             <label>School (optioneel)</label>
             <input name="school" value={formData.school} onChange={handleChange} />
+
             <label>Jaar (optioneel)</label>
             <select name="year" value={formData.year} onChange={handleChange}>
               <option value="">-- selecteer --</option>
@@ -71,8 +83,10 @@ export default function ProfielStudent() {
               <option value="Tweede jaar">Tweede jaar</option>
               <option value="Derde jaar">Derde jaar</option>
             </select>
+
             <label>LinkedIn (optioneel)</label>
             <input name="linkedin" value={formData.linkedin} onChange={handleChange} />
+
             <label>Email</label>
             <input name="email" value={formData.email} onChange={handleChange} />
           </div>
@@ -92,10 +106,10 @@ export default function ProfielStudent() {
             <label>Tot welke van de 4 IT domeinen behoort u?</label>
             <select name="domain" value={formData.domain} onChange={handleChange}>
               <option value="">-- selecteer --</option>
-              <option value="data">Data</option>
-              <option value="netwerking">Netwerking</option>
-              <option value="ai">AI / Robotica</option>
-              <option value="software">Software</option>
+              <option value="Data">Data</option>
+              <option value="Netwerking">Netwerking</option>
+              <option value="AI / Robotica">AI / Robotica</option>
+              <option value="Software">Software</option>
             </select>
           </div>
         </div>
@@ -114,10 +128,10 @@ export default function ProfielStudent() {
           <label>Wat zoekt u?</label>
           <select name="lookingFor" value={formData.lookingFor} onChange={handleChange}>
             <option value="">-- selecteer --</option>
-            <option value="jobstudent">Jobstudent</option>
-            <option value="connecties">Connecties</option>
-            <option value="stage">Stage</option>
-            <option value="job">Job</option>
+            <option value="Jobstudent">Jobstudent</option>
+            <option value="Connecties">Connecties</option>
+            <option value="Stage">Stage</option>
+            <option value="Job">Job</option>
           </select>
         </div>
 
