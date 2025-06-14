@@ -13,8 +13,8 @@ export default function ProfielStudent() {
     linkedin: '',
     email: '',
     about: '',
-    lookingFor: '',
-    domain: '',
+    lookingFor: [],
+    domain: [],
     profilePicture: null,
   });
 
@@ -33,13 +33,25 @@ export default function ProfielStudent() {
     }
   };
 
+  const handleCheckboxChange = (e, field) => {
+    const value = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].includes(value)
+        ? prev[field].filter(v => v !== value)
+        : [...prev[field], value]
+    }));
+  };
+
   const handleSubmit = () => {
     alert('Wijzigingen bevestigd!');
+    console.log(formData);
   };
 
   const handleLogout = () => {
     alert('Uitgelogd');
-    // Voeg hier logout-logica toe
+    localStorage.clear();
+    window.location.href = '/login';
   };
 
   return (
@@ -96,21 +108,22 @@ export default function ProfielStudent() {
             <input name="lastname" value={formData.lastname} onChange={handleChange} />
 
             <label>Richting (optioneel)</label>
-            <select name="direction" value={formData.direction} onChange={handleChange}>
-              <option value="">-- selecteer --</option>
-              <option value="Toegepaste Informatica">Toegepaste Informatica</option>
-              <option value="Bedrijf & Management">Bedrijf & Management</option>
-              <option value="Media">Media</option>
-            </select>
+            <input name="direction" value={formData.direction} onChange={handleChange} />
 
             <label>Tot welke van de 4 IT domeinen behoort u?</label>
-            <select name="domain" value={formData.domain} onChange={handleChange}>
-              <option value="">-- selecteer --</option>
-              <option value="Data">Data</option>
-              <option value="Netwerking">Netwerking</option>
-              <option value="AI / Robotica">AI / Robotica</option>
-              <option value="Software">Software</option>
-            </select>
+            <div className="checkbox-group">
+              {["Data", "Netwerking", "AI / Robotica", "Software"].map(option => (
+                <label key={option}>
+                  <input
+                    type="checkbox"
+                    value={option}
+                    checked={formData.domain.includes(option)}
+                    onChange={(e) => handleCheckboxChange(e, "domain")}
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -126,13 +139,19 @@ export default function ProfielStudent() {
 
         <div className="section">
           <label>Wat zoekt u?</label>
-          <select name="lookingFor" value={formData.lookingFor} onChange={handleChange}>
-            <option value="">-- selecteer --</option>
-            <option value="Jobstudent">Jobstudent</option>
-            <option value="Connecties">Connecties</option>
-            <option value="Stage">Stage</option>
-            <option value="Job">Job</option>
-          </select>
+          <div className="checkbox-group">
+            {["Jobstudent", "Connecties", "Stage", "Job"].map(option => (
+              <label key={option}>
+                <input
+                  type="checkbox"
+                  value={option}
+                  checked={formData.lookingFor.includes(option)}
+                  onChange={(e) => handleCheckboxChange(e, "lookingFor")}
+                />
+                {option}
+              </label>
+            ))}
+          </div>
         </div>
 
         <button className="confirm-btn" onClick={handleSubmit}>Bevestig wijzigingen</button>
