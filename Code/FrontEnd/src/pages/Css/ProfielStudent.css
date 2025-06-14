@@ -3,6 +3,7 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  line-height: 1.6;
 }
 
 .page-wrapper {
@@ -45,38 +46,40 @@ body {
 .container {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 30px 20px;
 }
 
+/* Profile Picture Section */
 .profile-picture {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 30px 0;
+  margin: 30px 0 40px 0;
 }
 
 .circle {
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #aaa;
+  border: 3px solid #aaa;
   margin-bottom: 15px;
+  background-color: #ccc;
 }
 
 .upload-btn {
   margin-bottom: 20px;
 }
 
+/* Form Grid */
 .form-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 50px;
-  justify-content: space-between;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 .left, .right {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -84,22 +87,45 @@ body {
 
 .left label, .right label {
   font-weight: bold;
-  display: block;
+  color: #333;
+  font-size: 16px;
   margin-bottom: 5px;
+  display: block;
 }
 
-input, select {
-  background: #ddd;
+.left input, .left select, .right input {
+  background-color: #ddd;
   padding: 12px;
   border: none;
   border-radius: 5px;
   font-size: 15px;
   width: 100%;
   box-sizing: border-box;
+  border: 1px solid #bbb;
 }
 
-textarea {
-  background: #ddd;
+.left input:focus, .left select:focus, .right input:focus {
+  outline: none;
+  border-color: #999;
+}
+
+/* Section Styling */
+.section {
+  margin-bottom: 30px;
+}
+
+.section label {
+  font-weight: bold;
+  color: #333;
+  font-size: 16px;
+  display: block;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 8px;
+}
+
+.section textarea {
+  background-color: #ddd;
   padding: 12px;
   border: none;
   border-radius: 5px;
@@ -108,19 +134,15 @@ textarea {
   min-height: 120px;
   width: 100%;
   box-sizing: border-box;
+  border: 1px solid #bbb;
 }
 
-.section {
-  margin-bottom: 30px;
-  width: 100%;
+.section textarea:focus {
+  outline: none;
+  border-color: #999;
 }
 
-.section label {
-  font-weight: bold;
-  display: block;
-  margin-bottom: 10px;
-}
-
+/* Checkbox Group Styling */
 .checkbox-group {
   display: flex;
   flex-direction: column;
@@ -128,6 +150,7 @@ textarea {
   background-color: #ddd;
   padding: 20px;
   border-radius: 5px;
+  border: 1px solid #bbb;
 }
 
 .checkbox-group label {
@@ -147,6 +170,7 @@ textarea {
   accent-color: #444;
 }
 
+/* Confirm Button */
 .confirm-btn {
   background-color: #444;
   color: white;
@@ -156,30 +180,59 @@ textarea {
   border-radius: 6px;
   cursor: pointer;
   display: block;
-  margin: 0 auto 40px;
+  margin: 30px auto 40px;
   font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 
 .confirm-btn:hover {
   background-color: #333;
 }
 
-/* Responsive design */
+/* Responsive Design */
 @media (max-width: 768px) {
+  .container {
+    padding: 20px 15px;
+  }
+  
   .form-grid {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 20px;
   }
   
-  .container {
-    padding: 0 15px;
+  .circle {
+    width: 150px;
+    height: 150px;
   }
   
   .nav {
     gap: 20px;
+    font-size: 14px;
   }
   
   .header {
     padding: 15px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .circle {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .form-grid {
+    gap: 15px;
   }
 }

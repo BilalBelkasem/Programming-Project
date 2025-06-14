@@ -1,94 +1,255 @@
 body {
-    background: #f2f2f2;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .company-profile-wrapper {
-    padding: 20px;
-  }
-  
-  .navbar {
-    background: #d9d9d9;
-    display: flex;
-    align-items: center;
-    padding: 10px 20px;
-  }
-  
-  .logo {
-    height: 40px;
-    margin-right: auto;
-  }
-  
-  .nav-links {
-    list-style: none;
-    display: flex;
-    gap: 30px;
-    font-weight: bold;
-  }
-  
-  .profile-section {
-    text-align: center;
-    margin-top: 30px;
-  }
-  
-  .profile-picture {
-    width: 120px;
-    height: 120px;
-    background: #ddd;
-    border-radius: 50%;
-    margin: 0 auto 20px;
-    line-height: 120px;
+  background-color: #f2f2f2;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.page-wrapper {
+  min-height: 100vh;
+}
+
+.header {
+  background: #d9d9d9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 40px;
+}
+
+.logo {
+  height: 45px;
+}
+
+.nav {
+  display: flex;
+  gap: 50px;
+}
+
+.navLink {
+  font-weight: bold;
+  text-decoration: none;
+  color: black;
+}
+
+.navLink:hover {
+  text-decoration: underline;
+}
+
+.logoutIcon {
+  font-size: 22px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* Profile Picture Section */
+.profile-picture {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 30px 0 40px 0;
+}
+
+.circle {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #aaa;
+  margin-bottom: 15px;
+  background-color: #ccc;
+}
+
+.upload-btn {
+  margin-bottom: 20px;
+}
+
+/* Profile Grid */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label {
+  font-weight: bold;
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.field input {
+  background-color: #ddd;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  border: 1px solid #bbb;
+  box-sizing: border-box;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: #999;
+}
+
+/* Full-width fields */
+.full {
+  grid-column: 1 / -1;
+}
+
+/* Section Styling */
+.section {
+  margin-bottom: 30px;
+}
+
+.section h2, .section h3 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 8px;
+}
+
+.section h3 {
+  font-size: 18px;
+}
+
+.textarea {
+  background-color: #ddd;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  resize: vertical;
+  min-height: 120px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #bbb;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #999;
+}
+
+/* Checkbox Group Styling */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #ddd;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #bbb;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: normal;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #444;
+}
+
+.checkbox-group p {
+  margin: 0;
+  font-style: italic;
+  color: #666;
+  text-align: center;
+}
+
+/* Confirm Button */
+.confirm-btn {
+  background-color: #444;
+  color: white;
+  font-weight: bold;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: block;
+  margin: 30px auto 40px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.confirm-btn:hover {
+  background-color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 15px;
   }
   
   .profile-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 20px;
-    max-width: 600px;
-    margin: 0 auto;
   }
   
-  .field, .full-width-field {
-    text-align: left;
+  .circle {
+    width: 150px;
+    height: 150px;
   }
   
-  .full-width-field {
-    grid-column: span 2;
+  .nav {
+    gap: 20px;
+    font-size: 14px;
   }
   
-  .value {
-    background: #ddd;
-    padding: 8px;
-    margin-top: 5px;
+  .header {
+    padding: 15px 20px;
   }
   
-  .company-info {
-    margin: 40px auto;
-    max-width: 800px;
+  .section h2, .section h3 {
+    font-size: 18px;
   }
-  
-  .section {
-    margin-bottom: 30px;
-  }
-  
-  .section label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  .textarea {
-    background: #ccc;
-    padding: 20px;
-    min-height: 100px;
-  }
-  
-  .checkbox-group {
-    background: #ccc;
-    padding: 15px;
-    display: flex;
+}
+
+@media (max-width: 480px) {
+  .nav {
     flex-direction: column;
     gap: 10px;
   }
+  
+  .header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .circle {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .profile-grid {
+    gap: 15px;
+  }
+}
