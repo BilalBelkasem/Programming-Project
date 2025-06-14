@@ -1,27 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from '../../assets/logo Erasmus.png';
 import '../../pages/Css/AdminBedrijf.css';
 import { FaSignOutAlt, FaTrash, FaArrowLeft } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export default function AdminBedrijf() {
   const [zoekterm, setZoekterm] = useState('');
-  const [bedrijven, setBedrijven] = useState([
-    { id: 1, naam: 'Colruyt group' },
-    { id: 2, naam: 'Decathlon' },
-    { id: 3, naam: 'Action' },
-    { id: 4, naam: 'DELL' }
-  ]);
+  const [bedrijven, setBedrijven] = useState([]);
 
   const navigate = useNavigate();
 
   const handleLogout = () => navigate('/');
   const handleBack = () => navigate('/admin');
 
+  // ✅ Laad bedrijven van backend bij mount
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/bedrijven', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+      .then(res => {
+        setBedrijven(res.data);
+      })
+      .catch(err => {
+        console.error('Fout bij ophalen bedrijven:', err);
+      });
+  }, []);
+
+  // ✅ Verwijder bedrijf via API en update lijst
   const handleVerwijder = (id, naam) => {
     const bevestiging = window.confirm(`Ben je zeker dat je ${naam} wilt verwijderen?`);
     if (bevestiging) {
-      setBedrijven(prev => prev.filter(b => b.id !== id));
+      axios.delete(`http://localhost:5000/api/bedrijven/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      .then(() => {
+        setBedrijven(prev => prev.filter(b => b.id !== id));
+      })
+      .catch(err => {
+        console.error('Fout bij verwijderen bedrijf:', err);
+        alert('Verwijderen is mislukt. Probeer later opnieuw.');
+      });
     }
   };
 
