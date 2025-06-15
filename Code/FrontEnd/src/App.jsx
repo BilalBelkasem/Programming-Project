@@ -5,6 +5,7 @@ import GInfoPagina from './pages/jsx/GInfoPagina.jsx';
 import UInfoPagina from './pages/jsx/UInfoPagina.jsx';
 import LoginPagina from './pages/jsx/LoginPagina.jsx';
 import UBedrijven from './pages/jsx/UBedrijven.jsx';
+import GBedrijven from './pages/jsx/GBedrijven.jsx';  // 👈 import toegevoegd
 import AdminDashboard from './pages/jsx/AdminDashboard.jsx';
 import CompanyRegistrationForm from './pages/jsx/CompanyRegistrationForm.jsx';
 import AdminStudent from './pages/jsx/AdminStudent.jsx';
@@ -18,6 +19,11 @@ import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
 import UBedrijfView from './pages/jsx/UProfielBedrijfView.jsx';
+
+function BedrijvenRedirect() {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  return isLoggedIn ? <Navigate to="/ubedrijven" /> : <Navigate to="/gbedrijven" />;
+}
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -80,10 +86,12 @@ export default function App() {
         }
       />
 
-      <Route path="/bedrijven"
-        element={isLoggedIn ? <UBedrijven /> : <Navigate to="/login" />}
-      />
-      
+      {/* Nieuwe route die redirect naar UBedrijven of GBedrijven */}
+      <Route path="/bedrijven" element={<BedrijvenRedirect />} />
+
+      <Route path="/ubedrijven" element={<UBedrijven />} />
+      <Route path="/gbedrijven" element={<GBedrijven />} />
+
       <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/admin/studenten" element={<AdminStudent />} />
       <Route path="/admin/bedrijven" element={<AdminBedrijf />} />

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../Css/ProfielStudent.css';
 
-export default function ProfielStudent() {
+export default function ProfielStudent({ user }) {
   const [formData, setFormData] = useState({
     name: '',
     lastname: '',
@@ -17,6 +17,25 @@ export default function ProfielStudent() {
     domain: [],
     profilePicture: null,
   });
+
+  // Vul formData met user data zodra user beschikbaar is
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || '',
+        lastname: user.lastname || '',
+        school: user.school || '',
+        direction: user.direction || '',
+        year: user.year || '',
+        linkedin: user.linkedin || '',
+        email: user.email || '',
+        about: user.about || '',
+        lookingFor: user.lookingFor || [],
+        domain: user.domain || [],
+        profilePicture: user.profilePicture || null,
+      });
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,6 +65,7 @@ export default function ProfielStudent() {
   const handleSubmit = () => {
     alert('Wijzigingen bevestigd!');
     console.log(formData);
+    // TODO: hier kan je update request naar backend doen
   };
 
   const handleLogout = () => {
@@ -53,6 +73,10 @@ export default function ProfielStudent() {
     localStorage.clear();
     window.location.href = '/login';
   };
+
+  if (!user || user.role !== 'student') {
+    return <p>Je bent niet ingelogd als student.</p>;
+  }
 
   return (
     <div className="page-wrapper">
