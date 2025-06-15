@@ -18,22 +18,33 @@ export default function ProfielStudent({ user }) {
     profilePicture: null,
   });
 
-  // Vul formData met user data zodra user beschikbaar is
+  // Fetch profile data from backend on mount and when user.id changes
   useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || '',
-        lastname: user.lastname || '',
-        school: user.school || '',
-        direction: user.direction || '',
-        year: user.year || '',
-        linkedin: user.linkedin || '',
-        email: user.email || '',
-        about: user.about || '',
-        lookingFor: user.lookingFor || [],
-        domain: user.domain || [],
-        profilePicture: user.profilePicture || null,
-      });
+    if (user && user.id) {
+      fetch(`/api/mijnprofiel/${user.id}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch profile');
+          return res.json();
+        })
+        .then(data => {
+          setFormData({
+            name: data.name || '',
+            lastname: data.lastname || '',
+            school: data.school || '',
+            direction: data.education || '',  // backend uses 'education'
+            year: data.year || '',
+            linkedin: data.linkedin_url || '', // backend uses linkedin_url
+            email: data.email || '',
+            about: data.about || '',
+            lookingFor: data.lookingFor || [],
+            domain: data.domain || [],
+            profilePicture: null, // keep null until user uploads a new one
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Kon profiel niet laden.');
+        });
     }
   }, [user]);
 
@@ -62,10 +73,28 @@ export default function ProfielStudent({ user }) {
     }));
   };
 
-  const handleSubmit = () => {
-    alert('Wijzigingen bevestigd!');
-    console.log(formData);
-    // TODO: hier kan je update request naar backend doen
+  const handleSubmit = async () => {
+    if (!user || !user.id) {
+      alert('Geen gebruiker ingelogd!');
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/mijnprofiel/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (!res.ok) {
+        throw new Error('Update mislukt');
+      }
+
+      alert('Wijzigingen succesvol bevestigd!');
+    } catch (err) {
+      console.error(err);
+      alert('Fout bij opslaan van profiel');
+    }
   };
 
   const handleLogout = () => {

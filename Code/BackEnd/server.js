@@ -10,6 +10,7 @@ const protectedRoutes = require('./routes/authRoutes');
 const companiesRoutes = require('./companies');
 const studentRoutes = require('./students');
 const badgeRoutes = require('./badge');
+const mijnProfielRoutes = require('./routes/mijnprofiel');  // <-- Added here
 
 const app = express();
 app.use(cors());
@@ -47,6 +48,7 @@ app.use('/api', protectedRoutes);
 app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
+app.use('/api/mijnprofiel', mijnProfielRoutes);  // <-- Mounted here
 
 // Users ophalen
 app.get('/api/users', async (req, res) => {
@@ -132,7 +134,8 @@ app.post('/api/register-company', upload.single('logo'), async (req, res) => {
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    db.query(
+    // Use promise version for consistency with the rest of your code
+    const [result] = await pool.promise().query(
       sql,
       [
         email,
@@ -150,22 +153,17 @@ app.post('/api/register-company', upload.single('logo'), async (req, res) => {
         invoice_contact_email,
         vat_number,
         logoBuffer
-      ],
-      (err, result) => {
-        if (err) {
-          console.error('Fout bij registratie:', err);
-          return res.status(500).json({ error: 'Registratie mislukt' });
-        }
-        res.status(201).json({ message: 'Bedrijf succesvol geregistreerd' });
-      }
+      ]
     );
+
+    res.status(201).json({ message: 'Bedrijf succesvol geregistreerd' });
   } catch (error) {
     console.error('Server error:', error);
     res.status(500).json({ error: 'Server fout' });
   }
 });
 
-  const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
