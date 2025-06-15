@@ -3,13 +3,13 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  line-height: 1.6;
 }
 
 .page-wrapper {
   min-height: 100vh;
 }
 
-/* ✅ HEADER */
 .header {
   background: #d9d9d9;
   display: flex;
@@ -43,79 +43,134 @@ body {
   font-weight: bold;
 }
 
-/* ✅ MAIN FORM */
 .container {
   max-width: 1000px;
   margin: 0 auto;
+  padding: 30px 20px;
 }
 
+/* Profile Picture Section */
 .profile-picture {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 30px;
+  margin: 30px 0 40px 0;
 }
 
 .circle {
-  width: 150px;
-  height: 150px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #aaa;
-  margin-bottom: 10px;
+  border: 3px solid #aaa;
+  margin-bottom: 15px;
+  background-color: #ccc;
 }
 
 .upload-btn {
-  margin-bottom: 5px;
+  margin-bottom: 20px;
 }
 
-.note {
-  font-size: 12px;
-  color: #444;
-  text-align: center;
-  margin: 10px 0 30px;
-}
-
+/* Form Grid */
 .form-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 50px;
-  justify-content: space-between;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 }
 
 .left, .right {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-input, select, textarea {
-  background: #ddd;
+.left label, .right label {
+  font-weight: bold;
+  color: #333;
+  font-size: 16px;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.left input, .left select, .right input {
+  background-color: #ddd;
   padding: 12px;
   border: none;
   border-radius: 5px;
   font-size: 15px;
   width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #bbb;
 }
 
-textarea {
-  resize: vertical;
-  min-height: 250px;
-  width: 100%;
+.left input:focus, .left select:focus, .right input:focus {
+  outline: none;
+  border-color: #999;
 }
 
+/* Section Styling */
 .section {
   margin-bottom: 30px;
-  width: 100%;
 }
 
 .section label {
   font-weight: bold;
+  color: #333;
+  font-size: 16px;
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 8px;
 }
 
+.section textarea {
+  background-color: #ddd;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  resize: vertical;
+  min-height: 120px;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #bbb;
+}
+
+.section textarea:focus {
+  outline: none;
+  border-color: #999;
+}
+
+/* Checkbox Group Styling */
+.checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background-color: #ddd;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #bbb;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: normal;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #444;
+}
+
+/* Confirm Button */
 .confirm-btn {
   background-color: #444;
   color: white;
@@ -125,10 +180,59 @@ textarea {
   border-radius: 6px;
   cursor: pointer;
   display: block;
-  margin: 0 auto 40px;
+  margin: 30px auto 40px;
   font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 
 .confirm-btn:hover {
   background-color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 15px;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .circle {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .nav {
+    gap: 20px;
+    font-size: 14px;
+  }
+  
+  .header {
+    padding: 15px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .circle {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .form-grid {
+    gap: 15px;
+  }
 }
