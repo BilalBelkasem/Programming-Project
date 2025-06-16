@@ -283,3 +283,55 @@ input[type="checkbox"]:checked + .checkbox-custom::before {
     font-size: 20px;
   }
 }
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px 20px;
+  }
+
+  .nav {
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .navLink {
+    padding: 6px 0;
+    font-size: 16px;
+  }
+
+  .logo {
+    height: 40px;
+    margin-bottom: 10px;
+  }
+
+  .logoutIcon {
+    align-self: flex-end;
+    margin-top: -30px;
+    margin-bottom: 10px;
+  }
+
+  .container {
+    padding: 20px 15px;
+  }
+
+  .profile-row {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .profile-grid .field,
+  .checkbox-label {
+    width: 100%;
+  }
+
+  .section {
+    padding: 20px;
+  }
+
+  .save-button {
+    width: 100%;
+  }
+}
