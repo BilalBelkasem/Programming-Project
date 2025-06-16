@@ -8,7 +8,7 @@ export default function CompanyRegistrationForm() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-     email: '',
+    email: '',
     phone_number: '',
     password: '',
     company_name: '',
@@ -28,19 +28,19 @@ export default function CompanyRegistrationForm() {
   const handleChange = (e) => {
     const { name, files, value } = e.target;
 
-  if (name === 'logo') {
-    const file = files[0];
-    if (file) {
-      const maxSize = 2 * 1024 * 1024; // 2MB in bytes
-      if (file.size > maxSize) {
-        alert('Het logo mag maximaal 2MB zijn.');
-        return; // Stoppen als te groot
+    if (name === 'logo') {
+      const file = files[0];
+      if (file) {
+        const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+        if (file.size > maxSize) {
+          alert('Het logo mag maximaal 2MB zijn.');
+          return;
+        }
+        setFormData({ ...formData, logo: file });
       }
-      setFormData({ ...formData, logo: file });
+    } else {
+      setFormData({ ...formData, [name]: value });
     }
-  } else {
-    setFormData({ ...formData, [name]: value });
-  }
   };
 
   const handleSubmit = async (e) => {
@@ -49,7 +49,7 @@ export default function CompanyRegistrationForm() {
     const legeVelden = Object.entries(formData).filter(
       ([key, value]) => {
         if (key === 'logo') return false;
-        return value === '' || value === null 
+        return value === '' || value === null;
       }
     );
 
@@ -77,11 +77,16 @@ export default function CompanyRegistrationForm() {
       alert('Bedrijf succesvol geregistreerd!');
       console.log('Response:', response.data);
       navigate('/profiel-bedrijf');
-    } catch (err) {
-      console.error('Registratie mislukt:', err.response?.data || err);
-      alert('Registratie mislukt.');
+    } catch (error) {
+      if (error.response) {
+        console.error('Registratie mislukt:', error.response.data);
+        alert('Registratie mislukt: ' + (error.response.data?.error || 'Onbekende fout'));
+      } else {
+        console.error('Registratie mislukt:', error);
+        alert('Registratie mislukt: onbekende fout');
+      }
     }
-  };
+  }; // ✅ DIT WAS DE ONTBREKENDE SLUITENDE ACCOLADE
 
   return (
     <form onSubmit={handleSubmit} className="form-container">
@@ -92,25 +97,25 @@ export default function CompanyRegistrationForm() {
       <h2 className="form-title">Registreren bedrijf</h2>
 
       {[
-          { label: 'E-mailadres', name: 'email' },
-          { label: 'Telefoonnummer', name: 'phone_number' },
-          { label: 'Wachtwoord', name: 'password' },
-          { label: 'Bedrijfsnaam', name: 'company_name' },
-          { label: 'Website of LinkedIn pagina van uw bedrijf', name: 'website' },
-          { label: 'Naam Contactpersoon vertegenwoordigers beurs', name: 'booth_contact_name' },
-          { label: 'Straat', name: 'street' },
-          { label: 'Gemeente', name: 'city' },
-          { label: 'Postcode', name: 'postal_code' },
-          { label: 'Email Contactpersoon vertegenwoordigers beurs', name: 'booth_contact_email' },
-          { label: 'Naam Contactpersoon facturatie', name: 'invoice_contact_name' },
-          { label: 'E-mailadres Contactpersoon facturatie', name: 'invoice_contact_email' },
-          { label: 'BTW-nummer', name: 'vat_number' },
+        { label: 'E-mailadres', name: 'email' },
+        { label: 'Telefoonnummer', name: 'phone_number' },
+        { label: 'Wachtwoord', name: 'password' },
+        { label: 'Bedrijfsnaam', name: 'company_name' },
+        { label: 'Website of LinkedIn pagina van uw bedrijf', name: 'website' },
+        { label: 'Naam Contactpersoon vertegenwoordigers beurs', name: 'booth_contact_name' },
+        { label: 'Straat', name: 'street' },
+        { label: 'Gemeente', name: 'city' },
+        { label: 'Postcode', name: 'postal_code' },
+        { label: 'Email Contactpersoon vertegenwoordigers beurs', name: 'booth_contact_email' },
+        { label: 'Naam Contactpersoon facturatie', name: 'invoice_contact_name' },
+        { label: 'E-mailadres Contactpersoon facturatie', name: 'invoice_contact_email' },
+        { label: 'BTW-nummer', name: 'vat_number' },
       ].map((field) => (
         <div key={field.name} className="form-group">
           <label htmlFor={field.name}>{field.label} <span style={{ color: 'red' }}>*</span></label>
           <input
             type={
-              field.name === 'password' ? 'password' : 
+              field.name === 'password' ? 'password' :
               field.name.includes('email') ? 'email' :
               field.name === 'phone_number' ? 'tel' :
               'text'
@@ -120,7 +125,6 @@ export default function CompanyRegistrationForm() {
             value={formData[field.name]}
             onChange={handleChange}
           />
-
         </div>
       ))}
 

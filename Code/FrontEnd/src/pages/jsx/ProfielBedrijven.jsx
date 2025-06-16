@@ -6,7 +6,6 @@ import logo from '../../assets/logo Erasmus.png';
 export default function ProfielBedrijven() {
   const [formData, setFormData] = useState({
     name: '',
-    lastname: '',
     companyName: '',
     function: '',
     email: '',
@@ -59,9 +58,8 @@ export default function ProfielBedrijven() {
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
           <Link to="/dashboard" className="navLink">Info</Link>
-          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
           <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/favorieten" className="navLink">studenten</Link>
           <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
         </nav>
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
@@ -84,24 +82,15 @@ export default function ProfielBedrijven() {
 
         <div className="profile-grid">
           <div className="field">
-            <label><strong>Voornaam:</strong></label>
+            <label><strong>voornaamnaam + Achternaam:</strong></label>
             <input 
               name="name" 
               value={formData.name} 
               onChange={handleChange}
-              placeholder="Voornaam"
+              placeholder="name"
             />
           </div>
-          <div className="field">
-            <label><strong>Achternaam:</strong></label>
-            <input 
-              name="lastname" 
-              value={formData.lastname} 
-              onChange={handleChange}
-              placeholder="Achternaam"
-            />
-          </div>
-          <div className="field">
+                <div className="field">
             <label><strong>Bedrijfsnaam:</strong></label>
             <input 
               name="companyName" 
