@@ -1,46 +1,32 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../Css/StudentProfiel.css';
 
 export default function ProfielStudent() {
-  const [formData, setFormData] = useState({
+  const student = {
     name: '',
-    lastname: '',
     school: '',
     direction: '',
     year: '',
     linkedin: '',
     email: '',
     about: '',
-    lookingFor: '',
-    domain: '',
-    profilePicture: null,
-  });
-
-  // Bijhouden van wijzigingen in formuliervelden
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    lookingFor: [],
+    domain: [],
+    profilePicture: '', // evt. base64 of URL
   };
 
-  // Foto uploaden
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData(prev => ({
-        ...prev,
-        profilePicture: URL.createObjectURL(file),
-      }));
-    }
-  };
-
-  const handleSubmit = () => {
-    alert('Wijzigingen bevestigd!');
+  const handleSave = () => {
+    alert('Studentgegevens opgeslagen!');
+    console.log('Opslaan:', student);
+    // hier kun je eventueel opslaan naar API of localStorage
   };
 
   const handleLogout = () => {
-    alert('Uitgelogd');
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
   };
 
   return (
@@ -57,87 +43,66 @@ export default function ProfielStudent() {
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
-      <div className="container">
-        {/* Linkerkant: profielfoto en velden */}
-        <div className="profile-left">
-          <div className="profile-picture">
-            <img src={formData.profilePicture || '/profile.jpg'} alt="Profile" />
-          </div>
-          <input type="file" accept="image/*" onChange={handleImageUpload} className="upload-btn" />
+      <main className="container">
+        <div className="profile-picture">
+          {student.profilePicture ? (
+            <img src={student.profilePicture} alt="Profiel" className="circle" />
+          ) : (
+            <div className="circle">[Foto]</div>
+          )}
+        </div>
 
-          <div className="form-grid">
-            <div className="left">
-              <label>Naam</label>
-              <input name="name" value={formData.name} onChange={handleChange} />
-
-              <label>School (optioneel)</label>
-              <input name="school" value={formData.school} onChange={handleChange} />
-
-              <label>Jaar (optioneel)</label>
-              <select name="year" value={formData.year} onChange={handleChange}>
-                <option value="">-- selecteer --</option>
-                <option value="Eerste jaar">Eerste jaar</option>
-                <option value="Tweede jaar">Tweede jaar</option>
-                <option value="Derde jaar">Derde jaar</option>
-              </select>
-
-              <label>LinkedIn (optioneel)</label>
-              <input name="linkedin" value={formData.linkedin} onChange={handleChange} />
-
-              <label>Email</label>
-              <input name="email" value={formData.email} onChange={handleChange} />
+        <div className="profile-grid">
+          <div className="field"><strong>Voornaam + Achternaam:</strong> {student.name}</div>
+          <div className="field"><strong>School:</strong> {student.school}</div>
+          <div className="field"><strong>Richting:</strong> {student.direction}</div>
+          <div className="field"><strong>Jaar:</strong> {student.year}</div>
+          <div className="field full"><strong>Email:</strong> {student.email}</div>
+          {student.linkedin && (
+            <div className="field full">
+              <strong>LinkedIn:</strong>{" "}
+              <a href={student.linkedin} target="_blank" rel="noreferrer">{student.linkedin}</a>
             </div>
+          )}
+        </div>
+
+        <div className="section">
+          <h2>Over mezelf</h2>
+          <p className="textarea">{student.about}</p>
+        </div>
+
+        <div className="section">
+          <h3>Wat zoek ik?</h3>
+          <div className="checkbox-group">
+            {student.lookingFor.length === 0 ? (
+              <p><em>Geen selectie opgegeven</em></p>
+            ) : (
+              student.lookingFor.map((item, index) => (
+                <label key={index}>
+                  <input type="checkbox" checked disabled />
+                  {item}
+                </label>
+              ))
+            )}
           </div>
         </div>
 
-        {/* Rechterkant: extra velden en about */}
-        <div className="profile-right">
-          <div className="right">
-            <label>Achternaam</label>
-            <input name="lastname" value={formData.lastname} onChange={handleChange} />
-
-            <label>Richting (optioneel)</label>
-            <select name="direction" value={formData.direction} onChange={handleChange}>
-              <option value="">-- selecteer --</option>
-              <option value="Toegepaste Informatica">Toegepaste Informatica</option>
-              <option value="Bedrijf & Management">Bedrijf & Management</option>
-              <option value="Media">Media</option>
-            </select>
-
-            <label>Tot welke van de 4 IT domeinen behoort u?</label>
-            <select name="domain" value={formData.domain} onChange={handleChange}>
-              <option value="">-- selecteer --</option>
-              <option value="Data">Data</option>
-              <option value="Netwerking">Netwerking</option>
-              <option value="AI / Robotica">AI / Robotica</option>
-              <option value="Software">Software</option>
-            </select>
+        <div className="section">
+          <h3>IT-domeinen</h3>
+          <div className="checkbox-group">
+            {student.domain.length === 0 ? (
+              <p><em>Geen selectie opgegeven</em></p>
+            ) : (
+              student.domain.map((item, index) => (
+                <label key={index}>
+                  <input type="checkbox" checked disabled />
+                  {item}
+                </label>
+              ))
+            )}
           </div>
-
-          <div className="section">
-            <label>About</label>
-            <textarea
-              name="about"
-              value={formData.about}
-              onChange={handleChange}
-              placeholder="Schrijf iets over jezelf..."
-            ></textarea>
-          </div>
-
-          <div className="section">
-            <label>Wat zoekt u?</label>
-            <select name="lookingFor" value={formData.lookingFor} onChange={handleChange}>
-              <option value="">-- selecteer --</option>
-              <option value="Jobstudent">Jobstudent</option>
-              <option value="Connecties">Connecties</option>
-              <option value="Stage">Stage</option>
-              <option value="Job">Job</option>
-            </select>
-          </div>
-
-          <button className="confirm-btn" onClick={handleSubmit}>Bevestig wijzigingen</button>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
