@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../Css/ProfielStudent.css';
 
-export default function ProfielStudent() {
+export default function ProfielStudent({ user }) {
   const [formData, setFormData] = useState({
     name: '',
     school: '',
@@ -16,6 +16,34 @@ export default function ProfielStudent() {
     domain: [],
     profilePicture: null,
   });
+
+  useEffect(() => {
+    if (user && user.id) {
+      fetch(`/api/mijnprofiel/${user.id}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch profile');
+          return res.json();
+        })
+        .then(data => {
+          setFormData({
+            name: data.name || '',
+            school: data.school || '',
+            direction: data.education || '',
+            year: data.year || '',
+            linkedin: data.linkedin_url || '',
+            email: data.email || '',
+            about: data.about || '',
+            lookingFor: data.lookingFor || [],
+            domain: data.domain || [],
+            profilePicture: null,
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Kon profiel niet laden.');
+        });
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,17 +69,56 @@ export default function ProfielStudent() {
         : [...prev[field], value]
     }));
   };
+const handleSubmit = async () => {
+  if (!user || !user.id) {
+    alert('Geen gebruiker ingelogd!');
+    return;
+  }
 
-  const handleSubmit = () => {
-    alert('Wijzigingen bevestigd!');
-    console.log(formData);
+  // Zorg dat je de correcte property names gebruikt
+  const updatedData = {
+    name: formData.name,
+    email: formData.email,
+    school: formData.school,
+    direction: formData.direction,
+    year: formData.year,
+    about: formData.about,
+    linkedin: formData.linkedin,
+    lookingFor: formData.lookingFor,  // array, bv ["Jobstudent", "Stage"]
+    domain: formData.domain,          // array, bv ["Data", "Software"]
   };
+
+  try {
+    const res = await fetch(`/api/mijnprofiel/${user.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData)
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Server response:", errorText);
+      throw new Error('Update mislukt');
+    }
+
+    alert('Wijzigingen succesvol bevestigd!');
+  } catch (err) {
+    console.error(err);
+    alert('Fout bij opslaan van profielgegevens');
+  }
+};
+
+
 
   const handleLogout = () => {
     alert('Uitgelogd');
     localStorage.clear();
     window.location.href = '/login';
   };
+
+  if (!user || user.role !== 'student') {
+    return <p>Je bent niet ingelogd als student.</p>;
+  }
 
   return (
     <div className="page-wrapper">
@@ -103,7 +170,6 @@ export default function ProfielStudent() {
           </div>
 
           <div className="right">
-
             <label>Richting (optioneel)</label>
             <input name="direction" value={formData.direction} onChange={handleChange} />
 

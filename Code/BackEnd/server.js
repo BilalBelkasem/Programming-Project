@@ -2,6 +2,8 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 require('dotenv').config();
+const multer = require('multer');
+const upload = multer({ storage: multer.memoryStorage() });
 
 
 // Route imports
@@ -9,6 +11,7 @@ const protectedRoutes = require('./routes/authRoutes');
 const companiesRoutes = require('./companies');
 const studentRoutes = require('./students');
 const badgeRoutes = require('./badge');
+const mijnProfielRoutes = require('./Controller/mijnprofiel');  // <-- Added here
 
 const app = express();
 app.use(cors());
@@ -47,6 +50,7 @@ app.use('/api', protectedRoutes);
 app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
+app.use('/api/mijnprofiel', mijnProfielRoutes);  // <-- Mounted here
 
 // Users ophalen
 app.get('/api/users', async (req, res) => {
@@ -102,7 +106,66 @@ app.delete('/api/studenten/:id', async (req, res) => {
   }
 });
 
-  const PORT = process.env.PORT || 5000;
+// *** NIEUWE ROUTE VOOR COMPANY REGISTRATIE MET LOGO ***
+app.post('/api/register-company', upload.single('logo'), async (req, res) => {
+  try {
+    const logoBuffer = req.file ? req.file.buffer : null;
+
+    const {
+      email,
+      phone_number,
+      password,
+      company_name,
+      website,
+      sector,
+      booth_contact_name,
+      street,
+      city,
+      postal_code,
+      booth_contact_email,
+      invoice_contact_name,
+      invoice_contact_email,
+      vat_number
+    } = req.body;
+
+    const sql = `
+      INSERT INTO companies_details (
+        email, phone_number, password, company_name, website, sector,
+        booth_contact_name, street, city, postal_code, booth_contact_email,
+        invoice_contact_name, invoice_contact_email, vat_number, logo
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    // Use promise version for consistency with the rest of your code
+    const [result] = await pool.promise().query(
+      sql,
+      [
+        email,
+        phone_number,
+        password,
+        company_name,
+        website,
+        sector,
+        booth_contact_name,
+        street,
+        city,
+        postal_code,
+        booth_contact_email,
+        invoice_contact_name,
+        invoice_contact_email,
+        vat_number,
+        logoBuffer
+      ]
+    );
+
+    res.status(201).json({ message: 'Bedrijf succesvol geregistreerd' });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({ error: 'Server fout' });
+  }
+});
+
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

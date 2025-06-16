@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 
 import GInfoPagina from './pages/jsx/GInfoPagina.jsx';
 import UInfoPagina from './pages/jsx/UInfoPagina.jsx';
 import LoginPagina from './pages/jsx/LoginPagina.jsx';
 import UBedrijven from './pages/jsx/UBedrijven.jsx';
+import GBedrijven from './pages/jsx/GBedrijven.jsx';
 import AdminDashboard from './pages/jsx/AdminDashboard.jsx';
 import CompanyRegistrationForm from './pages/jsx/CompanyRegistrationForm.jsx';
 import AdminStudent from './pages/jsx/AdminStudent.jsx';
@@ -17,15 +18,9 @@ import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
 import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
-import UBedrijfView from './pages/jsx/UProfielBedrijfView.jsx';
-import Bedrijveninfo from './pages/jsx/bedrijveninfopagina.jsx'
-import Gbedrijveninfo from './pages/jsx/Gbedrijveninfopagina.jsx'
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    return localStorage.getItem('isLoggedIn') === 'true';
-  });
-
+  const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem('user');
     return stored ? JSON.parse(stored) : null;
@@ -43,52 +38,43 @@ export default function App() {
     }
   }, [user]);
 
-  // Centraal gedefinieerde bedrijvenlijst
-  const bedrijvenLijst = [
-    {
-      id: 1,
-      naam: 'CoolCompany',
-      beschrijving: 'Innovatief softwarebedrijf',
-      tags: ['Software', 'Innovatie'],
-    },
-    {
-      id: 2,
-      naam: 'Techies BV',
-      beschrijving: 'Specialist in AI-oplossingen',
-      tags: ['AI', 'Data'],
-    },
-    {
-      id: 3,
-      naam: 'NextGen IT',
-      beschrijving: 'IT-diensten voor onderwijs',
-      tags: ['IT', 'Onderwijs'],
-    },
-    {
-      id: 4,
-      naam: 'colruyt',
-      beschrijving: 'onderhoud van alle systemen',
-      tags: ['Retail', 'Systemen'],
-    }
-  ];
-
-  const [favorieteBedrijven, setFavorieteBedrijven] = useState([]);
-  const [favorieteStudenten, setFavorieteStudenten] = useState([
-    { id: 101, naam: 'Jelle Peeters', studierichting: 'Toegepaste Informatica' },
-    { id: 102, naam: 'Sara Jacobs', studierichting: 'Marketing' }
-  ]);
-
-  const toggleLike = (id) => {
-    setFavorieteBedrijven((prev) =>
-      prev.some((b) => b.id === id)
-        ? prev.filter((b) => b.id !== id)
-        : [...prev, bedrijvenLijst.find((b) => b.id === id)]
-    );
-  };
-
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUser(null);
+    // Geen localStorage.clear() hier, de useEffect zorgt voor sync
   };
+
+  const ProfileRedirect = () => {
+    if (!isLoggedIn || !user) return <Navigate to="/login" />;
+    if (user.role === 'student') return <Navigate to={`/mijn-profiel`} />;
+    if (user.role === 'bedrijf') return <Navigate to={`/mijn-profiel`} />;
+    if (user.role === 'admin') return <Navigate to="/admin" />;
+    return <Navigate to="/login" />;
+  };
+
+  // ProtectedRoute checkt login, rol en optioneel idParam
+  function ProtectedRoute({ children, role, idParam }) {
+    if (!isLoggedIn || !user) {
+      return <Navigate to="/login" />;
+    }
+    
+     if (role) {
+        if (Array.isArray(role)) {
+          if (!role.includes(user.role)) {
+            return <Navigate to="/login" />;
+          }
+        } else {
+          if (user.role !== role) {
+            return <Navigate to="/login" />;
+          }
+        }
+    }
+
+    if (idParam && idParam !== user.id) {
+      return <Navigate to="/login" />;
+    }
+    return children;
+  }
 
   return (
     <Routes>
@@ -96,10 +82,18 @@ export default function App() {
 
       <Route
         path="/login"
-        element={<LoginPagina onLogin={(userData) => {
-          setUser(userData);
-          setIsLoggedIn(true);
-        }} />}
+        element={
+          isLoggedIn && user ? (
+            <Navigate to="/mijn-profiel" />
+          ) : (
+            <LoginPagina
+              onLogin={(userData) => {
+                setUser(userData);
+                setIsLoggedIn(true);
+              }}
+            />
+          )
+        }
       />
 
       <Route path="/bedrijf-registratie" element={<CompanyRegistrationForm />} />
@@ -107,76 +101,60 @@ export default function App() {
 
       <Route
         path="/dashboard"
-        element={
-          isLoggedIn ? (
-            <UInfoPagina onLogout={handleLogout} />
-          ) : (
-            <Navigate to="/bedrijven" />
-          )
-        }
+        element={isLoggedIn ? <UInfoPagina onLogout={handleLogout} /> : <Navigate to="/bedrijven" />}
       />
+
+      {/* Navigatie naar juiste bedrijvenpagina afhankelijk van login */}
+      <Route path="/bedrijven" element={<Navigate to={isLoggedIn ? "/ubedrijven" : "/gbedrijven"} />} />
+      <Route path="/ubedrijven" element={<UBedrijven />} />
+      <Route path="/gbedrijven" element={<GBedrijven />} />
 
       <Route
-        path="/bedrijven"
-        element={
-          isLoggedIn ? (
-            <UBedrijven
-              bedrijven={bedrijvenLijst}
-              likedCompanies={favorieteBedrijven}
-              toggleLike={toggleLike}
-              onLogout={handleLogout}
-            />
-          ) : (
-            <Navigate to="/login" />
-          )
-        }
+        path="/admin"
+        element={isLoggedIn && user?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/admin/studenten"
+        element={isLoggedIn && user?.role === 'admin' ? <AdminStudent /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/admin/bedrijven"
+        element={isLoggedIn && user?.role === 'admin' ? <AdminBedrijf /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/admin/badges"
+        element={isLoggedIn && user?.role === 'admin' ? <AdminBadge /> : <Navigate to="/login" />}
       />
 
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/admin/studenten" element={<AdminStudent />} />
-      <Route path="/admin/bedrijven" element={<AdminBedrijf />} />
-      <Route path="/admin/badges" element={<AdminBadge />} />
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
-      <Route path="/BedrijfInfo" element={<Bedrijveninfo />} />
-      <Route path="/Gbedrijveninfo" element={<Gbedrijveninfo />} />
 
-      <Route
-        path="/UFavorietenBedrijven"
-        element={
-          <UFavorietenBedrijven
-            favorieten={favorieteBedrijven}
-            onUnsave={(id) =>
-              setFavorieteBedrijven((prev) => prev.filter((b) => b.id !== id))
-            }
-            onLogout={handleLogout}
-          />
-        }
-      />
-
-      <Route
-        path="/b-favorieten"
-        element={
-          <BFavorietenStudenten
-            favorieten={favorieteStudenten}
-            onUnsave={(id) =>
-              setFavorieteStudenten((prev) => prev.filter((s) => s.id !== id))
-            }
-          />
-        }
+      {/* Profiel routes met wrappers */}
+      <Route path="/mijn-profiel"
+          element={
+            <ProtectedRoute role={['student', 'bedrijf']}>
+              {user?.role === 'student' ? (
+                <ProfielStudent user={user} />
+              ) : user?.role === 'bedrijf' ? (
+                <ProfielBedrijven user={user} />
+              ) : (
+                <Navigate to="/login" />
+              )}
+            </ProtectedRoute>
+          }
       />
 
       <Route
         path="/favorieten"
         element={
-          isLoggedIn ? (
-            <UFavorietenBedrijven
-              favorieten={favorieteBedrijven}
-              onUnsave={(id) =>
-                setFavorieteBedrijven((prev) => prev.filter((b) => b.id !== id))
-              }
-              onLogout={handleLogout}
-            />
+          isLoggedIn && user ? (
+            user.role === 'student' ? (
+              <UFavorietenBedrijven favorieten={[]} onUnsave={() => {}} />
+            ) : user.role === 'bedrijf' ? (
+              <BFavorietenStudenten favorieten={[]} onUnsave={() => {}} />
+            ) : (
+              <Navigate to="/login" />
+            )
           ) : (
             <Navigate to="/login" />
           )
