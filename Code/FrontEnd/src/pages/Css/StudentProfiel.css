@@ -1,148 +1,130 @@
+/* === ALGEMENE STIJL === */
 body {
-    background-color: #f2f2f2;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .page-wrapper {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-  
-  .header {
-    background-color: #d9d9d9;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 20px;
-  }
-  
-  .logo {
-    height: 40px;
-  }
-  
-  .nav {
-    display: flex;
-    gap: 30px;
-    font-weight: bold;
-  }
-  
-  .navLink {
-    text-decoration: none;
-    color: #333;
-  }
-  
-  .logoutIcon {
-    cursor: pointer;
-    font-size: 24px;
-  }
-  
-  .container {
-    display: flex;
-    flex-direction: row;
-    gap: 40px;
-    padding: 40px;
-  }
-  
-  /* Linkerkant met profiel en form */
-  .profile-left {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .profile-picture {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    overflow: hidden;
-    background-color: #ddd;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  
-  .profile-picture img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-  
-  .upload-btn {
-    margin-top: 10px;
-  }
-  
-  .form-grid {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    align-items: center;
-  }
-  
-  .left,
-  .right {
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .left label,
-  .right label,
-  .section label {
-    font-weight: bold;
-    margin-top: 10px;
-    margin-bottom: 4px;
-  }
-  
-  .left input,
-  .right input,
-  .left select,
-  .right select,
-  textarea,
-  input {
-    padding: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    background-color: #e0e0e0;
-  }
-  
-  /* Rechterzijde met about */
-  .profile-right {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    justify-content: flex-start;
-  }
-  
-  .section {
-    margin-bottom: 20px;
-  }
-  
-  textarea {
-    width: 100%;
-    min-height: 120px;
-    resize: vertical;
-  }
-  
-  .confirm-btn {
-    padding: 10px 20px;
-    background-color: #c62828;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    margin-top: 20px;
-    align-self: flex-start;
-  }
-  
-  .confirm-btn:hover {
-    background-color: #b71c1c;
-  }
+  background-color: #f2f2f2;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.page-wrapper {
+  padding: 30px 60px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f0f0f0;
+  padding: 20px 40px;
+}
+
+.logo {
+  height: 50px;
+}
+
+.nav {
+  display: flex;
+  gap: 40px;
+  font-weight: bold;
+}
+
+.navLink {
+  text-decoration: none;
+  color: #000;
+}
+
+.logoutIcon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+
+/* === GECOMBINEERDE WEERGAVE === */
+.profile-card {
+  width: 80%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.profile-picture {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-content {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.profile-content label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.profile-content .field {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-content input,
+.profile-content select,
+.profile-content textarea {
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #e0e0e0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* READ ONLY */
+input[readonly],
+select[disabled],
+textarea[readonly] {
+  background-color: #e0e0e0;
+  color: #333;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.confirm-btn {
+  display: none;
+}
+
+.upload-btn {
+  display: none;
+}
