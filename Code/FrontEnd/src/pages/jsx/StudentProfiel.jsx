@@ -20,7 +20,6 @@ export default function ProfielStudent() {
   const handleSave = () => {
     alert('Studentgegevens opgeslagen!');
     console.log('Opslaan:', student);
-    // hier kun je eventueel opslaan naar API of localStorage
   };
 
   const handleLogout = () => {
@@ -44,12 +43,15 @@ export default function ProfielStudent() {
       </header>
 
       <main className="container">
-        <div className="profile-picture">
-          {student.profilePicture ? (
-            <img src={student.profilePicture} alt="Profiel" className="circle" />
-          ) : (
-            <div className="circle">[Foto]</div>
-          )}
+        <div className="profile-row">
+          <div className="profile-picture">
+            {student.profilePicture ? (
+              <img src={student.profilePicture} alt="Profiel" className="circle" />
+            ) : (
+              <div className="circle">[Foto]</div>
+            )}
+          </div>
+          <button className="like-button" title="Like ♥">♥</button>
         </div>
 
         <div className="profile-grid">
@@ -68,7 +70,7 @@ export default function ProfielStudent() {
 
         <div className="section">
           <h2>Over mezelf</h2>
-          <p className="textarea">{student.about}</p>
+          <p className="textarea">{student.about || <em>Geen informatie opgegeven</em>}</p>
         </div>
 
         <div className="section">
