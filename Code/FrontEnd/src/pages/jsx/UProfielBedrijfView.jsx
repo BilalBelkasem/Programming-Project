@@ -14,9 +14,8 @@ export default function UBedrijfView({ company }) {
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
           <Link to="/dashboard" className="nav-link">info</Link>
-          <Link to="/bedrijven" className="nav-link">bedrijven</Link>
           <Link to="/plattegrond" className="nav-link">plattegrond</Link>
-          <Link to="/favorieten" className="nav-link">favorieten</Link>
+          <Link to="/favorieten" className="nav-link">studenten</Link>
           <Link to="/dashboard" className="nav-link">mijn profiel</Link>
         </nav>
       </header>
