@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import '../Css/ClientRegistration.css';
 import logo from '../../assets/logo Erasmus.png';
 
@@ -12,8 +13,11 @@ const Register = () => {
     wachtwoord: '',
     herhaalWachtwoord: ''
   });
+
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -84,10 +88,32 @@ const Register = () => {
           <input type="email" name="email" value={form.email} onChange={handleChange} className="form-input" required />
 
           <label className="form-label">wachtwoord*</label>
-          <input type="password" name="wachtwoord" value={form.wachtwoord} onChange={handleChange} className="form-input" required />
+          <div className="password-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="wachtwoord"
+              value={form.wachtwoord}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+            <div
+              onClick={() => setShowPassword(!showPassword)}
+              className="pass-icon-btn"
+            >
+              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+            </div>
+          </div>
 
           <label className="form-label">wachtwoord herhalen*</label>
-          <input type="password" name="herhaalWachtwoord" value={form.herhaalWachtwoord} onChange={handleChange} className="form-input" required />
+          <input
+            type="password"
+            name="herhaalWachtwoord"
+            value={form.herhaalWachtwoord}
+            onChange={handleChange}
+            className="form-input"
+            required
+          />
 
           <button type="submit" className="register-button" disabled={loading}>
             {loading ? 'Bezig...' : 'registreren'}
