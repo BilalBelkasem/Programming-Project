@@ -102,8 +102,6 @@ export default function ProfielStudent() {
             )}
           </div>
         </div>
-
-        <button className="confirm-btn" onClick={handleSave}>Opslaan</button>
       </main>
     </div>
   );
