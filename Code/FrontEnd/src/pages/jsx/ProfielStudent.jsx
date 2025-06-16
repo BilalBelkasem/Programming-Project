@@ -6,7 +6,6 @@ import '../Css/ProfielStudent.css';
 export default function ProfielStudent({ user }) {
   const [formData, setFormData] = useState({
     name: '',
-    lastname: '',
     school: '',
     direction: '',
     year: '',
@@ -29,7 +28,6 @@ export default function ProfielStudent({ user }) {
         .then(data => {
           setFormData({
             name: data.name || '',
-            lastname: data.lastname || '',
             school: data.school || '',
             direction: data.education || '',  // backend uses 'education'
             year: data.year || '',

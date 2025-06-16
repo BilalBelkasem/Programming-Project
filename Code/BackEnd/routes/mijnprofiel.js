@@ -2,13 +2,13 @@
 const express = require('express');
 const router = express.Router();
 
-// GET student profile
+// GET student profile  
 router.get('/:id', async (req, res) => {
   const studentId = req.params.id;
   const db = req.db;
 
   const sql = `
-    SELECT users.id, users.name, users.lastname, users.email,
+    SELECT users.id, users.name, users.email,
            sd.school, sd.education, sd.year, sd.about, sd.linkedin_url,
            sd.interest_jobstudent, sd.interest_stage, sd.interest_job, sd.interest_connect,
            sd.domain_data, sd.domain_networking, sd.domain_ai, sd.domain_software
@@ -43,7 +43,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: 'Error fetching student data' });
   }
 });
-
+    
 // PUT student profile
 router.put('/:id', async (req, res) => {
   const studentId = req.params.id;
@@ -66,24 +66,48 @@ router.put('/:id', async (req, res) => {
   const domain_software = domain.includes('Software');
 
   try {
+    // Update users table
     await db.query(
       `UPDATE users SET name = ?, lastname = ?, email = ? WHERE id = ?`,
       [name, lastname, email, studentId]
     );
 
-    await db.query(
-      `UPDATE students_details 
-       SET school = ?, education = ?, year = ?, about = ?, linkedin_url = ?,
-           interest_jobstudent = ?, interest_stage = ?, interest_job = ?, interest_connect = ?,
-           domain_data = ?, domain_networking = ?, domain_ai = ?, domain_software = ?
-       WHERE user_id = ?`,
-      [
-        school, direction, year, about, linkedin,
-        interest_jobstudent, interest_stage, interest_job, interest_connect,
-        domain_data, domain_networking, domain_ai, domain_software,
-        studentId
-      ]
+    // Check if students_details record exists
+    const [rows] = await db.query(
+      `SELECT * FROM students_details WHERE user_id = ?`,
+      [studentId]
     );
+
+    if (rows.length > 0) {
+      // update
+      await db.query(
+        `UPDATE students_details 
+         SET school = ?, education = ?, year = ?, about = ?, linkedin_url = ?,
+             interest_jobstudent = ?, interest_stage = ?, interest_job = ?, interest_connect = ?,
+             domain_data = ?, domain_networking = ?, domain_ai = ?, domain_software = ?
+         WHERE user_id = ?`,
+        [
+          school, direction, year, about, linkedin,
+          interest_jobstudent, interest_stage, interest_job, interest_connect,
+          domain_data, domain_networking, domain_ai, domain_software,
+          studentId
+        ]
+      );
+    } else {
+      // insert
+      await db.query(
+        `INSERT INTO students_details 
+         (user_id, school, education, year, about, linkedin_url,
+          interest_jobstudent, interest_stage, interest_job, interest_connect,
+          domain_data, domain_networking, domain_ai, domain_software)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          studentId, school, direction, year, about, linkedin,
+          interest_jobstudent, interest_stage, interest_job, interest_connect,
+          domain_data, domain_networking, domain_ai, domain_software
+        ]
+      );
+    }
 
     res.json({ message: 'Student updated' });
   } catch (err) {
@@ -91,8 +115,5 @@ router.put('/:id', async (req, res) => {
     res.status(500).json({ error: 'Update failed' });
   }
 });
-
-
-
 
 module.exports = router;
