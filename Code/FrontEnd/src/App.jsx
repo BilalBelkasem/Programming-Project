@@ -19,6 +19,7 @@ import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
 import StudentProfiel from '../src/pages/jsx/StudentProfiel.jsx';
+import BedrijfProfiel from './pages/jsx/BedrijfProfiel.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
@@ -125,6 +126,7 @@ export default function App() {
         element={isLoggedIn && user?.role === 'admin' ? <AdminBadge /> : <Navigate to="/login" />}
       />
       <Route path="/studentprofiel" element={<StudentProfiel />} />
+      <Route path="/bedrijfprofiel" element={<BedrijfProfiel />} />
 
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
