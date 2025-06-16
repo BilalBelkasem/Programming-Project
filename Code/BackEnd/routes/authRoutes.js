@@ -14,7 +14,7 @@ const bedrijfAdmin = require('../Controller/BedrijfAdmin');
 //  PUBLIC ROUTES
 router.post('/register', StudentRegistratieController.register);           
 router.post('/register-company', BedrijfRegistratieController.registerCompany); 
-router.post('/login', LoginController.login);                             
+router.post('/login', LoginController.login);  
 
 //  PROTECTED ROUTES
 router.get('/protected', authenticateToken, StudentRegistratieController.getProtectedData);

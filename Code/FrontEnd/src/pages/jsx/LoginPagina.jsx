@@ -19,6 +19,7 @@ export default function LoginPagina({ onLogin }) {
     setIsLoading(true);
 
     try {
+      /*
       const response = await axios.post('http://localhost:5000/api/login', {
         email,
         password: wachtwoord
@@ -32,7 +33,8 @@ export default function LoginPagina({ onLogin }) {
         navigate('/dashboard');
       } else {
         setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
-      }
+      }*/
+     const response = await axios.get('http://localhost:5000/api/test');
     } catch (err) {
       if (err.response) {
         if (err.response.status === 401) {
