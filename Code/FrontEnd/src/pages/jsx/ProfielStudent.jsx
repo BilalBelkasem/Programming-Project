@@ -17,7 +17,6 @@ export default function ProfielStudent({ user }) {
     profilePicture: null,
   });
 
-  // Fetch profile data from backend on mount and when user.id changes
   useEffect(() => {
     if (user && user.id) {
       fetch(`/api/mijnprofiel/${user.id}`)
@@ -29,14 +28,14 @@ export default function ProfielStudent({ user }) {
           setFormData({
             name: data.name || '',
             school: data.school || '',
-            direction: data.education || '',  // backend uses 'education'
+            direction: data.education || '',
             year: data.year || '',
-            linkedin: data.linkedin_url || '', // backend uses linkedin_url
+            linkedin: data.linkedin_url || '',
             email: data.email || '',
             about: data.about || '',
             lookingFor: data.lookingFor || [],
             domain: data.domain || [],
-            profilePicture: null, // keep null until user uploads a new one
+            profilePicture: null,
           });
         })
         .catch(err => {
@@ -70,30 +69,46 @@ export default function ProfielStudent({ user }) {
         : [...prev[field], value]
     }));
   };
+const handleSubmit = async () => {
+  if (!user || !user.id) {
+    alert('Geen gebruiker ingelogd!');
+    return;
+  }
 
-  const handleSubmit = async () => {
-    if (!user || !user.id) {
-      alert('Geen gebruiker ingelogd!');
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/mijnprofiel/${user.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      if (!res.ok) {
-        throw new Error('Update mislukt');
-      }
-
-      alert('Wijzigingen succesvol bevestigd!');
-    } catch (err) {
-      console.error(err);
-      alert('Fout bij opslaan van profiel');
-    }
+  // Zorg dat je de correcte property names gebruikt
+  const updatedData = {
+    name: formData.name,
+    email: formData.email,
+    school: formData.school,
+    direction: formData.direction,
+    year: formData.year,
+    about: formData.about,
+    linkedin: formData.linkedin,
+    lookingFor: formData.lookingFor,  // array, bv ["Jobstudent", "Stage"]
+    domain: formData.domain,          // array, bv ["Data", "Software"]
   };
+
+  try {
+    const res = await fetch(`/api/mijnprofiel/${user.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData)
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Server response:", errorText);
+      throw new Error('Update mislukt');
+    }
+
+    alert('Wijzigingen succesvol bevestigd!');
+  } catch (err) {
+    console.error(err);
+    alert('Fout bij opslaan van profielgegevens');
+  }
+};
+
+
 
   const handleLogout = () => {
     alert('Uitgelogd');
@@ -155,7 +170,6 @@ export default function ProfielStudent({ user }) {
           </div>
 
           <div className="right">
-
             <label>Richting (optioneel)</label>
             <input name="direction" value={formData.direction} onChange={handleChange} />
 

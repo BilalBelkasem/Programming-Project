@@ -50,7 +50,7 @@ router.put('/:id', async (req, res) => {
   const db = req.db;
 
   const {
-    name, lastname, email,
+    name, email,
     school, direction, year, about, linkedin,
     lookingFor = [], domain = []
   } = req.body;
@@ -68,8 +68,8 @@ router.put('/:id', async (req, res) => {
   try {
     // Update users table
     await db.query(
-      `UPDATE users SET name = ?, lastname = ?, email = ? WHERE id = ?`,
-      [name, lastname, email, studentId]
+      `UPDATE users SET name = ?,  email = ? WHERE id = ?`,
+      [name, email, studentId]
     );
 
     // Check if students_details record exists

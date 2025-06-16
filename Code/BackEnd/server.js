@@ -10,7 +10,7 @@ const protectedRoutes = require('./routes/authRoutes');
 const companiesRoutes = require('./companies');
 const studentRoutes = require('./students');
 const badgeRoutes = require('./badge');
-const mijnProfielRoutes = require('./routes/mijnprofiel');  // <-- Added here
+const mijnProfielRoutes = require('./Controller/mijnprofiel');  // <-- Added here
 
 const app = express();
 app.use(cors());
