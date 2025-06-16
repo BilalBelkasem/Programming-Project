@@ -3,8 +3,7 @@ const mysql = require('mysql2');
 const cors = require('cors');
 require('dotenv').config();
 
-// ✅ Corrigeerd pad (want je zit al in /BackEnd)
-const protectedRoutes = require('./routes/authRoutes');
+
 // Route imports
 const protectedRoutes = require('./routes/authRoutes');
 const companiesRoutes = require('./companies');
