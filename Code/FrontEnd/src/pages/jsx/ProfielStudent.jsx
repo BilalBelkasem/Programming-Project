@@ -6,7 +6,6 @@ import '../Css/ProfielStudent.css';
 export default function ProfielStudent() {
   const [formData, setFormData] = useState({
     name: '',
-    lastname: '',
     school: '',
     direction: '',
     year: '',
@@ -82,7 +81,7 @@ export default function ProfielStudent() {
 
         <div className="form-grid">
           <div className="left">
-            <label>Naam</label>
+            <label>Voornaam + Achternaam</label>
             <input name="name" value={formData.name} onChange={handleChange} />
 
             <label>School (optioneel)</label>
@@ -104,8 +103,6 @@ export default function ProfielStudent() {
           </div>
 
           <div className="right">
-            <label>Achternaam</label>
-            <input name="lastname" value={formData.lastname} onChange={handleChange} />
 
             <label>Richting (optioneel)</label>
             <input name="direction" value={formData.direction} onChange={handleChange} />
