@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 12, 2025 at 11:12 AM
+-- Generation Time: Jun 16, 2025 at 10:59 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -42,16 +42,17 @@ CREATE TABLE `companies_details` (
   `invoice_contact_name` varchar(100) DEFAULT NULL,
   `invoice_contact_email` varchar(100) DEFAULT NULL,
   `po_number` varchar(50) DEFAULT NULL,
-  `vat_number` varchar(50) DEFAULT NULL
+  `vat_number` varchar(50) DEFAULT NULL,
+  `logo` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `companies_details`
 --
 
-INSERT INTO `companies_details` (`id`, `user_id`, `company_name`, `sector`, `website`, `phone_number`, `street`, `postal_code`, `city`, `booth_contact_name`, `booth_contact_email`, `invoice_contact_name`, `invoice_contact_email`, `po_number`, `vat_number`) VALUES
-(1, 3, 'TechCorp', 'IT Consultancy', 'https://techcorp.be', '+32012345678', 'Main Street 5', '1000', 'Brussel', 'Bob Tech', 'bob@techcorp.be', 'Finance TechCorp', 'factuur@techcorp.be', 'PO1234', 'BE0123456789'),
-(2, 4, 'SmartSolutions', 'Softwareontwikkeling', 'https://smartsolutions.be', '+32098765432', 'Innovationlaan 3', '2000', 'Antwerpen', 'Eva Manager', 'eva@smartsolutions.be', 'Boekhouding Smart', 'boekhouding@smartsolutions.be', 'PO5678', 'BE9876543210');
+INSERT INTO `companies_details` (`id`, `user_id`, `company_name`, `sector`, `website`, `phone_number`, `street`, `postal_code`, `city`, `booth_contact_name`, `booth_contact_email`, `invoice_contact_name`, `invoice_contact_email`, `po_number`, `vat_number`, `logo`) VALUES
+(1, 3, 'TechCorp', 'IT Consultancy', 'https://techcorp.be', '+32012345678', 'Main Street 5', '1000', 'Brussel', 'Bob Tech', 'bob@techcorp.be', 'Finance TechCorp', 'factuur@techcorp.be', 'PO1234', 'BE0123456789', NULL),
+(2, 4, 'SmartSolutions', 'Softwareontwikkeling', 'https://smartsolutions.be', '+32098765432', 'Innovationlaan 3', '2000', 'Antwerpen', 'Eva Manager', 'eva@smartsolutions.be', 'Boekhouding Smart', 'boekhouding@smartsolutions.be', 'PO5678', 'BE9876543210', NULL);
 
 -- --------------------------------------------------------
 
@@ -161,7 +162,8 @@ CREATE TABLE `students_details` (
 
 INSERT INTO `students_details` (`id`, `user_id`, `school`, `education`, `year`, `about`, `linkedin_url`, `interest_jobstudent`, `interest_stage`, `interest_job`, `interest_connect`, `domain_data`, `domain_networking`, `domain_ai`, `domain_software`) VALUES
 (1, 1, 'Hogeschool Gent', 'Toegepaste Informatica', 'derde', 'Passie voor software development.', 'https://linkedin.com/in/alice', 1, 1, 1, 0, 0, 0, 1, 1),
-(2, 2, 'Hogeschool Gent', 'Toegepaste Informatica', 'tweede', 'Grote interesse in AI en data.', 'https://linkedin.com/in/thomas', 0, 1, 1, 1, 1, 0, 1, 0);
+(2, 2, 'Hogeschool Gent', 'Toegepaste Informatica', 'tweede', 'Grote interesse in AI en data.', 'https://linkedin.com/in/thomas', 0, 1, 1, 1, 1, 0, 1, 0),
+(4, 8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -189,8 +191,9 @@ INSERT INTO `users` (`id`, `name`, `email`, `password_hash`, `role`, `organizati
 (2, 'Thomas Student', 'thomas@student.com', 'hashed_pw2', 'student', 'Hogeschool Gent', 'thomas-student', '2025-06-05 09:01:00'),
 (3, 'Bob Company', 'bob@bedrijf.com', 'hashed_pw3', 'bedrijf', 'TechCorp', 'bob-techcorp', '2025-06-05 09:01:00'),
 (4, 'Eva Enterprise', 'eva@bedrijf.com', 'hashed_pw4', 'bedrijf', 'SmartSolutions', 'eva-smartsolutions', '2025-06-05 09:01:00'),
-(5, 'Admin Beheer', 'admin@careerlaunch.be', 'hashed_admin', 'admin', NULL, 'admin-launch', '2025-06-05 09:01:00'),
-(6, 'Bilal Belkasem', 'bilal.belkasem@student.ehb.be', '$2b$10$Qdog0YiEjEDkKV4SIfQ4zuPfFdcT6/vGFz/mTY6iTNQD3W8A1AWn6', 'student', 'Hogeschool Gent', 'bilal-belkasem', '2025-06-10 12:57:03');
+(5, 'Admin Beheer', 'admin@careerlaunch.be', '$2b$10$yd6ZQbXM3QBC.uNfz2apBulLeqIiEb78ss.C7wIbxTzC4xLa5pd2S', 'admin', NULL, 'admin-launch', '2025-06-05 09:01:00'),
+(8, 'Digay kengoum', 'Digay.kengoum@student.ehb.be', '$2b$10$OSWeRWMn6mJSlZP//.BdOOXGBdP5h.tUxHQ9W7bUzw86JXpx5jVHG', 'student', 'Hogeschool Gent', 'digay-kengoum', '2025-06-13 13:22:59'),
+(10, 'âzerty', 'azerty@azerty', '$2b$10$INqhpWp9K8hGxIDmzeH5tOXWrGavD85GVPKwLnFRamoA7Oy1sT9ra', 'bedrijf', NULL, 'âzerty', '2025-06-16 07:52:30');
 
 --
 -- Indexes for dumped tables
@@ -279,13 +282,13 @@ ALTER TABLE `stands`
 -- AUTO_INCREMENT for table `students_details`
 --
 ALTER TABLE `students_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
