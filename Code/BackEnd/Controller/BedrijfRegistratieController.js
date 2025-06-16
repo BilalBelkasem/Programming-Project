@@ -31,7 +31,7 @@ exports.registerCompany = async (req, res) => {
       const {
         email,
         password,
-        company_name,
+        organization,
         website,
         phone_number,
         street,
@@ -46,7 +46,7 @@ exports.registerCompany = async (req, res) => {
         sector
       } = req.body;
 
-      if (!email || !password || !company_name || !booth_contact_name) {
+      if (!email || !password || !organization || !booth_contact_name) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
@@ -79,7 +79,7 @@ exports.registerCompany = async (req, res) => {
 
           const companySql = `
             INSERT INTO companies_details (
-              user_id, company_name, sector, website, phone_number,
+              user_id, organization, sector, website, phone_number,
               street, postal_code, city,
               booth_contact_name, booth_contact_email,
               invoice_contact_name, invoice_contact_email,
@@ -88,7 +88,7 @@ exports.registerCompany = async (req, res) => {
           `;
 
           const values = [
-            userId, company_name, sector, website, phone_number,
+            userId, organization, sector, website, phone_number,
             street, postal_code, city,
             booth_contact_name, booth_contact_email,
             invoice_contact_name, invoice_contact_email,
@@ -120,6 +120,7 @@ exports.registerCompany = async (req, res) => {
       });
 
     } catch (error) {
+      console.error('register company error', error)
       res.status(500).json({ error: 'Server error: ' + error.message });
     }
   }); // sluit upload()
