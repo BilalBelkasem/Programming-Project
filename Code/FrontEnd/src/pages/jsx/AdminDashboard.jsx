@@ -7,8 +7,14 @@ import { useNavigate } from 'react-router-dom';
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
+  // Logout handler
   const handleLogout = () => {
-    navigate('/'); 
+    navigate('/');
+  };
+
+  // Open badge pagina (die public.html via Express backend)
+  const openBadgePage = () => {
+    window.open('http://localhost:5000', '_blank'); // open in nieuw tabblad
   };
 
   return (
@@ -36,7 +42,7 @@ export default function AdminDashboard() {
         </div>
         <div
           className="admin-tile badge"
-          onClick={() => navigate('/admin/badges')}
+          onClick={openBadgePage}
         >
           badge
         </div>

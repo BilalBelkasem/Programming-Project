@@ -27,8 +27,17 @@ export default function LoginPagina({ onLogin }) {
       if (response.data?.token && response.data?.user) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
+
         if (onLogin) onLogin(response.data.user);
-        navigate('/dashboard');
+
+        const role = response.data.user.role;
+        if (role === 'admin') {
+          navigate('/admin');
+        } else if (role === 'student' || role === 'bedrijf') {
+          navigate('/mijn-profiel');
+        } else {
+          navigate('/');
+        }
       } else {
         setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
       }

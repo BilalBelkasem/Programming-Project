@@ -8,15 +8,20 @@ import axios from 'axios';
 export default function AdminStudent() {
   const [zoekterm, setZoekterm] = useState('');
   const [studenten, setStudenten] = useState([]);
-
   const navigate = useNavigate();
 
   const handleLogout = () => navigate('/');
   const handleBack = () => navigate('/admin');
 
-  // Studenten ophalen van backend
+  // Studenten ophalen van backend met auth header
   const laadStudenten = () => {
-    axios.get('http://localhost:5000/api/studenten')
+    const token = localStorage.getItem('token');
+
+    axios.get('http://localhost:5000/api/studenten', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(res => {
         setStudenten(res.data);
         console.log('Data van backend:', res.data);
@@ -31,11 +36,15 @@ export default function AdminStudent() {
   }, []);
 
   const handleVerwijder = (id, naam) => {
+    const token = localStorage.getItem('token');
+
     if (window.confirm(`Ben je zeker dat je ${naam} wilt verwijderen?`)) {
-      // DELETE request naar backend
-      axios.delete(`http://localhost:5000/api/studenten/${id}`)
+      axios.delete(`http://localhost:5000/api/studenten/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then(() => {
-          // Alleen verwijderen uit frontend als backend succes gaf
           setStudenten(prev => prev.filter(student => student.id !== id));
         })
         .catch(err => {
@@ -45,7 +54,6 @@ export default function AdminStudent() {
     }
   };
 
-  // Filter veilig met fallback voor naam
   const gefilterdeStudenten = studenten.filter(student =>
     (student.naam || '').toLowerCase().includes(zoekterm.toLowerCase())
   );
