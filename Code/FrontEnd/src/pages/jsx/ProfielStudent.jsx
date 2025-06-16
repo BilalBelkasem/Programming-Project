@@ -133,7 +133,7 @@ export default function ProfielStudent({ user }) {
 
         <div className="form-grid">
           <div className="left">
-            <label>Naam</label>
+            <label>Voornaam + Achternaam</label>
             <input name="name" value={formData.name} onChange={handleChange} />
 
             <label>School (optioneel)</label>
@@ -155,8 +155,6 @@ export default function ProfielStudent({ user }) {
           </div>
 
           <div className="right">
-            <label>Achternaam</label>
-            <input name="lastname" value={formData.lastname} onChange={handleChange} />
 
             <label>Richting (optioneel)</label>
             <input name="direction" value={formData.direction} onChange={handleChange} />
