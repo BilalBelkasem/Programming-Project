@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../Css/StudentProfiel.css';
 
 export default function ProfielStudent() {
-  const [liked, setLiked] = useState(false);
-
   const student = {
     name: 'Jan Jansen',
     school: 'Erasmushogeschool Brussel',
@@ -14,8 +12,6 @@ export default function ProfielStudent() {
     linkedin: 'https://linkedin.com/in/jan-jansen',
     email: 'jan.jansen@student.ehb.be',
     about: 'Passionate developer specializing in frontend technologies. Currently exploring React ecosystem and looking for internship opportunities.',
-    lookingFor: ['Stage', 'Vast werk', 'Deeltijds werk'],
-    domain: ['Web Development', 'UI/UX Design', 'Cloud Computing'],
     profilePicture: '',
   };
 
@@ -48,9 +44,7 @@ export default function ProfielStudent() {
               <div className="circle">[Foto]</div>
             )}
           </div>
-          <div className={`like-button ${liked ? 'liked' : ''}`} title="Like ♥" onClick={() => setLiked(!liked)}>
-            ♥
-          </div>
+          <button className="like-button" title="Like ♥">♥</button>
         </div>
 
         <div className="profile-grid">
@@ -61,7 +55,7 @@ export default function ProfielStudent() {
           <div className="field full"><strong>Email:</strong> {student.email}</div>
           {student.linkedin && (
             <div className="field full">
-              <strong>LinkedIn:</strong>{' '}
+              <strong>LinkedIn:</strong>{" "}
               <a href={student.linkedin} target="_blank" rel="noreferrer" className="link">
                 {student.linkedin}
               </a>
