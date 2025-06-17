@@ -1,7 +1,8 @@
+// GBedrijven.jsx
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-import '../css/UBedrijven.css';
+import '../Css/Gbedrijveninfopagina.css';
 
 export default function GBedrijven({ onLogout }) {
   const navigate = useNavigate();
@@ -28,18 +29,25 @@ export default function GBedrijven({ onLogout }) {
 
   return (
     <>
-      <div className="pageWrapper">
+      <div className="pagina-wrapper">
         <header className="header">
-          <img src={logo} alt="Erasmus Logo" className="logo" />
-          <nav className="nav-links">
-            <Link to="/" className="nav-btn">info</Link>
-            <Link to="/GBedrijven" className="nav-btn active">bedrijven</Link>
-            <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
-            <Link to="/login" className="nav-btn">login/registeren</Link>
-          </nav>
+          <div className="header-section left">
+            <img src={logo} alt="Erasmus Logo" className="logo" />
+          </div>
+
+          <div className="header-section center">
+            <nav className="nav-center">
+              <Link to="/" className="nav-btn">info</Link>
+              <Link to="/GBedrijven" className="nav-btn active">bedrijven</Link>
+              <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
+              <Link to="/login" className="nav-btn">login/registeren</Link>
+            </nav>
+          </div>
+
+          <div className="header-section right">{/* lege ruimte voor balans */}</div>
         </header>
 
-        <main className="main">
+        <main className="main-content">
           <h2 className="title">Ontdek bedrijven</h2>
           <div className="bedrijvenContainer">
             {bedrijven.length === 0 ? (
@@ -61,7 +69,6 @@ export default function GBedrijven({ onLogout }) {
         </main>
       </div>
 
-      {/* FOOTER */}
       <footer className="site-footer">
         <div className="footer-columns">
           <div className="footer-column">
