@@ -1,22 +1,53 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../Css/StudentProfiel.css';
 
 export default function ProfielStudent() {
-  const [liked, setLiked] = useState(false);
-
-  const student = {
-    name: 'Jan Jansen',
-    school: 'Erasmushogeschool Brussel',
-    direction: 'Toegepaste Informatica',
-    year: '3de Bachelor',
-    linkedin: 'https://linkedin.com/in/jan-jansen',
-    email: 'jan.jansen@student.ehb.be',
-    about: 'Passionate developer specializing in frontend technologies. Currently exploring React ecosystem and looking for internship opportunities.',
-    lookingFor: ['Stage', 'Vast werk', 'Deeltijds werk'],
-    domain: ['Web Development', 'UI/UX Design', 'Cloud Computing'],
+  // State voor student info (initieel met lege velden)
+  const [student, setStudent] = useState({
+    name: 'Jan Jansen', // voorbeeldnaam
+    school: '',
+    Richting: '',
+    year: '',
+    linkedin: '',
+    email: '',
+    about: '',
+    lookingFor: [],
+    domain: [],
     profilePicture: '',
+  });
+
+  // State voor fouten (validatie)
+  const [errors, setErrors] = useState({});
+
+  // Handler voor input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setStudent(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    // Simpele validatie email verplicht
+    const newErrors = {};
+    if (!student.email) {
+      newErrors.email = 'Email is verplicht';
+    } else if (!/\S+@\S+\.\S+/.test(student.email)) {
+      newErrors.email = 'Ongeldig emailadres';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return; // stop opslaan
+    }
+
+    setErrors({});
+    alert('Studentgegevens opgeslagen!');
+    console.log('Opslaan:', student);
+    // Hier kun je evt. een API call doen om te saven
   };
 
   const handleLogout = () => {
@@ -30,11 +61,11 @@ export default function ProfielStudent() {
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
-          <NavLink to="/dashboard" className="navLink">Info</NavLink>
-          <NavLink to="/bedrijven" className="navLink">Bedrijven</NavLink>
-          <NavLink to="/plattegrond" className="navLink">Plattegrond</NavLink>
-          <NavLink to="/favorieten" className="navLink">Favorieten</NavLink>
-          <NavLink to="/mijn-profiel" className="navLink active">Mijn profiel</NavLink>
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
         </nav>
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
@@ -48,31 +79,85 @@ export default function ProfielStudent() {
               <div className="circle">[Foto]</div>
             )}
           </div>
-          <div className={`like-button ${liked ? 'liked' : ''}`} title="Like ♥" onClick={() => setLiked(!liked)}>
-            ♥
-          </div>
+          <button className="like-button" title="Like ♥">♥</button>
         </div>
 
         <div className="profile-grid">
-          <div className="field"><strong>Voornaam + Achternaam:</strong> {student.name}</div>
-          <div className="field"><strong>School:</strong> {student.school}</div>
-          <div className="field"><strong>Richting:</strong> {student.direction}</div>
-          <div className="field"><strong>Jaar:</strong> {student.year}</div>
-          <div className="field full"><strong>Email:</strong> {student.email}</div>
+          {/* Naam als read-only input */}
+          <div className="field">
+            <label><strong>Voornaam + Achternaam:</strong></label><br />
+            <div className="readonly-input">{student.name}</div>
+          </div>
+
+
+          <div className="field">
+            <label><strong>School:</strong></label><br />
+            <input
+              type="text"
+              name="school"
+              value={student.school}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="field">
+            <label><strong>Richting:</strong></label><br />
+            <input
+              type="text"
+              name="Richting"
+              value={student.Richting}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="field">
+            <label><strong>Jaar:</strong></label><br />
+            <input
+              type="text"
+              name="year"
+              value={student.year}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Email verplicht veld */}
+          <div className="field full">
+            <label><strong>Email:</strong></label><br />
+            <input
+              type="email"
+              name="email"
+              value={student.email}
+              onChange={handleChange}
+              required
+              className={errors.email ? 'input-error' : ''}
+            />
+            {errors.email && <div className="error-text">{errors.email}</div>}
+          </div>
+
           {student.linkedin && (
             <div className="field full">
-              <strong>LinkedIn:</strong>{' '}
-              <a href={student.linkedin} target="_blank" rel="noreferrer" className="link">
-                {student.linkedin}
-              </a>
+              <strong>LinkedIn:</strong>{" "}
+              <a href={student.linkedin} target="_blank" rel="noreferrer">{student.linkedin}</a>
             </div>
           )}
         </div>
 
         <div className="section">
           <h2>Over mezelf</h2>
-          <p className="textarea">{student.about || <em>Geen informatie opgegeven</em>}</p>
+          <textarea
+            name="about"
+            value={student.about}
+            onChange={handleChange}
+            rows={5}
+            placeholder="Vertel iets over jezelf..."
+          />
         </div>
+
+        {/* ... overige secties ... */}
+
+        <button onClick={handleSave} className="save-button">
+          Opslaan
+        </button>
       </main>
     </div>
   );

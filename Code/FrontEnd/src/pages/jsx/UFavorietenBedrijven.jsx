@@ -1,55 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-import '../css/UBedrijven.css';
+import '../Css/UFavorietenBedrijven.css';
 import axios from 'axios';
 
 export default function UFavorietenBedrijven({ onLogout }) {
   const navigate = useNavigate();
-  const [bedrijven, setBedrijven] = useState([]);
   const [favorieten, setFavorieten] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const bedrijvenRes = await axios.get('http://localhost:5000/api/open-bedrijven');
-        setBedrijven(bedrijvenRes.data);
-
-        const user = JSON.parse(localStorage.getItem('user'));
-        const favorietenRes = await axios.get(`http://localhost:5000/api/favorieten/${user.id}`);
-        const geliketeIds = favorietenRes.data.map((bedrijf) => bedrijf.id);
-        setFavorieten(geliketeIds);
-      } catch (err) {
-        console.error('Fout bij ophalen:', err);
-      }
-    };
-    fetchData();
-  }, []);
 
   const handleLogout = () => {
     if (onLogout) onLogout();
     navigate("/login");
   };
 
-  const toggleLike = async (bedrijfId) => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    const isFavoriet = favorieten.includes(bedrijfId);
-
+  const verwijderFavoriet = async (bedrijfId) => {
     try {
-      if (isFavoriet) {
-        await axios.delete(`http://localhost:5000/api/favorieten/${bedrijfId}?student_id=${user.id}`);
-        setFavorieten(prev => prev.filter(id => id !== bedrijfId));
-      } else {
-        await axios.post('http://localhost:5000/api/favorieten', {
-          student_id: user.id,
-          company_id: bedrijfId
-        });
-        setFavorieten(prev => [...prev, bedrijfId]);
-      }
+      const user = JSON.parse(localStorage.getItem('user'));
+      await axios.delete(`http://localhost:5000/api/favorieten/${bedrijfId}?student_id=${user.id}`);
+      const res = await axios.get(`http://localhost:5000/api/favorieten/${user.id}`);
+      setFavorieten(res.data);
     } catch (err) {
-      console.error('Fout bij togglen van favoriet:', err);
+      console.error('Fout bij verwijderen:', err);
     }
   };
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    axios.get(`http://localhost:5000/api/favorieten/${user.id}`)
+      .then(res => setFavorieten(res.data))
+      .catch(err => console.error('Fout bij ophalen favorieten:', err));
+  }, []);
 
   return (
     <div className="pageWrapper">
@@ -66,25 +46,23 @@ export default function UFavorietenBedrijven({ onLogout }) {
       </header>
 
       <main className="main">
-        <h2 className="title">Ontdek bedrijven</h2>
+        <h2 className="title">Mijn favorieten</h2>
         <div className="bedrijvenContainer">
-          {bedrijven.length === 0 ? (
-            <p style={{ color: 'gray' }}>Geen bedrijven gevonden...</p>
+          {favorieten.length === 0 ? (
+            <p>Je hebt nog geen favoriete bedrijven.</p>
           ) : (
-            bedrijven
-              .filter((bedrijf) => favorieten.includes(bedrijf.id))
-              .map((bedrijf) => (
-                <div key={bedrijf.id} className="bedrijfCard">
-                  <h3 className="bedrijfNaam">{bedrijf.company_name}</h3>
-                  <p className="bedrijfBeschrijving">{bedrijf.sector}</p>
-                  <button
-                    onClick={() => toggleLike(bedrijf.id)}
-                    className={`likeButton ${favorieten.includes(bedrijf.id) ? 'liked' : ''}`}
-                  >
-                    ♥
-                  </button>
-                </div>
-              ))
+            favorieten.map((bedrijf) => (
+              <div key={bedrijf.id} className="bedrijfCard">
+                <h3 className="bedrijfNaam">{bedrijf.naam}</h3>
+                <p className="bedrijfBeschrijving">{bedrijf.beschrijving}</p>
+                <button
+                  onClick={() => verwijderFavoriet(bedrijf.id)}
+                  className="actionButton"
+                >
+                  Verwijder
+                </button>
+              </div>
+            ))
           )}
         </div>
       </main>

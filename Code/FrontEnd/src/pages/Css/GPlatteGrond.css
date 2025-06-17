@@ -1,51 +1,32 @@
 .uplattegrond-wrapper {
   background-color: #f8f8f8;
   font-family: sans-serif;
+
 }
 
-/* ========== HEADER STRUCTUUR ========== */
-
+/* HERGEBRUIK header layout van UBedrijven */
+/* HEADER CONTAINER */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px 60px;
-  background-color: #f9f9f9;
 }
 
-/* Structuur in 3 zones */
-.header-section {
-  flex: 1;
+.nav-links {
   display: flex;
-  align-items: center;
-}
-
-.header-section.left {
-  justify-content: flex-start;
-}
-
-.header-section.center {
-  justify-content: center;
-}
-
-.header-section.right {
-  justify-content: flex-end;
+  gap: 80px;
+  margin-right: 200px;
 }
 
 /* LOGO */
 .logo {
-  max-height: 60px;
-  max-width: 120px;
+  height: auto;
+  max-height: 100px;
   object-fit: contain;
 }
 
-/* NAV LINKS CENTRAAL */
-.nav-center {
-  display: flex;
-  gap: 200px;
-  align-items: center;
-  justify-content: center;
-}
+
 
 /* ALGEMENE KNOPSTIJL */
 .nav-btn {
@@ -66,12 +47,12 @@
   border-radius: 20px;
 }
 
-/* HOVER EFFECT */
+/* HOVER (enkel op niet-actieve knoppen) */
 .nav-btn:not(.active):hover {
   color: #C8102E;
 }
 
-/* HOVER ONDERSTREPING */
+/* HOVER-ONDERLIJNING */
 .nav-btn:not(.active)::after {
   content: "";
   position: absolute;
@@ -87,8 +68,8 @@
   width: 100%;
 }
 
-/* ========== PLATTEGROND CONTENT ========== */
 
+/* KAART + LEGENDE */
 .uplattegrond-kader {
   margin: 1rem;
   padding: 1.5rem;
@@ -97,6 +78,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* TITEL */
 .uplattegrond-title-box {
   margin-bottom: 1rem;
   background-color: #f0f0f0;
@@ -111,12 +93,14 @@
   color: #222;
 }
 
+/* INHOUD VERDELING */
 .uplattegrond-content-box {
   display: flex;
   gap: 1rem;
   height: calc(100vh - 200px);
 }
 
+/* PLATTEGROND */
 .uplattegrond-image {
   width: 75%;
   height: 100%;
@@ -125,6 +109,7 @@
   border: 1px solid #ddd;
 }
 
+/* LEGENDE */
 .uplattegrond-legend-box {
   width: 25%;
   background-color: #fafafa;

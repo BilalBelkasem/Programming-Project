@@ -9,38 +9,28 @@
 
 /* ========== HEADER ========== */
 
+/* HEADER CONTAINER */
 .header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 20px 60px;
+  justify-content: space-between;
   background-color: #f9f9f9;
-  position: relative;
+  padding: 20px 60px;
 }
 
-/* LOGO AAN DE LINKERKANT */
+/* LOGO */
 .logo {
-  position: absolute;
-  left: 40px;                /* iets meer marge links */
-  max-height: 60px;          /* iets kleiner voor balans */
-  max-width: 120px;          /* voorkom dat het te breed wordt */
+  height: auto;
+  max-height: 80px;
   object-fit: contain;
 }
 
-/* NAVIGATIE WRAPPER VOOR CENTRERING */
-.nav-wrapper {
+/* NAVIGATION LINKS */
+.nav-links {
   display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
-/* NAV LINKS GECENTREERD */
-.nav-center {
-  display: flex;
-  gap: 40px;
+  gap: 40px; /* ruimte tussen knoppen */
   align-items: center;
-  justify-content: center;
-  margin: 0 auto; /* zorgt dat het perfect centraal blijft */
+  margin-right: 200px;
 }
 
 /* ALGEMENE KNOPSTIJL */
@@ -101,8 +91,8 @@
 }
 
 .info-banner {
-  width: 90%;
-  height: 600px;
+  width: 90%;          /* groter in breedte (was 60%) */
+  height: 600px;       /* iets lager dan 500px voor balans */
   overflow: hidden;
   background-color: #f9f9f9;
   border-radius: 10px;
@@ -191,84 +181,4 @@
   color: #C8102E;
   text-decoration: none;
   font-weight: bold;
-}
-/* === HEADER STRUCTUUR MET CENTRUMMENU === */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #f9f9f9;
-  padding: 20px 60px;
-}
-
-/* Verdeeld in 3 delen */
-.header-section {
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-/* Logo links */
-.header-section.left {
-  justify-content: flex-start;
-}
-
-.header-section.center {
-  justify-content: center;
-}
-
-.header-section.right {
-  justify-content: flex-end;
-}
-
-/* Logo styling */
-.logo {
-  height: auto;
-  max-height: 80px;
-  object-fit: contain;
-}
-
-/* Navigatie gecentreerd */
-.nav-center {
-  display: flex;
-  gap: 200px;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Navigatieknoppen */
-.nav-btn {
-  text-decoration: none;
-  color: black;
-  font-size: 16px;
-  font-weight: bold;
-  padding: 10px 16px;
-  border-radius: 6px;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
-.nav-btn.active {
-  background-color: #C8102E;
-  color: white;
-  border-radius: 20px;
-}
-
-.nav-btn:not(.active):hover {
-  color: #C8102E;
-}
-
-.nav-btn:not(.active)::after {
-  content: "";
-  position: absolute;
-  width: 0%;
-  height: 2px;
-  left: 0;
-  bottom: 0;
-  background-color: #C8102E;
-  transition: width 0.3s ease;
-}
-
-.nav-btn:not(.active):hover::after {
-  width: 100%;
 }
