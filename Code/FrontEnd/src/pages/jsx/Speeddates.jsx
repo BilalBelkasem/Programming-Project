@@ -91,11 +91,9 @@ const Speeddates = () => {
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
-      {/* TITEL */}
+      {/* TITEL + SEARCH */}
       <h1 className="speeddates-title">Speeddate Reservaties</h1>
       <p className="speeddates-subtitle">Reserveer je speeddate met innovatieve bedrijven</p>
-
-      {/* ZOEKVELD */}
       <input
         className="speeddates-search"
         type="text"
@@ -104,8 +102,8 @@ const Speeddates = () => {
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
-      {/* BEDRIJVEN */}
-      <div className="speeddates-companies">
+      {/* BEDRIJVEN GRID */}
+      <div className="speeddates-grid">
         {filteredCompanies.map(c => (
           <div key={c._id} className="company-card" onClick={() => handleCompanyClick(c)}>
             <h3 className="company-name">{c.name}</h3>
@@ -115,7 +113,7 @@ const Speeddates = () => {
               <span>{c.location}</span>
               <span>{c.contact}</span>
             </div>
-            <span className="session-badge">15 min sessies</span>
+            <span className="session-badge">5 min sessies</span>
           </div>
         ))}
       </div>
@@ -152,7 +150,11 @@ const Speeddates = () => {
 
       {/* RESERVATIES */}
       <div className="reservations-section">
-        <h2 className="reservations-title">📅 Mijn Reservaties</h2>
+        <div className="reservations-header">
+          <h2 className="reservations-title">📅 Mijn Reservaties</h2>
+          <button className="mini-refresh-btn" onClick={() => window.location.reload()}>↻</button>
+        </div>
+
         {myReservations.length === 0 ? (
           <p className="no-reservations">Je hebt nog geen reservaties gemaakt.</p>
         ) : (
