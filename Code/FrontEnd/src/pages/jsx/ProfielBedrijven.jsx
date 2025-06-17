@@ -1,20 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../Css/ProfielBedrijven.css';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 
 export default function ProfielBedrijven() {
   const [formData, setFormData] = useState({
-    name: '',
+    booth_contact_name: '',
+    booth_contact_email: '',
+    invoice_contact_name: '',
+    invoice_contact_email: '',
     companyName: '',
-    function: '',
-    email: '',
-    linkedin: '',
+    website: '',
     about: '',
     lookingFor: [],
     domains: [],
     profilePicture: null,
   });
+
+  useEffect(() => {
+    fetch('/api/company-details')
+      .then(res => {
+        if (!res.ok) throw new Error('Netwerk fout');
+        return res.json();
+      })
+      .then(data => {
+        setFormData(prev => ({
+          ...prev,
+          booth_contact_name: data.booth_contact_name || '',
+          booth_contact_email: data.booth_contact_email || '',
+          invoice_contact_name: data.invoice_contact_name || '',
+          invoice_contact_email: data.invoice_contact_email || '',
+          companyName: data.company_name || '',
+          website: data.website || '',        // aangepast naar website ipv linkedin
+          about: data.about || '',
+          profilePicture: data.logo || null,
+          lookingFor: Array.isArray(data.lookingFor) ? data.lookingFor : [],
+          domains: Array.isArray(data.domains) ? data.domains : [],
+        }));
+      })
+      .catch(err => {
+        console.error('Fout bij ophalen company details:', err);
+      });
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -59,7 +86,7 @@ export default function ProfielBedrijven() {
         <nav className="nav">
           <Link to="/dashboard" className="navLink">Info</Link>
           <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/favorieten" className="navLink">studenten</Link>
+          <Link to="/favorieten" className="navLink">Studenten</Link>
           <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
         </nav>
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
@@ -72,59 +99,74 @@ export default function ProfielBedrijven() {
             alt="Bedrijfsfoto"
             className="circle"
           />
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handleImageUpload} 
-            className="upload-btn" 
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="upload-btn"
           />
         </div>
 
         <div className="profile-grid">
+          {/* Rij 1 */}
           <div className="field">
-            <label><strong>voornaamnaam + Achternaam:</strong></label>
-            <input 
-              name="name" 
-              value={formData.name} 
-              onChange={handleChange}
-              placeholder="name"
-            />
-          </div>
-                <div className="field">
             <label><strong>Bedrijfsnaam:</strong></label>
-            <input 
-              name="companyName" 
-              value={formData.companyName} 
+            <input
+              name="companyName"
+              value={formData.companyName}
               onChange={handleChange}
               placeholder="Bedrijfsnaam"
             />
           </div>
           <div className="field">
-            <label><strong>Functie:</strong></label>
-            <input 
-              name="function" 
-              value={formData.function} 
+            <label><strong>Website / LinkedIn URL:</strong></label>
+            <input
+              name="website"
+              value={formData.website}
               onChange={handleChange}
-              placeholder="Functie"
+              placeholder="Website of LinkedIn URL"
             />
           </div>
-          <div className="field full">
-            <label><strong>E-mail:</strong></label>
-            <input 
-              name="email" 
+
+          {/* Rij 2 */}
+          <div className="field">
+            <label><strong>Algemene contactpersoon naam:</strong></label>
+            <input
+              name="booth_contact_name"
+              value={formData.booth_contact_name}
+              onChange={handleChange}
+              placeholder="Naam contactpersoon"
+            />
+          </div>
+          <div className="field">
+            <label><strong>Algemene contactpersoon email:</strong></label>
+            <input
+              name="booth_contact_email"
               type="email"
-              value={formData.email} 
+              value={formData.booth_contact_email}
               onChange={handleChange}
-              placeholder="E-mail adres"
+              placeholder="Email contactpersoon"
             />
           </div>
-          <div className="field full">
-            <label><strong>LinkedIn (optioneel):</strong></label>
-            <input 
-              name="linkedin" 
-              value={formData.linkedin} 
+
+          {/* Rij 3 */}
+          <div className="field">
+            <label><strong>Facturatie contactpersoon naam:</strong></label>
+            <input
+              name="invoice_contact_name"
+              value={formData.invoice_contact_name}
               onChange={handleChange}
-              placeholder="LinkedIn profiel URL"
+              placeholder="Naam facturatiecontact"
+            />
+          </div>
+          <div className="field">
+            <label><strong>Facturatie email:</strong></label>
+            <input
+              name="invoice_contact_email"
+              type="email"
+              value={formData.invoice_contact_email}
+              onChange={handleChange}
+              placeholder="Email facturatie"
             />
           </div>
         </div>
