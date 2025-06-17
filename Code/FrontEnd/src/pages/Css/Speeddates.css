@@ -289,3 +289,7 @@
 .reservation-card button:hover {
   background: #dc2626;
 }
+.company-header{
+  display: flex;
+  gap: 10px;
+}

@@ -10,23 +10,31 @@ const Speeddates = () => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [myReservations, setMyReservations] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [availableSlots, setAvailableSlots] = useState([]);
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Fetch companies
     axios.get('/api/companies')
       .then(res => setCompanies(res.data))
       .catch(err => console.error(err));
 
+    // Fetch user reservations
     axios.get('/api/reservations/user/me')
       .then(res => setMyReservations(res.data))
       .catch(err => console.error(err));
   }, []);
 
-  const handleCompanyClick = (company) => {
+  const handleNewReservationClick = (company) => {
     setSelectedCompany(company);
     axios.get(`/api/companies/${company._id}/slots`)
-      .then(res => setTimeSlots(res.data))
+      .then(res => {
+        const available = res.data.filter(slot => 
+          !myReservations.some(r => r.slot._id === slot._id)
+        );
+        setAvailableSlots(available);
+      })
       .catch(err => console.error(err));
   };
 
@@ -36,7 +44,10 @@ const Speeddates = () => {
       companyId: selectedCompany._id,
     }).then(res => {
       setMyReservations(prev => [...prev, res.data]);
-      setTimeSlots(prev => prev.map(s => s._id === slot._id ? { ...s, available: false } : s));
+      setAvailableSlots(prev => prev.filter(s => s._id !== slot._id));
+    }).catch(err => {
+      console.error('Error creating reservation:', err);
+      alert('Er is een fout opgetreden bij het maken van de reservatie');
     });
   };
 
@@ -49,11 +60,6 @@ const Speeddates = () => {
     localStorage.clear();
     navigate("/login");
   };
-
-  const filteredCompanies = companies.filter(c =>
-    [c.name, c.description, c.industry, c.location].some(field =>
-      field?.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
 
   const formatDateTime = (datetime) => {
     const d = new Date(datetime);
@@ -74,10 +80,15 @@ const Speeddates = () => {
     }, {});
   };
 
+  // Filter companies based on search query
+  const filteredCompanies = companies.filter(c =>
+    [c.name, c.description, c.industry, c.location].some(field =>
+      field?.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   return (
     <div className="speeddates-container">
-
-      {/* HEADER */}
+      {/* Header */}
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
@@ -91,7 +102,7 @@ const Speeddates = () => {
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
-      {/* TITEL + SEARCH */}
+      {/* Title and search */}
       <h1 className="speeddates-title">Speeddate Reservaties</h1>
       <p className="speeddates-subtitle">Reserveer je speeddate met innovatieve bedrijven</p>
       <input
@@ -102,11 +113,24 @@ const Speeddates = () => {
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
-      {/* BEDRIJVEN GRID */}
+      {/* Companies grid */}
       <div className="speeddates-grid">
         {filteredCompanies.map(c => (
-          <div key={c._id} className="company-card" onClick={() => handleCompanyClick(c)}>
-            <h3 className="company-name">{c.name}</h3>
+          <div key={c._id} className="company-card">
+            <div className="company-card-header">
+              <div className='company-header'>
+              <h3 className="company-name">{c.name}</h3>
+              <button 
+                className="new-reservation-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleNewReservationClick(c);
+                }}
+              >
+                +
+              </button>
+              </div>
+            </div>
             <p className="company-description">{c.description}</p>
             <div className="company-meta">
               <span>{c.industry}</span>
@@ -118,37 +142,41 @@ const Speeddates = () => {
         ))}
       </div>
 
-      {/* SLOT MODAL */}
+      {/* Timeslot modal for new reservation */}
       {selectedCompany && (
         <div className="slot-modal">
           <div className="slot-modal-content">
             <button className="close-btn" onClick={() => setSelectedCompany(null)}>×</button>
-            <h2>{selectedCompany.name}</h2>
-            {Object.entries(groupSlotsByDate(timeSlots)).map(([date, slots]) => (
-              <div key={date} className="slot-group">
-                <h4 className="slot-date">{formatDateTime(slots[0].datetime).date}</h4>
-                <div className="slot-list">
-                  {slots.map(slot => {
-                    const { time } = formatDateTime(slot.datetime);
-                    return (
-                      <button
-                        key={slot._id}
-                        disabled={!slot.available}
-                        className={`slot-button ${slot.available ? '' : 'disabled'}`}
-                        onClick={() => handleReservation(slot)}
-                      >
-                        {time}
-                      </button>
-                    );
-                  })}
+            <h2>Reserveer bij {selectedCompany.name}</h2>
+            
+            {availableSlots.length > 0 ? (
+              Object.entries(groupSlotsByDate(availableSlots)).map(([date, slots]) => (
+                <div key={date} className="slot-group">
+                  <h4 className="slot-date">{formatDateTime(slots[0].datetime).date}</h4>
+                  <div className="slot-list">
+                    {slots.map(slot => {
+                      const { time } = formatDateTime(slot.datetime);
+                      return (
+                        <button
+                          key={slot._id}
+                          className="slot-button"
+                          onClick={() => handleReservation(slot)}
+                        >
+                          {time}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="no-slots">Geen beschikbare slots voor dit bedrijf</p>
+            )}
           </div>
         </div>
       )}
 
-      {/* RESERVATIES */}
+      {/* Reservations section */}
       <div className="reservations-section">
         <div className="reservations-header">
           <h2 className="reservations-title">📅 Mijn Reservaties</h2>
