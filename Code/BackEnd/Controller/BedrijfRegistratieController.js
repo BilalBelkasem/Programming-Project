@@ -28,7 +28,7 @@ exports.registerCompany = async (req, res) => {
       const {
         email,
         password,
-        company_name,
+        organization,
         website,
         phone_number,
         street,
@@ -43,7 +43,7 @@ exports.registerCompany = async (req, res) => {
         sector
       } = req.body;
 
-      if (!email || !password || !company_name || !booth_contact_name) {
+      if (!email || !password || !organization || !booth_contact_name) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
