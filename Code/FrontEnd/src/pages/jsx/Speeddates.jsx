@@ -1,6 +1,7 @@
-import logo from '../../assets/logo Erasmus.png';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
+import logo from '../../assets/logo Erasmus.png';
 import '../Css/Speeddates.css';
 
 const Speeddates = () => {
@@ -9,6 +10,8 @@ const Speeddates = () => {
   const [timeSlots, setTimeSlots] = useState([]);
   const [myReservations, setMyReservations] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('/api/companies')
@@ -42,6 +45,11 @@ const Speeddates = () => {
       .then(() => setMyReservations(prev => prev.filter(r => r._id !== id)));
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
+
   const filteredCompanies = companies.filter(c =>
     [c.name, c.description, c.industry, c.location].some(field =>
       field?.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -50,8 +58,10 @@ const Speeddates = () => {
   const formatDateTime = (datetime) => {
     const d = new Date(datetime);
     return {
-      date: d.toLocaleDateString(),
-      time: d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      date: d.toLocaleDateString('nl-NL', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+      }),
+      time: d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
     };
   };
 
@@ -66,33 +76,59 @@ const Speeddates = () => {
 
   return (
     <div className="speeddates-container">
+
+      {/* HEADER */}
+      <header className="header">
+        <img src={logo} alt="Erasmus Logo" className="logo" />
+        <nav className="nav">
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/speeddates" className="navLink">Speeddates</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/UFavorietenBedrijven" className="navLink">Favorieten</Link>
+          <Link to="/mijn-profiel" className="navLink">Mijn Profiel</Link>
+        </nav>
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+      </header>
+
+      {/* TITEL */}
       <h1 className="speeddates-title">Speeddate Reservaties</h1>
+      <p className="speeddates-subtitle">Reserveer je speeddate met innovatieve bedrijven</p>
+
+      {/* ZOEKVELD */}
       <input
         className="speeddates-search"
         type="text"
         value={searchQuery}
-        placeholder="Zoek bedrijf..."
+        placeholder="Zoek bedrijf, locatie, of industrie..."
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
+      {/* BEDRIJVEN */}
       <div className="speeddates-companies">
         {filteredCompanies.map(c => (
           <div key={c._id} className="company-card" onClick={() => handleCompanyClick(c)}>
-            <h3>{c.name}</h3>
-            <p>{c.description}</p>
-            <small>{c.industry} | {c.location}</small>
+            <h3 className="company-name">{c.name}</h3>
+            <p className="company-description">{c.description}</p>
+            <div className="company-meta">
+              <span>{c.industry}</span>
+              <span>{c.location}</span>
+              <span>{c.contact}</span>
+            </div>
+            <span className="session-badge">15 min sessies</span>
           </div>
         ))}
       </div>
 
+      {/* SLOT MODAL */}
       {selectedCompany && (
         <div className="slot-modal">
           <div className="slot-modal-content">
             <button className="close-btn" onClick={() => setSelectedCompany(null)}>×</button>
             <h2>{selectedCompany.name}</h2>
             {Object.entries(groupSlotsByDate(timeSlots)).map(([date, slots]) => (
-              <div key={date}>
-                <h4>{date}</h4>
+              <div key={date} className="slot-group">
+                <h4 className="slot-date">{formatDateTime(slots[0].datetime).date}</h4>
                 <div className="slot-list">
                   {slots.map(slot => {
                     const { time } = formatDateTime(slot.datetime);
@@ -114,10 +150,11 @@ const Speeddates = () => {
         </div>
       )}
 
+      {/* RESERVATIES */}
       <div className="reservations-section">
-        <h2>Mijn Reservaties</h2>
+        <h2 className="reservations-title">📅 Mijn Reservaties</h2>
         {myReservations.length === 0 ? (
-          <p>Je hebt nog geen reservaties.</p>
+          <p className="no-reservations">Je hebt nog geen reservaties gemaakt.</p>
         ) : (
           <div className="reservations-list">
             {myReservations.map(r => {
