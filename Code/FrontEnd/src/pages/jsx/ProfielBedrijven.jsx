@@ -13,6 +13,7 @@ export default function ProfielBedrijven({ user }) {
     companyName: '',
     website: '',
     about: '',
+    phone_number: '', // toegevoegd
     lookingFor: [],
     domains: [],
     profilePicture: null,
@@ -36,6 +37,7 @@ export default function ProfielBedrijven({ user }) {
           companyName: data.company_name || '',
           website: data.website || '',
           about: data.about || '',
+          phone_number: data.phone_number || '', // toegevoegd
           profilePicture: data.logo || null,
           lookingFor: Array.isArray(data.lookingFor) ? data.lookingFor : [],
           domains: Array.isArray(data.domains) ? data.domains : [],
@@ -88,12 +90,13 @@ export default function ProfielBedrijven({ user }) {
       company_name: formData.companyName,
       website: formData.website,
       about: formData.about,
+      phone_number: formData.phone_number, // toegevoegd
       lookingFor: formData.lookingFor,
       domains: formData.domains,
     };
 
     try {
-      await axios.put(`/api/company-details/user/${user.id}`, payload);
+      await axios.put(`/api/company-details/${user.id}`, payload);
       alert('Wijzigingen succesvol opgeslagen!');
     } catch (error) {
       if (error.response) {
@@ -202,6 +205,18 @@ export default function ProfielBedrijven({ user }) {
               placeholder="Email facturatie"
             />
           </div>
+        </div>
+
+        {/* Phone number above 'Over het bedrijf' */}
+        <div className="field">
+          <label><strong>Telefoonnummer verantwoordelijke:</strong></label>
+          <input
+            name="phone_number"
+            type="text"
+            value={formData.phone_number}
+            onChange={handleChange}
+            placeholder="Telefoonnummer verantwoordelijke"
+          />
         </div>
 
         <div className="section">

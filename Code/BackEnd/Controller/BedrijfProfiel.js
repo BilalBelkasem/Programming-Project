@@ -38,7 +38,7 @@ router.get('/company-details/:user_id', async (req, res) => {
   }
 });
 
-// **Nieuwe route**: GET bedrijfsprofiel op basis van userId (optioneel, kan je weghalen als dubbel)
+// GET bedrijfsprofiel op basis van userId (optioneel)
 router.get('/company-details/user/:userId', async (req, res) => {
   const { userId } = req.params;
 
@@ -79,7 +79,6 @@ router.get('/company-details/user/:userId', async (req, res) => {
 router.put('/company-details/:user_id', async (req, res) => {
   const { user_id } = req.params;
   const {
-    email,
     phone_number,
     company_name,
     website,
@@ -109,7 +108,7 @@ router.put('/company-details/:user_id', async (req, res) => {
 
   const sql = `
     UPDATE companies_details
-    SET email = ?, phone_number = ?, company_name = ?, website = ?, sector = ?,
+    SET phone_number = ?, company_name = ?, website = ?, sector = ?,
         booth_contact_name = ?, street = ?, city = ?, postal_code = ?, booth_contact_email = ?,
         invoice_contact_name = ?, invoice_contact_email = ?, vat_number = ?,
         interest_jobstudent = ?, interest_stage = ?, interest_job = ?, interest_connect = ?,
@@ -119,7 +118,6 @@ router.put('/company-details/:user_id', async (req, res) => {
 
   try {
     await req.db.query(sql, [
-      email,
       phone_number,
       company_name,
       website,
