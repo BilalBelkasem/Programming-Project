@@ -1,75 +1,100 @@
-/* InfoPagina.css */
+/* ========== ALGEMENE LAYOUT ========== */
 
 .pagina-wrapper {
   font-family: Arial, sans-serif;
   background-color: #f9f9f9;
-    margin: 0;
+  margin: 0;
   padding: 0;
 }
 
+/* ========== HEADER ========== */
+
+/* HEADER CONTAINER */
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   background-color: #f9f9f9;
-  padding: 10px 20px;
+  padding: 20px 60px;
 }
 
+/* LOGO */
 .logo {
   height: auto;
-  max-height: 200px;
-  object-fit:cover;
-  margin-top:20px;
+  max-height: 80px;
+  object-fit: contain;
 }
 
-.nav {
+/* NAVIGATION LINKS */
+.nav-links {
   display: flex;
-  gap: 30px;
+  gap: 40px; /* ruimte tussen knoppen */
+  align-items: center;
+  margin-right: 200px;
 }
 
-.nav-link {
+/* ALGEMENE KNOPSTIJL */
+.nav-btn {
   text-decoration: none;
   color: black;
   font-size: 16px;
-  transition: color 0.2s;
-}
-
-.nav-link:hover {
-  color: #C8102E;
-}
-
-.nav-link.active {
   font-weight: bold;
+  padding: 10px 16px;
+  border-radius: 6px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* ACTIEVE KNOP */
+.nav-btn.active {
+  background-color: #C8102E;
+  color: white;
+  border-radius: 20px;
+}
+
+/* HOVER (enkel op niet-actieve knoppen) */
+.nav-btn:not(.active):hover {
   color: #C8102E;
 }
 
-.nav-link.highlight {
-  font-weight: bold;
-  color: #C8102E;
+/* HOVER-ONDERLIJNING */
+.nav-btn:not(.active)::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  left: 0;
+  bottom: 0;
+  background-color: #C8102E;
+  transition: width 0.3s ease;
 }
+
+.nav-btn:not(.active):hover::after {
+  width: 100%;
+}
+
+/* ========== MAIN CONTENT ========== */
 
 .main-content {
   padding: 40px 80px;
-
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 }
 
 .page-title {
   font-size: 28px;
   margin-bottom: 30px;
   color: #C8102E;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
 }
 
 .info-banner {
-  width: 60%;
-  height: 500px;
+  width: 90%;          /* groter in breedte (was 60%) */
+  height: 600px;       /* iets lager dan 500px voor balans */
   overflow: hidden;
-  background-color: #ddd;w;
+  background-color: #f9f9f9;
   border-radius: 10px;
   display: flex;
   justify-content: center;
@@ -85,16 +110,18 @@
 .info-lines .line {
   height: 1px;
   background-color: black;
-  margin: 20px 0;
+  margin: 5px 0;
   transform: rotate(-0.3deg);
   text-align: center;
 }
+
+/* ========== FOOTER ========== */
+
 .info-footer {
   background-color: #f9f9f9;
- 
- 
   display: flex;
   justify-content: center;
+  padding: 0px 0;
 }
 
 .footer-content {

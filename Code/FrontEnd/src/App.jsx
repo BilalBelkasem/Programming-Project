@@ -18,6 +18,8 @@ import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
 import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
+import StudentProfiel from '../src/pages/jsx/StudentProfiel.jsx';
+import BedrijfProfiel from './pages/jsx/BedrijfProfiel.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
@@ -41,7 +43,6 @@ export default function App() {
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUser(null);
-    // Geen localStorage.clear() hier, de useEffect zorgt voor sync
   };
 
   const ProfileRedirect = () => {
@@ -52,27 +53,27 @@ export default function App() {
     return <Navigate to="/login" />;
   };
 
-  // ProtectedRoute checkt login, rol en optioneel idParam
   function ProtectedRoute({ children, role, idParam }) {
     if (!isLoggedIn || !user) {
       return <Navigate to="/login" />;
     }
-    
-     if (role) {
-        if (Array.isArray(role)) {
-          if (!role.includes(user.role)) {
-            return <Navigate to="/login" />;
-          }
-        } else {
-          if (user.role !== role) {
-            return <Navigate to="/login" />;
-          }
+
+    if (role) {
+      if (Array.isArray(role)) {
+        if (!role.includes(user.role)) {
+          return <Navigate to="/login" />;
         }
+      } else {
+        if (user.role !== role) {
+          return <Navigate to="/login" />;
+        }
+      }
     }
 
     if (idParam && idParam !== user.id) {
       return <Navigate to="/login" />;
     }
+
     return children;
   }
 
@@ -80,21 +81,17 @@ export default function App() {
     <Routes>
       <Route path="/" element={<GInfoPagina />} />
 
-      <Route
-        path="/login"
-        element={
-          isLoggedIn && user ? (
-            <Navigate to="/mijn-profiel" />
-          ) : (
-            <LoginPagina
-              onLogin={(userData) => {
-                setUser(userData);
-                setIsLoggedIn(true);
-              }}
-            />
-          )
-        }
-      />
+ <Route
+  path="/login"
+  element={
+    <LoginPagina
+      onLogin={(userData) => {
+        setUser(userData);
+        setIsLoggedIn(true);
+      }}
+    />
+  }
+/>
 
       <Route path="/bedrijf-registratie" element={<CompanyRegistrationForm />} />
       <Route path="/registreer" element={<ClientRegistration />} />
@@ -104,7 +101,6 @@ export default function App() {
         element={isLoggedIn ? <UInfoPagina onLogout={handleLogout} /> : <Navigate to="/bedrijven" />}
       />
 
-      {/* Navigatie naar juiste bedrijvenpagina afhankelijk van login */}
       <Route path="/bedrijven" element={<Navigate to={isLoggedIn ? "/ubedrijven" : "/gbedrijven"} />} />
       <Route path="/ubedrijven" element={<UBedrijven />} />
       <Route path="/gbedrijven" element={<GBedrijven />} />
@@ -125,23 +121,25 @@ export default function App() {
         path="/admin/badges"
         element={isLoggedIn && user?.role === 'admin' ? <AdminBadge /> : <Navigate to="/login" />}
       />
+      <Route path="/studentprofiel" element={<StudentProfiel />} />
+      <Route path="/bedrijfprofiel" element={<BedrijfProfiel />} />
 
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
 
-      {/* Profiel routes met wrappers */}
-      <Route path="/mijn-profiel"
-          element={
-            <ProtectedRoute role={['student', 'bedrijf']}>
-              {user?.role === 'student' ? (
-                <ProfielStudent user={user} />
-              ) : user?.role === 'bedrijf' ? (
-                <ProfielBedrijven user={user} />
-              ) : (
-                <Navigate to="/login" />
-              )}
-            </ProtectedRoute>
-          }
+      <Route
+        path="/mijn-profiel"
+        element={
+          <ProtectedRoute role={['student', 'bedrijf']}>
+            {user?.role === 'student' ? (
+              <ProfielStudent user={user} />
+            ) : user?.role === 'bedrijf' ? (
+              <ProfielBedrijven user={user} />
+            ) : (
+              <Navigate to="/login" />
+            )}
+          </ProtectedRoute>
+        }
       />
 
       <Route
@@ -160,6 +158,7 @@ export default function App() {
           )
         }
       />
+      
     </Routes>
   );
 }

@@ -10,12 +10,12 @@ export default function InfoPagina() {
     <div className="pagina-wrapper">
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
-        <nav className="nav spaced">
-          <Link to="/" className="nav-link active">info</Link>
-          <Link to="/bedrijven" className="nav-link">bedrijven</Link>
-          <Link to="/g-plattegrond" className="nav-link">plattegrond</Link>
-          <Link to="/login" className="nav-link highlight">login/registeren</Link>
-        </nav>
+        <nav className="nav-links">
+  <Link to="/" className="nav-btn active">info</Link>
+  <Link to="/GBedrijven" className="nav-btn">bedrijven</Link>
+  <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
+  <Link to="/login" className="nav-btn">login/registeren</Link>
+</nav>
       </header>
 
       <main className="main-content">

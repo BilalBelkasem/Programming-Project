@@ -1,15 +1,10 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-import '../css/UBedrijven.css';
+import '../Css/Gbedrijveninfopagina.css';
 
 export default function UBedrijven({ onLogout }) {
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    if (onLogout) onLogout();
-    navigate("/login");
-  };
 
   const bedrijven = [
     {
@@ -33,7 +28,7 @@ export default function UBedrijven({ onLogout }) {
     {
       id: 4,
       naam: 'colruyt',
-      beschrijving: 'onderhoud van alle sysemen',
+      beschrijving: 'onderhoud van alle systemen',
       tags: ['Data', 'Retail'],
     }
   ];
@@ -41,14 +36,14 @@ export default function UBedrijven({ onLogout }) {
   return (
     <div className="pageWrapper">
       <header className="header">
-        <img src={logo} alt="Erasmus Logo" className="logo" />
-        <nav className="nav spaced">
-        <Link to="/" className="nav-link active">info</Link>
-        <Link to="/GBedrijven" className="nav-link">bedrijven</Link>
-        <Link to="/g-plattegrond" className="nav-link">plattegrond</Link>
-        <Link to="/login" className="nav-link highlight">login/registeren</Link>
-        </nav>
-      </header>
+  <img src={logo} alt="Erasmus Logo" className="logo" />
+  <nav className="nav-links">
+  <Link to="/" className="nav-btn">info</Link>
+  <Link to="/Gbedrijveninfo" className="nav-btn active">bedrijven</Link>
+  <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
+  <Link to="/login" className="nav-btn">login/registeren</Link>
+</nav>
+</header>
 
       <main className="main">
         <h2 className="title">Ontdek bedrijven</h2>
@@ -62,7 +57,6 @@ export default function UBedrijven({ onLogout }) {
                   <span key={index} className="tag">{tag}</span>
                 ))}
               </div>
-              {/* Like knop verwijderd */}
             </div>
           ))}
         </div>

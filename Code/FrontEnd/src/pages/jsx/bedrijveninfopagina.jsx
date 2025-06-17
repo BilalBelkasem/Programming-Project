@@ -1,15 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-import '../css/UBedrijven.css';
+import '../Css/bedrijveninfopagina.css';
 
 export default function UBedrijven({ onLogout }) {
+  const [likedCompanies, setLikedCompanies] = useState([]);
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    if (onLogout) onLogout();
-    navigate("/login");
-  };
 
   const bedrijven = [
     {
@@ -33,21 +29,28 @@ export default function UBedrijven({ onLogout }) {
     {
       id: 4,
       naam: 'colruyt',
-      beschrijving: 'onderhoud van alle sysemen',
+      beschrijving: 'onderhoud van alle systemen',
       tags: ['Data', 'Retail'],
     }
   ];
 
+  const toggleLike = (id) => {
+    setLikedCompanies((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
   return (
     <div className="pageWrapper">
-      <header className="header">
+      <header className="navbar">
         <img src={logo} alt="Erasmus Logo" className="logo" />
-        <nav className="nav spaced">
-        <Link to="/" className="nav-link active">info</Link>
-        <Link to="/GBedrijven" className="nav-link">bedrijven</Link>
-        <Link to="/g-plattegrond" className="nav-link">plattegrond</Link>
-        <Link to="/login" className="nav-link highlight">login/registeren</Link>
-        </nav>
+
+        <nav className="nav-links">
+  <Link to="/" className="nav-btn">info</Link>
+  <Link to="/Gbedrijveninfo" className="nav-btn active">bedrijven</Link>
+  <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
+  <Link to="/login" className="nav-btn">login/registeren</Link>
+</nav>
       </header>
 
       <main className="main">
@@ -62,7 +65,12 @@ export default function UBedrijven({ onLogout }) {
                   <span key={index} className="tag">{tag}</span>
                 ))}
               </div>
-              {/* Like knop verwijderd */}
+              <button
+                onClick={() => toggleLike(bedrijf.id)}
+                className={`likeButton ${likedCompanies.includes(bedrijf.id) ? 'liked' : ''}`}
+              >
+                ♥
+              </button>
             </div>
           ))}
         </div>
