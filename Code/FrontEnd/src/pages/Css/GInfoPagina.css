@@ -28,7 +28,7 @@
 /* NAVIGATION LINKS */
 .nav-links {
   display: flex;
-  gap: 40px; /* ruimte tussen knoppen */
+  gap: 80px; /* ruimte tussen knoppen */
   align-items: center;
   margin-right: 200px;
 }
