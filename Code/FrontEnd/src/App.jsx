@@ -82,21 +82,17 @@ export default function App() {
     <Routes>
       <Route path="/" element={<GInfoPagina />} />
 
-      <Route
-        path="/login"
-        element={
-          isLoggedIn && user ? (
-            <Navigate to="/mijn-profiel" />
-          ) : (
-            <LoginPagina
-              onLogin={(userData) => {
-                setUser(userData);
-                setIsLoggedIn(true);
-              }}
-            />
-          )
-        }
-      />
+ <Route
+  path="/login"
+  element={
+    <LoginPagina
+      onLogin={(userData) => {
+        setUser(userData);
+        setIsLoggedIn(true);
+      }}
+    />
+  }
+/>
 
       <Route path="/bedrijf-registratie" element={<CompanyRegistrationForm />} />
       <Route path="/registreer" element={<ClientRegistration />} />

@@ -19,17 +19,23 @@ export default function LoginPagina({ onLogin }) {
     try {
       const response = await axios.post('http://localhost:5000/api/login', {
         email,
-        password: wachtwoord
+        password: wachtwoord,
       });
 
-      if (response.data && response.data.token && response.data.user) {
-        console.log('Login response:', response.data);
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+      if (response.data?.token && response.data?.user) {
+        const { token, user } = response.data;
 
-        if (onLogin) onLogin(response.data.user);
+        // Save to localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
 
-        const role = response.data.user.role;
+        // Avoid loops from parent useEffect
+        if (typeof onLogin === 'function') {
+          setTimeout(() => onLogin(user), 0); // ❗ prevent render loop
+        }
+
+        // Redirect based on role
+        const { role } = user;
         if (role === 'admin') {
           navigate('/admin');
         } else if (role === 'student' || role === 'bedrijf') {
@@ -41,16 +47,10 @@ export default function LoginPagina({ onLogin }) {
         setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
       }
     } catch (err) {
-      if (err.response) {
-        if (err.response.status === 401) {
-          setError('Ongeldige e-mail of wachtwoord.');
-        } else if (err.response.data?.error) {
-          setError(err.response.data.error);
-        } else {
-          setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
-        }
+      if (err.response?.status === 401) {
+        setError('Ongeldige e-mail of wachtwoord.');
       } else {
-        setError('Kan geen verbinding maken met de server. Controleer je internetverbinding.');
+        setError(err.response?.data?.error || 'Serverfout. Probeer opnieuw.');
       }
     } finally {
       setIsLoading(false);
