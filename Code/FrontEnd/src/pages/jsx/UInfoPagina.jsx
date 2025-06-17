@@ -1,12 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import careerBanner from '../../assets/Banner C.png';
 import '../Css/UInfoPagina.css';
 
 export default function UInfoPagina({ onLogout }) {
+  const navigate = useNavigate(); // toegevoegd
+
   const handleLogout = () => {
     onLogout(); 
+    navigate('/login'); // navigatie naar loginpagina
   };
 
   return (
