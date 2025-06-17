@@ -9,28 +9,38 @@
 
 /* ========== HEADER ========== */
 
-/* HEADER CONTAINER */
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background-color: #f9f9f9;
+  justify-content: center;
   padding: 20px 60px;
+  background-color: #f9f9f9;
+  position: relative;
 }
 
-/* LOGO */
+/* LOGO AAN DE LINKERKANT */
 .logo {
-  height: auto;
-  max-height: 80px;
+  position: absolute;
+  left: 40px;                /* iets meer marge links */
+  max-height: 60px;          /* iets kleiner voor balans */
+  max-width: 120px;          /* voorkom dat het te breed wordt */
   object-fit: contain;
 }
 
-/* NAVIGATION LINKS */
-.nav-links {
+/* NAVIGATIE WRAPPER VOOR CENTRERING */
+.nav-wrapper {
   display: flex;
-  gap: 80px; /* ruimte tussen knoppen */
+  justify-content: center;
+  width: 100%;
+}
+
+/* NAV LINKS GECENTREERD */
+.nav-center {
+  display: flex;
+  gap: 40px;
   align-items: center;
-  margin-right: 200px;
+  justify-content: center;
+  margin: 0 auto; /* zorgt dat het perfect centraal blijft */
 }
 
 /* ALGEMENE KNOPSTIJL */
@@ -91,8 +101,8 @@
 }
 
 .info-banner {
-  width: 90%;          /* groter in breedte (was 60%) */
-  height: 600px;       /* iets lager dan 500px voor balans */
+  width: 90%;
+  height: 600px;
   overflow: hidden;
   background-color: #f9f9f9;
   border-radius: 10px;
@@ -182,140 +192,83 @@
   text-decoration: none;
   font-weight: bold;
 }
-.auth-guide {
-  margin-top: 60px;
-  background: linear-gradient(to bottom right, #fff, #f1f1f1);
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  font-family: 'Segoe UI', sans-serif;
-  color: #2d3436;
-}
-
-.auth-title {
-  color: #C8102E;
-  font-size: 26px;
-  margin-bottom: 16px;
-}
-
-.auth-intro {
-  font-size: 16px;
-  margin-bottom: 25px;
-}
-
-.auth-subtitle {
-  font-size: 20px;
-  margin-top: 30px;
-  margin-bottom: 8px;
-  color: #333;
-}
-
-.auth-steps {
-  padding-left: 22px;
-  font-size: 15px;
-  line-height: 1.8;
-}
-
-.auth-steps ul {
-  padding-left: 20px;
-  margin: 6px 0 10px;
-  list-style-type: circle;
-}
-.campus-map {
-  margin-top: 60px;
-  padding: 40px;
-  background-color: #f9f9f9;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-}
-
-.map-title {
-  font-size: 24px;
-  color: #C8102E;
-  margin-bottom: 10px;
-}
-
-.map-info {
-  font-size: 15px;
-  color: #2d3436;
-  margin-bottom: 20px;
-}
-
-.map-container {
-  width: 100%;
-  overflow: hidden;
-  border-radius: 12px;
-}
-.site-footer {
-  background-color: #f0f0f0;
-  padding: 40px 20px 20px;
-  font-size: 14px;
-  color: #2d3436;
-}
-
-.footer-columns {
+/* === HEADER STRUCTUUR MET CENTRUMMENU === */
+.header {
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  gap: 40px;
-  max-width: 1200px;
-  margin: 0 auto;
+  align-items: center;
+  background-color: #f9f9f9;
+  padding: 20px 60px;
 }
 
-.footer-column h4 {
+/* Verdeeld in 3 delen */
+.header-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+/* Logo links */
+.header-section.left {
+  justify-content: flex-start;
+}
+
+.header-section.center {
+  justify-content: center;
+}
+
+.header-section.right {
+  justify-content: flex-end;
+}
+
+/* Logo styling */
+.logo {
+  height: auto;
+  max-height: 80px;
+  object-fit: contain;
+}
+
+/* Navigatie gecentreerd */
+.nav-center {
+  display: flex;
+  gap: 200px;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Navigatieknoppen */
+.nav-btn {
+  text-decoration: none;
+  color: black;
   font-size: 16px;
-  margin-bottom: 10px;
+  font-weight: bold;
+  padding: 10px 16px;
+  border-radius: 6px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-btn.active {
+  background-color: #C8102E;
+  color: white;
+  border-radius: 20px;
+}
+
+.nav-btn:not(.active):hover {
   color: #C8102E;
 }
 
-.footer-column ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-.footer-column ul li {
-  margin-bottom: 6px;
-}
-
-.footer-column a {
-  text-decoration: none;
-  color: #2d3436;
-}
-
-.footer-column a:hover {
-  text-decoration: underline;
-}
-
-.footer-bottom {
-  text-align: center;
-  margin-top: 30px;
-  font-size: 13px;
-  color: #999;
-}
-.easter-egg {
+.nav-btn:not(.active)::after {
+  content: "";
   position: absolute;
-  bottom: 6px;
-  right: 12px;
-  font-size: 9px;
-  opacity: 0.15;
-  z-index: 2;
+  width: 0%;
+  height: 2px;
+  left: 0;
+  bottom: 0;
+  background-color: #C8102E;
+  transition: width 0.3s ease;
 }
 
-.easter-egg a {
-  color: #666;
-  text-decoration: none;
-  transition: opacity 0.3s ease, color 0.3s ease;
-}
-
-.easter-egg a:hover {
-  opacity: 1;
-  color: crimson;
-  text-shadow: 0 0 2px rgba(255, 0, 0, 0.3);
-}
-.site-footer {
-  position: relative; /* nodig voor .easter-egg positioning */
-  background-color: #f0f0f0;
-  padding: 40px 20px 20px;
-  font-size: 14px;
-  color: #2d3436;
+.nav-btn:not(.active):hover::after {
+  width: 100%;
 }

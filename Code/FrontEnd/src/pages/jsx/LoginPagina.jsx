@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react'; // 👁️ Toegevoegd
 import '../Css/LoginPagina.css';
 import logo from '../../assets/logo Erasmus.png';
 
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
   const [wachtwoord, setWachtwoord] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // 👁️ Toggle state
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -17,7 +19,6 @@ export default function LoginPagina({ onLogin }) {
     setIsLoading(true);
 
     try {
-      /*
       const response = await axios.post('http://localhost:5000/api/login', {
         email,
         password: wachtwoord,
@@ -26,16 +27,13 @@ export default function LoginPagina({ onLogin }) {
       if (response.data?.token && response.data?.user) {
         const { token, user } = response.data;
 
-        // Save to localStorage
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
 
-        // Avoid loops from parent useEffect
         if (typeof onLogin === 'function') {
-          setTimeout(() => onLogin(user), 0); // ❗ prevent render loop
+          setTimeout(() => onLogin(user), 0);
         }
 
-        // Redirect based on role
         const { role } = user;
         if (role === 'admin') {
           navigate('/admin');
@@ -46,8 +44,7 @@ export default function LoginPagina({ onLogin }) {
         }
       } else {
         setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
-      }*/
-     const response = await axios.get('http://localhost:5000/api/test');
+      }
     } catch (err) {
       if (err.response?.status === 401) {
         setError('Ongeldige e-mail of wachtwoord.');
@@ -91,14 +88,12 @@ export default function LoginPagina({ onLogin }) {
                 required
                 placeholder="Voer je wachtwoord in"
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
+              <div
                 className="pass-icon"
+                onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-
-              </button>
+              </div>
             </div>
           </div>
 
