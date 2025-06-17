@@ -27,7 +27,7 @@ export default function GPlatteGrond({ onLogout }) {
 
         <nav className="nav-links">
   <Link to="/" className="nav-btn">info</Link>
-  <Link to="/Gbedrijveninfo" className="nav-btn">bedrijven</Link>
+  <Link to="/GBedrijven" className="nav-btn">bedrijven</Link>
   <Link to="/g-plattegrond" className="nav-btn active">plattegrond</Link>
   <Link to="/login" className="nav-btn">login/registeren</Link>
 </nav>

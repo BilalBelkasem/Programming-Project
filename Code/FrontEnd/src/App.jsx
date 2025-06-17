@@ -18,7 +18,8 @@ import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
 import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
-import StudentProfiel from './pages/jsx/Studentprofiel.jsx';
+import StudentProfiel from '../src/pages/jsx/StudentProfiel.jsx';
+import BedrijfProfiel from './pages/jsx/BedrijfProfiel.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
@@ -80,21 +81,17 @@ export default function App() {
     <Routes>
       <Route path="/" element={<GInfoPagina />} />
 
-      <Route
-        path="/login"
-        element={
-          isLoggedIn && user ? (
-            <Navigate to="/mijn-profiel" />
-          ) : (
-            <LoginPagina
-              onLogin={(userData) => {
-                setUser(userData);
-                setIsLoggedIn(true);
-              }}
-            />
-          )
-        }
-      />
+ <Route
+  path="/login"
+  element={
+    <LoginPagina
+      onLogin={(userData) => {
+        setUser(userData);
+        setIsLoggedIn(true);
+      }}
+    />
+  }
+/>
 
       <Route path="/bedrijf-registratie" element={<CompanyRegistrationForm />} />
       <Route path="/registreer" element={<ClientRegistration />} />

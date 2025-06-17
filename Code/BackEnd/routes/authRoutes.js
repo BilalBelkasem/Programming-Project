@@ -4,28 +4,35 @@ const router = express.Router();
 //  Middleware
 const {authenticateToken, isAdmin, isCompany, isStudent } = require('../middleware/authMiddleware');
 
-//  Controllers
 const LoginController = require('../Controller/LoginController');
 const StudentRegistratieController = require('../Controller/StudentRegistratieController');
 const BedrijfRegistratieController = require('../Controller/BedrijfRegistratieController');
+const FavorietenController = require('../Controller/FavorietenController');
+const BedrijvenController = require('../Controller/BedrijvenController'); // ✅ dit toegevoegd
 const studentAdmin = require('../Controller/StudentAdmin');
 const bedrijfAdmin = require('../Controller/BedrijfAdmin');
 
-//  PUBLIC ROUTES
-router.post('/register', StudentRegistratieController.register);           
-router.post('/register-company', BedrijfRegistratieController.registerCompany); 
-router.post('/login', LoginController.login);  
+// PUBLIC ROUTES
+router.post('/register', StudentRegistratieController.register);
+router.post('/register-company', BedrijfRegistratieController.registerCompany);
+router.post('/login', LoginController.login);
 
-//  PROTECTED ROUTES
+// PROTECTED ROUTES
 router.get('/protected', authenticateToken, StudentRegistratieController.getProtectedData);
 router.get('/studenten', authenticateToken, studentAdmin.getAllStudents);
 router.get('/bedrijven', authenticateToken,  bedrijfAdmin.getAllCompanies);
 router.delete('/bedrijven/:id', authenticateToken, bedrijfAdmin.deleteCompany);
 
-//  You can now safely add more protected routes like:
 router.get('/profile', authenticateToken, (req, res) => {
   res.json({ message: 'Protected profile route for logged-in user', user: req.user });
 });
 
+// FAVORIETEN ROUTES via controller
+router.post('/favorieten', FavorietenController.addFavoriet);
+router.get('/favorieten/:studentId', FavorietenController.getFavorieten);
+router.delete('/favorieten/:companyId', FavorietenController.deleteFavoriet);
+
+// ✅ BEDRIJVEN ROUTE
+router.get('/bedrijven', BedrijvenController.getBedrijven);
 
 module.exports = router;

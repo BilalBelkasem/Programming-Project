@@ -1,59 +1,44 @@
+// server.js
 const express = require('express');
-const mysql = require('mysql2');
 const cors = require('cors');
 require('dotenv').config();
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 
+// Import de ton pool promise-based
+const db = require('./config/db');
+
 // Route imports
-const protectedRoutes = require('./routes/authRoutes');
-const companiesRoutes = require('./companies');
-const studentRoutes = require('./students');
-const badgeRoutes = require('./badge');
-const mijnProfielRoutes = require('./Controller/mijnprofiel');  // <-- Added here
+const authRoutes         = require('./routes/authRoutes');
+const companiesRoutes    = require('./companies');
+const studentRoutes      = require('./students');
+const badgeRoutes        = require('./badge');
+const mijnProfielRoutes  = require('./Controller/mijnprofiel');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public', {
-  index: 'public.html'
-}));
+app.use(express.static('public', { index: 'public.html' }));
 
-// Maak connection pool aan
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
-
-console.log('Connecting to MySQL with:');
-console.log('Host:', process.env.DB_HOST);
-console.log('User:', process.env.DB_USER);
-console.log('Password:', process.env.DB_PASSWORD);
-console.log('Database:', process.env.DB_NAME);
-
-// Zet pool op elke request
+// Expose ton pool promise à chaque requête sous req.db
 app.use((req, res, next) => {
-  req.db = pool.promise(); // gebruik async/await compatible pool
+  req.db = db;
   next();
 });
 
-// Mount routes
-app.use('/api', protectedRoutes);
+// Monte les routes
+app.use('/api', authRoutes);
 app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
-app.use('/api/mijnprofiel', mijnProfielRoutes);  // <-- Mounted here
+app.use('/api/mijnprofiel', mijnProfielRoutes);
 
-// Users ophalen
+// Example: récupérer tous les users étudiants
 app.get('/api/users', async (req, res) => {
   try {
-    const [users] = await req.db.query('SELECT id, name FROM users WHERE role = "student"');
+    const [users] = await req.db.query(
+      'SELECT id, name FROM users WHERE role = "student"'
+    );
     res.json(users);
   } catch (err) {
     console.error('Users route error:', err);
@@ -61,14 +46,13 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// Studentgegevens ophalen (users + school via JOIN)
+// Exemple : GET /api/studenten
 app.get('/api/studenten', async (req, res) => {
   const sql = `
     SELECT users.id, users.name AS naam, students_details.school
     FROM users
     JOIN students_details ON students_details.user_id = users.id
   `;
-
   try {
     const [result] = await req.db.query(sql);
     res.json(result);
@@ -78,20 +62,22 @@ app.get('/api/studenten', async (req, res) => {
   }
 });
 
-// Student verwijderen met transaction
+// Exemple : DELETE /api/studenten/:id avec transaction
 app.delete('/api/studenten/:id', async (req, res) => {
   const studentId = req.params.id;
   console.log(`DELETE request ontvangen voor student id: ${studentId}`);
 
-  const conn = await pool.promise().getConnection();
+  const conn = await req.db.getConnection();
   try {
     await conn.beginTransaction();
-
-    await conn.query('DELETE FROM students_details WHERE user_id = ?', [studentId]);
-    console.log(`Student details verwijderd voor user_id: ${studentId}`);
-
-    await conn.query('DELETE FROM users WHERE id = ?', [studentId]);
-
+    await conn.query(
+      'DELETE FROM students_details WHERE user_id = ?',
+      [studentId]
+    );
+    await conn.query(
+      'DELETE FROM users WHERE id = ?',
+      [studentId]
+    );
     await conn.commit();
     console.log(`User met id ${studentId} succesvol verwijderd.`);
     res.json({ message: 'Student succesvol verwijderd' });
@@ -104,40 +90,39 @@ app.delete('/api/studenten/:id', async (req, res) => {
   }
 });
 
-// *** NIEUWE ROUTE VOOR COMPANY REGISTRATIE MET LOGO ***
-app.post('/api/register-company', upload.single('logo'), async (req, res) => {
-  try {
-    const logoBuffer = req.file ? req.file.buffer : null;
+// Route pour enregistrer un company avec logo
+app.post(
+  '/api/register-company',
+  upload.single('logo'),
+  async (req, res) => {
+    try {
+      const logoBuffer = req.file ? req.file.buffer : null;
+      const {
+        email,
+        phone_number,
+        password,
+        company_name,
+        website,
+        sector,
+        booth_contact_name,
+        street,
+        city,
+        postal_code,
+        booth_contact_email,
+        invoice_contact_name,
+        invoice_contact_email,
+        vat_number
+      } = req.body;
 
-    const {
-      email,
-      phone_number,
-      password,
-      company_name,
-      website,
-      sector,
-      booth_contact_name,
-      street,
-      city,
-      postal_code,
-      booth_contact_email,
-      invoice_contact_name,
-      invoice_contact_email,
-      vat_number
-    } = req.body;
+      const sql = `
+        INSERT INTO companies_details (
+          email, phone_number, password, company_name, website, sector,
+          booth_contact_name, street, city, postal_code, booth_contact_email,
+          invoice_contact_name, invoice_contact_email, vat_number, logo
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
 
-    const sql = `
-      INSERT INTO companies_details (
-        email, phone_number, password, company_name, website, sector,
-        booth_contact_name, street, city, postal_code, booth_contact_email,
-        invoice_contact_name, invoice_contact_email, vat_number, logo
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    // Use promise version for consistency with the rest of your code
-    const [result] = await pool.promise().query(
-      sql,
-      [
+      const [result] = await req.db.query(sql, [
         email,
         phone_number,
         password,
@@ -153,15 +138,15 @@ app.post('/api/register-company', upload.single('logo'), async (req, res) => {
         invoice_contact_email,
         vat_number,
         logoBuffer
-      ]
-    );
+      ]);
 
-    res.status(201).json({ message: 'Bedrijf succesvol geregistreerd' });
-  } catch (error) {
-    console.error('Server error:', error);
-    res.status(500).json({ error: 'Server fout' });
+      res.status(201).json({ message: 'Bedrijf succesvol geregistreerd' });
+    } catch (error) {
+      console.error('Server error:', error);
+      res.status(500).json({ error: 'Server fout' });
+    }
   }
-});
+);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
