@@ -66,10 +66,13 @@ router.put('/:id', async (req, res) => {
   const domain_software = domain.includes('Software');
 
   try {
+    // Haalt huidige naam op uit database
+      const [[currentUser]] = await db.query('SELECT name FROM users WHERE id = ?', [studentId]);
+
     // Update users table
     await db.query(
-      `UPDATE users SET name = ?,  email = ? WHERE id = ?`,
-      [name, email, studentId]
+      `UPDATE users SET email = ? WHERE id = ?`, 
+      [email, studentId]
     );
 
     // Check if students_details record exists
