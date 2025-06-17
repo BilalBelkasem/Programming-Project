@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import plattegrondImg from "../../assets/plattegrond.png";
 import logo from "../../assets/logo Erasmus.png";
-import "../css/UPlatteGrond.css";
+import "../css/GPlatteGrond.css";
 
 const legendItems = [
   { id: 1, naam: "TechNova" },
@@ -29,7 +29,7 @@ export default function UPlatteGrond({ onLogout }) {
           <Link to="/dashboard" className="navLink">Info</Link>
           <Link to="/bedrijven" className="navLink">Bedrijven</Link>
           <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/UFavorietenBedrijven" className="navLink">Favorieten</Link>
           <Link to="/mijn-profiel" className="navLink">mijn profiel</Link>
         </nav>
 

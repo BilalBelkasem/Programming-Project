@@ -1,22 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../Css/ProfielStudent.css';
 
-export default function ProfielStudent() {
+export default function ProfielStudent({ user }) {
   const [formData, setFormData] = useState({
     name: '',
-    lastname: '',
     school: '',
     direction: '',
     year: '',
     linkedin: '',
     email: '',
     about: '',
-    lookingFor: '',
-    domain: '',
+    lookingFor: [],
+    domain: [],
     profilePicture: null,
   });
+
+  useEffect(() => {
+    if (user && user.id) {
+      fetch(`/api/mijnprofiel/${user.id}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch profile');
+          return res.json();
+        })
+        .then(data => {
+          setFormData({
+            name: data.name || '',
+            school: data.school || '',
+            direction: data.education || '',
+            year: data.year || '',
+            linkedin: data.linkedin_url || '',
+            email: data.email || '',
+            about: data.about || '',
+            lookingFor: data.lookingFor || [],
+            domain: data.domain || [],
+            profilePicture: null,
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          alert('Kon profiel niet laden.');
+        });
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,14 +60,65 @@ export default function ProfielStudent() {
     }
   };
 
-  const handleSubmit = () => {
-    alert('Wijzigingen bevestigd!');
+  const handleCheckboxChange = (e, field) => {
+    const value = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].includes(value)
+        ? prev[field].filter(v => v !== value)
+        : [...prev[field], value]
+    }));
   };
+const handleSubmit = async () => {
+  if (!user || !user.id) {
+    alert('Geen gebruiker ingelogd!');
+    return;
+  }
+
+  // Zorg dat je de correcte property names gebruikt
+  const updatedData = {
+    name: formData.name,
+    email: formData.email,
+    school: formData.school,
+    direction: formData.direction,
+    year: formData.year,
+    about: formData.about,
+    linkedin: formData.linkedin,
+    lookingFor: formData.lookingFor,  // array, bv ["Jobstudent", "Stage"]
+    domain: formData.domain,          // array, bv ["Data", "Software"]
+  };
+
+  try {
+    const res = await fetch(`/api/mijnprofiel/${user.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData)
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Server response:", errorText);
+      throw new Error('Update mislukt');
+    }
+
+    alert('Wijzigingen succesvol bevestigd!');
+  } catch (err) {
+    console.error(err);
+    alert('Fout bij opslaan van profielgegevens');
+  }
+};
+
+
 
   const handleLogout = () => {
     alert('Uitgelogd');
-    // Voeg hier logout-logica toe
+    localStorage.clear();
+    window.location.href = '/login';
   };
+
+  if (!user || user.role !== 'student') {
+    return <p>Je bent niet ingelogd als student.</p>;
+  }
 
   return (
     <div className="page-wrapper">
@@ -70,7 +148,7 @@ export default function ProfielStudent() {
 
         <div className="form-grid">
           <div className="left">
-            <label>Naam</label>
+            <label>Voornaam + Achternaam</label>
             <input name="name" value={formData.name} onChange={handleChange} />
 
             <label>School (optioneel)</label>
@@ -92,25 +170,23 @@ export default function ProfielStudent() {
           </div>
 
           <div className="right">
-            <label>Achternaam</label>
-            <input name="lastname" value={formData.lastname} onChange={handleChange} />
-
             <label>Richting (optioneel)</label>
-            <select name="direction" value={formData.direction} onChange={handleChange}>
-              <option value="">-- selecteer --</option>
-              <option value="Toegepaste Informatica">Toegepaste Informatica</option>
-              <option value="Bedrijf & Management">Bedrijf & Management</option>
-              <option value="Media">Media</option>
-            </select>
+            <input name="direction" value={formData.direction} onChange={handleChange} />
 
             <label>Tot welke van de 4 IT domeinen behoort u?</label>
-            <select name="domain" value={formData.domain} onChange={handleChange}>
-              <option value="">-- selecteer --</option>
-              <option value="Data">Data</option>
-              <option value="Netwerking">Netwerking</option>
-              <option value="AI / Robotica">AI / Robotica</option>
-              <option value="Software">Software</option>
-            </select>
+            <div className="checkbox-group">
+              {["Data", "Netwerking", "AI / Robotica", "Software"].map(option => (
+                <label key={option}>
+                  <input
+                    type="checkbox"
+                    value={option}
+                    checked={formData.domain.includes(option)}
+                    onChange={(e) => handleCheckboxChange(e, "domain")}
+                  />
+                  {option}
+                </label>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -126,13 +202,19 @@ export default function ProfielStudent() {
 
         <div className="section">
           <label>Wat zoekt u?</label>
-          <select name="lookingFor" value={formData.lookingFor} onChange={handleChange}>
-            <option value="">-- selecteer --</option>
-            <option value="Jobstudent">Jobstudent</option>
-            <option value="Connecties">Connecties</option>
-            <option value="Stage">Stage</option>
-            <option value="Job">Job</option>
-          </select>
+          <div className="checkbox-group">
+            {["Jobstudent", "Connecties", "Stage", "Job"].map(option => (
+              <label key={option}>
+                <input
+                  type="checkbox"
+                  value={option}
+                  checked={formData.lookingFor.includes(option)}
+                  onChange={(e) => handleCheckboxChange(e, "lookingFor")}
+                />
+                {option}
+              </label>
+            ))}
+          </div>
         </div>
 
         <button className="confirm-btn" onClick={handleSubmit}>Bevestig wijzigingen</button>

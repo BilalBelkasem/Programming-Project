@@ -1,44 +1,74 @@
 .uplattegrond-wrapper {
   background-color: #f8f8f8;
-  min-height: 100vh;
   font-family: sans-serif;
-  padding-top: 40px;
+
 }
 
 /* HERGEBRUIK header layout van UBedrijven */
+/* HEADER CONTAINER */
 .header {
-  background-color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  height: 70px; /* zelfde als in UBedrijven */
+  padding: 20px 60px;
 }
 
-.logo {
-  height: 50px;
-}
-
-.nav {
+.nav-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 80px;
+  margin-right: 200px;
 }
 
-.navLink {
-  color: #333;
+/* LOGO */
+.logo {
+  height: auto;
+  max-height: 100px;
+  object-fit: contain;
+}
+
+
+
+/* ALGEMENE KNOPSTIJL */
+.nav-btn {
   text-decoration: none;
-  font-weight: 500;
-  padding: 0.5rem 0;
+  color: black;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 16px;
+  border-radius: 6px;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
-.navLink:hover {
-  text-decoration: underline;
+/* ACTIEVE KNOP */
+.nav-btn.active {
+  background-color: #C8102E;
+  color: white;
+  border-radius: 20px;
 }
 
-.main {
-  padding-top: 80px; /* iets groter dan header height */
+/* HOVER (enkel op niet-actieve knoppen) */
+.nav-btn:not(.active):hover {
+  color: #C8102E;
 }
+
+/* HOVER-ONDERLIJNING */
+.nav-btn:not(.active)::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  left: 0;
+  bottom: 0;
+  background-color: #C8102E;
+  transition: width 0.3s ease;
+}
+
+.nav-btn:not(.active):hover::after {
+  width: 100%;
+}
+
+
 /* KAART + LEGENDE */
 .uplattegrond-kader {
   margin: 1rem;

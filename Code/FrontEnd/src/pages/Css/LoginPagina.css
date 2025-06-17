@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 .page {
   display: flex;
   justify-content: center;
@@ -6,7 +10,6 @@
   background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
-  box-sizing: border-box;
 }
 
 .login-container {
@@ -135,6 +138,7 @@ input:focus {
   color: #b02525;
   text-decoration: underline;
 }
+
 .admin-button {
   padding: 10px;
   background-color: #111;
@@ -148,4 +152,86 @@ input:focus {
 .admin-button:hover {
   background-color: #333;
   transform: scale(1.03);
+}
+
+/* Wachtwoordveld + oogicoon fix */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  padding-right: 40px;
+}
+
+.pass-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  opacity: 0.7;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Fix voor oogicoon styling */
+.pass-icon svg {
+  width: 20px;
+  height: 20px;
+  color: #777 !important;
+  fill: none !important;
+  stroke: #777 !important;
+  transition: stroke 0.3s ease, color 0.3s ease;
+}
+
+.pass-icon:hover {
+  opacity: 1;
+}
+
+.pass-icon:hover svg {
+  color: #000 !important;
+  stroke: #000 !important;
+}
+
+.pass-icon:focus,
+.pass-icon:focus-visible,
+.pass-icon:hover {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.pass-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pass-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: #777 !important;
+  color: #777 !important;
+  fill: none !important;
+  transition: stroke 0.3s ease;
+}
+
+.pass-icon:hover {
+  opacity: 1;
+}
+
+.pass-icon:hover svg {
+  stroke: #000 !important;
+  color: #000 !important;
 }

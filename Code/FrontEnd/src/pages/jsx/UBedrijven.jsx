@@ -1,64 +1,67 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../css/UBedrijven.css';
+import axios from 'axios';
 
 export default function UBedrijven({ onLogout }) {
-  const [likedCompanies, setLikedCompanies] = useState([]);
-
   const navigate = useNavigate();
+  const [bedrijven, setBedrijven] = useState([]);
+  const [favorieten, setFavorieten] = useState([]);
 
-const handleLogout = () => {
-  if (onLogout) onLogout();
-  navigate("/login");
-};
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const bedrijvenRes = await axios.get('http://localhost:5000/api/bedrijven');
+        setBedrijven(bedrijvenRes.data);
 
-  const bedrijven = [
-    {
-      id: 1,
-      naam: 'TechNova',
-      beschrijving: 'Wij zijn gespecialiseerd in AI-oplossingen voor de zorgsector.',
-      tags: ['AI', 'Healthcare', 'Backend'],
-    },
-    {
-      id: 2,
-      naam: 'WebFlex',
-      beschrijving: 'Frontend development agency met focus op React en UX design.',
-      tags: ['Frontend', 'React', 'UX/UI'],
-    },
-    {
-      id: 3,
-      naam: 'DataCore',
-      beschrijving: 'Big Data platformen en analyses voor de retailsector.',
-      tags: ['Data', 'Backend', 'Retail'],
-    },
-    {
-      id: 4,
-      naam: 'colruyt',
-      beschrijving: 'onderhoud van alle sysemen',
-      tags: ['Data', 'Retail'],
+        const user = JSON.parse(localStorage.getItem('user'));
+        const favorietenRes = await axios.get(`http://localhost:5000/api/favorieten/${user.id}`);
+        const geliketeIds = favorietenRes.data.map((bedrijf) => bedrijf.id);
+        setFavorieten(geliketeIds);
+      } catch (err) {
+        console.error('Fout bij ophalen:', err);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleLogout = () => {
+    if (onLogout) onLogout();
+    navigate("/login");
+  };
+
+  const toggleLike = async (bedrijfId) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const isFavoriet = favorieten.includes(bedrijfId);
+
+    try {
+      if (isFavoriet) {
+        await axios.delete(`http://localhost:5000/api/favorieten/${bedrijfId}?student_id=${user.id}`);
+        setFavorieten(prev => prev.filter(id => id !== bedrijfId));
+      } else {
+        await axios.post('http://localhost:5000/api/favorieten', {
+          student_id: user.id,
+          company_id: bedrijfId
+        });
+        setFavorieten(prev => [...prev, bedrijfId]);
+      }
+    } catch (err) {
+      console.error('Fout bij togglen van favoriet:', err);
     }
-  ];
-
-  const toggleLike = (id) => {
-    setLikedCompanies((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
   };
 
   return (
     <div className="pageWrapper">
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
-
         <nav className="nav">
           <Link to="/dashboard" className="navLink">Info</Link>
           <Link to="/bedrijven" className="navLink">Bedrijven</Link>
           <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/UFavorietenBedrijven" className="navLink">Favorieten</Link>
           <Link to="/mijn-profiel" className="navLink">mijn profiel</Link>
         </nav>
-
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
@@ -67,16 +70,11 @@ const handleLogout = () => {
         <div className="bedrijvenContainer">
           {bedrijven.map((bedrijf) => (
             <div key={bedrijf.id} className="bedrijfCard">
-              <h3 className="bedrijfNaam">{bedrijf.naam}</h3>
-              <p className="bedrijfBeschrijving">{bedrijf.beschrijving}</p>
-              <div className="tagContainer">
-                {bedrijf.tags.map((tag, index) => (
-                  <span key={index} className="tag">{tag}</span>
-                ))}
-              </div>
+              <h3 className="bedrijfNaam">{bedrijf.company_name}</h3>
+              <p className="bedrijfBeschrijving">{bedrijf.sector}</p>
               <button
                 onClick={() => toggleLike(bedrijf.id)}
-                className={`likeButton ${likedCompanies.includes(bedrijf.id) ? 'liked' : ''}`}
+                className={`likeButton ${favorieten.includes(bedrijf.id) ? 'liked' : ''}`}
               >
                 ♥
               </button>

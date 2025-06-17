@@ -1,88 +1,183 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../Css/ProfielBedrijven.css';
 import { Link } from 'react-router-dom';
-export default function CompanyProfilePage() {
+import logo from '../../assets/logo Erasmus.png';
 
-  const company = {
+export default function ProfielBedrijven() {
+  const [formData, setFormData] = useState({
     name: '',
-    lastname: '',
     companyName: '',
     function: '',
     email: '',
     linkedin: '',
     about: '',
-    lookingFor: [''],
-    domains: ['']
+    lookingFor: [],
+    domains: [],
+    profilePicture: null,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        profilePicture: URL.createObjectURL(file),
+      }));
+    }
+  };
+
+  const handleCheckboxChange = (e, field) => {
+    const value = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      [field]: prev[field].includes(value)
+        ? prev[field].filter(v => v !== value)
+        : [...prev[field], value]
+    }));
+  };
+
+  const handleSubmit = () => {
+    alert('Wijzigingen bevestigd!');
+    console.log(formData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('user');
+    window.location.href = '/login';
   };
 
   return (
-    <div className="company-profile-wrapper">
-     <header className="header">
+    <div className="page-wrapper">
+      <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
-          <Link to="/dashboard" className="nav-link">info</Link>
-          <Link to="/bedrijven" className="nav-link">bedrijven</Link>
-          <Link to="/plattegrond" className="nav-link">plattegrond</Link>
-          <Link to="/favorieten" className="nav-link">favorieten</Link>
-          <Link to="/dashboard" className="nav-link">mijn profiel</Link>
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">studenten</Link>
+          <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
         </nav>
-        <div onClick={onLogout} className="logout-icon" title="Uitloggen">⇦</div>
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
-      <div className="profile-section">
-        <div className="profile-picture">PROFILE PICTURE</div>
+      <main className="container">
+        <div className="profile-picture">
+          <img
+            src={formData.profilePicture || '/company-placeholder.jpg'}
+            alt="Bedrijfsfoto"
+            className="circle"
+          />
+          <input 
+            type="file" 
+            accept="image/*" 
+            onChange={handleImageUpload} 
+            className="upload-btn" 
+          />
+        </div>
+
         <div className="profile-grid">
           <div className="field">
-            <label>Name</label>
-            <div className="value">{company.name}</div>
+            <label><strong>voornaamnaam + Achternaam:</strong></label>
+            <input 
+              name="name" 
+              value={formData.name} 
+              onChange={handleChange}
+              placeholder="name"
+            />
+          </div>
+                <div className="field">
+            <label><strong>Bedrijfsnaam:</strong></label>
+            <input 
+              name="companyName" 
+              value={formData.companyName} 
+              onChange={handleChange}
+              placeholder="Bedrijfsnaam"
+            />
           </div>
           <div className="field">
-            <label>Lastname</label>
-            <div className="value">{company.lastname}</div>
+            <label><strong>Functie:</strong></label>
+            <input 
+              name="function" 
+              value={formData.function} 
+              onChange={handleChange}
+              placeholder="Functie"
+            />
           </div>
-          <div className="field">
-            <label>Company Name</label>
-            <div className="value">{company.companyName}</div>
+          <div className="field full">
+            <label><strong>E-mail:</strong></label>
+            <input 
+              name="email" 
+              type="email"
+              value={formData.email} 
+              onChange={handleChange}
+              placeholder="E-mail adres"
+            />
           </div>
-          <div className="field">
-            <label>Function</label>
-            <div className="value">{company.function}</div>
-          </div>
-          <div className="full-width-field">
-            <label>e-mail</label>
-            <div className="value">{company.email}</div>
-          </div>
-          <div className="full-width-field">
-            <label>linkedin</label>
-            <div className="value">{company.linkedin}</div>
+          <div className="field full">
+            <label><strong>LinkedIn (optioneel):</strong></label>
+            <input 
+              name="linkedin" 
+              value={formData.linkedin} 
+              onChange={handleChange}
+              placeholder="LinkedIn profiel URL"
+            />
           </div>
         </div>
-      </div>
 
-      <div className="company-info">
         <div className="section">
-          <label>about</label>
-          <div className="textarea">{company.about}</div>
+          <h2>Over het bedrijf</h2>
+          <textarea
+            name="about"
+            value={formData.about}
+            onChange={handleChange}
+            placeholder="Beschrijf je bedrijf..."
+            className="textarea"
+          />
         </div>
 
         <div className="section">
-          <label>wat zoekt u bedrijf?</label>
+          <h3>Wat zoekt dit bedrijf?</h3>
           <div className="checkbox-group">
-            {company.lookingFor.map((item, index) => (
-              <label key={index}><input type="checkbox" checked readOnly /> {item}</label>
+            {["Jobstudent", "Connecties", "Stage", "Voltijds personeel"].map(option => (
+              <label key={option}>
+                <input
+                  type="checkbox"
+                  value={option}
+                  checked={formData.lookingFor.includes(option)}
+                  onChange={(e) => handleCheckboxChange(e, "lookingFor")}
+                />
+                {option}
+              </label>
             ))}
           </div>
         </div>
 
         <div className="section">
-          <label>tot welke van de 4 IT domeinen behoort uw bedrijf</label>
+          <h3>IT-domeinen</h3>
           <div className="checkbox-group">
-            {company.domains.map((item, index) => (
-              <label key={index}><input type="checkbox" checked readOnly /> {item}</label>
+            {["Data", "Netwerking", "AI / Robotica", "Software"].map(option => (
+              <label key={option}>
+                <input
+                  type="checkbox"
+                  value={option}
+                  checked={formData.domains.includes(option)}
+                  onChange={(e) => handleCheckboxChange(e, "domains")}
+                />
+                {option}
+              </label>
             ))}
           </div>
         </div>
-      </div>
+
+        <button className="confirm-btn" onClick={handleSubmit}>
+          Bevestig wijzigingen
+        </button>
+      </main>
     </div>
   );
 }
