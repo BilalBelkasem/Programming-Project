@@ -13,7 +13,7 @@ const pool = mysql.createPool({
   queueLimit:         0
 });
 
-// Optionnel : vérifier la connexion au démarrage
+// Test the connection to ensure the pool is working
 ;(async () => {
   try {
     await pool.query('SELECT 1');
