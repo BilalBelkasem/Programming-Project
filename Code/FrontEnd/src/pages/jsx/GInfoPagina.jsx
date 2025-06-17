@@ -12,7 +12,7 @@ export default function InfoPagina() {
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav-links">
   <Link to="/" className="nav-btn active">info</Link>
-  <Link to="/Gbedrijveninfo" className="nav-btn">bedrijven</Link>
+  <Link to="/GBedrijven" className="nav-btn">bedrijven</Link>
   <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
   <Link to="/login" className="nav-btn">login/registeren</Link>
 </nav>

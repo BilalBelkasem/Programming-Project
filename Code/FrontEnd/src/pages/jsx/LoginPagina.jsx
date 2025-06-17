@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { Eye, EyeOff } from 'lucide-react';
 import '../Css/LoginPagina.css';
+import logo from '../../assets/logo Erasmus.png';
 
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
   const [wachtwoord, setWachtwoord] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -21,16 +19,23 @@ export default function LoginPagina({ onLogin }) {
     try {
       const response = await axios.post('http://localhost:5000/api/login', {
         email,
-        password: wachtwoord
+        password: wachtwoord,
       });
 
       if (response.data?.token && response.data?.user) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        const { token, user } = response.data;
 
-        if (onLogin) onLogin(response.data.user);
+        // Save to localStorage
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
 
-        const role = response.data.user.role;
+        // Avoid loops from parent useEffect
+        if (typeof onLogin === 'function') {
+          setTimeout(() => onLogin(user), 0); // ❗ prevent render loop
+        }
+
+        // Redirect based on role
+        const { role } = user;
         if (role === 'admin') {
           navigate('/admin');
         } else if (role === 'student' || role === 'bedrijf') {
@@ -42,16 +47,10 @@ export default function LoginPagina({ onLogin }) {
         setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
       }
     } catch (err) {
-      if (err.response) {
-        if (err.response.status === 401) {
-          setError('Ongeldige e-mail of wachtwoord.');
-        } else if (err.response.data?.error) {
-          setError(err.response.data.error);
-        } else {
-          setError('Er ging iets mis bij het inloggen. Probeer het opnieuw.');
-        }
+      if (err.response?.status === 401) {
+        setError('Ongeldige e-mail of wachtwoord.');
       } else {
-        setError('Kan geen verbinding maken met de server.');
+        setError(err.response?.data?.error || 'Serverfout. Probeer opnieuw.');
       }
     } finally {
       setIsLoading(false);
@@ -61,6 +60,9 @@ export default function LoginPagina({ onLogin }) {
   return (
     <div className="page">
       <div className="login-container">
+        <div className="logo-container">
+          <img src={logo} alt="Erasmus Logo" className="login-logo" />
+        </div>
         <h2 className="login-title">Inloggen</h2>
 
         <form onSubmit={handleSubmit} className="login-form">
@@ -76,25 +78,16 @@ export default function LoginPagina({ onLogin }) {
             />
           </div>
 
-          <div className="form-group password-field">
+          <div className="form-group">
             <label htmlFor="password">Wachtwoord</label>
-            <div className="password-wrapper">
-              <input
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                value={wachtwoord}
-                onChange={(e) => setWachtwoord(e.target.value)}
-                required
-                placeholder="Voer je wachtwoord in"
-              />
-              <div
-                onClick={() => setShowPassword(!showPassword)}
-                className="pass-icon"
-              >
-               {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
-              </div>
-
-            </div>
+            <input
+              type="password"
+              id="password"
+              value={wachtwoord}
+              onChange={(e) => setWachtwoord(e.target.value)}
+              required
+              placeholder="Voer je wachtwoord in"
+            />
           </div>
 
           {error && <div className="error-message">{error}</div>}
@@ -107,8 +100,12 @@ export default function LoginPagina({ onLogin }) {
         <div className="register-links">
           <p>Nog geen account?</p>
           <div className="register-options">
-            <Link to="/registreer" className="register-link">Registreer als student</Link>
-            <Link to="/bedrijf-registratie" className="register-link company">Registreer je bedrijf</Link>
+            <Link to="/registreer" className="register-link">
+              Registreer als student
+            </Link>
+            <Link to="/bedrijf-registratie" className="register-link company">
+              Registreer je bedrijf
+            </Link>
             <Link to="/" className="back-button">← Terug naar startpagina</Link>
             <Link to="/admin" className="admin-button">Admin login</Link>
           </div>
