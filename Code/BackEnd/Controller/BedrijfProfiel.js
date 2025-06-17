@@ -1,15 +1,51 @@
-// controllers/BedrijfProfiel.js
 const express = require('express');
 const router = express.Router();
 
-// GET bedrijfsprofiel
-router.get('/company-details/:companyId', async (req, res) => {
-  const { companyId } = req.params;
+// GET bedrijfsprofiel op basis van user_id
+router.get('/company-details/:user_id', async (req, res) => {
+  const { user_id } = req.params;
 
   try {
     const [rows] = await req.db.query(
-      'SELECT * FROM companies_details WHERE id = ?',
-      [companyId]
+      'SELECT * FROM companies_details WHERE user_id = ?',
+      [user_id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Bedrijf niet gevonden' });
+    }
+
+    const bedrijf = rows[0];
+
+    bedrijf.lookingFor = [
+      bedrijf.interest_jobstudent && 'Jobstudent',
+      bedrijf.interest_stage && 'Stage',
+      bedrijf.interest_job && 'Voltijds personeel',
+      bedrijf.interest_connect && 'Connecties'
+    ].filter(Boolean);
+
+    bedrijf.domains = [
+      bedrijf.domain_data && 'Data',
+      bedrijf.domain_networking && 'Netwerking',
+      bedrijf.domain_ai && 'AI / Robotica',
+      bedrijf.domain_software && 'Software'
+    ].filter(Boolean);
+
+    res.json(bedrijf);
+  } catch (err) {
+    console.error('Fout bij ophalen bedrijfsprofiel:', err);
+    res.status(500).json({ error: 'Server fout' });
+  }
+});
+
+// **Nieuwe route**: GET bedrijfsprofiel op basis van userId (optioneel, kan je weghalen als dubbel)
+router.get('/company-details/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const [rows] = await req.db.query(
+      'SELECT * FROM companies_details WHERE user_id = ?',
+      [userId]
     );
 
     if (rows.length === 0) {
@@ -40,8 +76,8 @@ router.get('/company-details/:companyId', async (req, res) => {
 });
 
 // PUT bedrijfsprofiel bijwerken
-router.put('/company-details/:companyId', async (req, res) => {
-  const { companyId } = req.params;
+router.put('/company-details/:user_id', async (req, res) => {
+  const { user_id } = req.params;
   const {
     email,
     phone_number,
@@ -60,15 +96,16 @@ router.put('/company-details/:companyId', async (req, res) => {
     domains = []
   } = req.body;
 
-  const interest_jobstudent = lookingFor.includes('Jobstudent');
-  const interest_stage = lookingFor.includes('Stage');
-  const interest_job = lookingFor.includes('Voltijds personeel');
-  const interest_connect = lookingFor.includes('Connecties');
+  // Zet booleans om naar 1 of 0 voor database
+  const interest_jobstudent = lookingFor.includes('Jobstudent') ? 1 : 0;
+  const interest_stage = lookingFor.includes('Stage') ? 1 : 0;
+  const interest_job = lookingFor.includes('Voltijds personeel') ? 1 : 0;
+  const interest_connect = lookingFor.includes('Connecties') ? 1 : 0;
 
-  const domain_data = domains.includes('Data');
-  const domain_networking = domains.includes('Netwerking');
-  const domain_ai = domains.includes('AI / Robotica');
-  const domain_software = domains.includes('Software');
+  const domain_data = domains.includes('Data') ? 1 : 0;
+  const domain_networking = domains.includes('Netwerking') ? 1 : 0;
+  const domain_ai = domains.includes('AI / Robotica') ? 1 : 0;
+  const domain_software = domains.includes('Software') ? 1 : 0;
 
   const sql = `
     UPDATE companies_details
@@ -77,7 +114,7 @@ router.put('/company-details/:companyId', async (req, res) => {
         invoice_contact_name = ?, invoice_contact_email = ?, vat_number = ?,
         interest_jobstudent = ?, interest_stage = ?, interest_job = ?, interest_connect = ?,
         domain_data = ?, domain_networking = ?, domain_ai = ?, domain_software = ?
-    WHERE id = ?
+    WHERE user_id = ?
   `;
 
   try {
@@ -103,7 +140,7 @@ router.put('/company-details/:companyId', async (req, res) => {
       domain_networking,
       domain_ai,
       domain_software,
-      companyId
+      user_id
     ]);
 
     res.json({ message: 'Bedrijfsprofiel succesvol bijgewerkt' });
