@@ -22,7 +22,7 @@ export default function InfoPagina() {
           </nav>
         </div>
 
-        <div className="header-section right">{/* lege ruimte voor balans */}</div>
+        <div className="header-section right" />
       </header>
 
       <main className="main-content">

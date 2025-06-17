@@ -59,14 +59,14 @@ export default function UFavorietenBedrijven({ onLogout }) {
           <Link to="/dashboard" className="navLink">Info</Link>
           <Link to="/bedrijven" className="navLink">Bedrijven</Link>
           <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/UFavorietenBedrijven" className="navLink">Favorieten</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
           <Link to="/mijn-profiel" className="navLink">mijn profiel</Link>
         </nav>
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
       <main className="main">
-        <h2 className="title">Ontdek bedrijven</h2>
+        <h2 className="title">Mijn favorieten</h2>
         <div className="bedrijvenContainer">
           {bedrijven.length === 0 ? (
             <p style={{ color: 'gray' }}>Geen bedrijven gevonden...</p>
