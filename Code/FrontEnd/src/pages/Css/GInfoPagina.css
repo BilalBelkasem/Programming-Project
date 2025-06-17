@@ -182,3 +182,67 @@
   text-decoration: none;
   font-weight: bold;
 }
+.auth-guide {
+  margin-top: 60px;
+  background: linear-gradient(to bottom right, #fff, #f1f1f1);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', sans-serif;
+  color: #2d3436;
+}
+
+.auth-title {
+  color: #C8102E;
+  font-size: 26px;
+  margin-bottom: 16px;
+}
+
+.auth-intro {
+  font-size: 16px;
+  margin-bottom: 25px;
+}
+
+.auth-subtitle {
+  font-size: 20px;
+  margin-top: 30px;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.auth-steps {
+  padding-left: 22px;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.auth-steps ul {
+  padding-left: 20px;
+  margin: 6px 0 10px;
+  list-style-type: circle;
+}
+.campus-map {
+  margin-top: 60px;
+  padding: 40px;
+  background-color: #f9f9f9;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.map-title {
+  font-size: 24px;
+  color: #C8102E;
+  margin-bottom: 10px;
+}
+
+.map-info {
+  font-size: 15px;
+  color: #2d3436;
+  margin-bottom: 20px;
+}
+
+.map-container {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+}
