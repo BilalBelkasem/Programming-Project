@@ -17,9 +17,9 @@ const pool = mysql.createPool({
 ;(async () => {
   try {
     await pool.query('SELECT 1');
-    console.log('MySQL pool initialized');
+    console.log('✅ MySQL pool initialized');
   } catch (err) {
-    console.error(' MySQL pool error', err);
+    console.error('❌ MySQL pool error', err);
     process.exit(1);
   }
 })();

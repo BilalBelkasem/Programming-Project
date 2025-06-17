@@ -3,24 +3,42 @@ const cors = require('cors');
 require('dotenv').config();
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
+const mysql = require('mysql2');
 
-const db = require('./config/db');  // Gebruik de pool uit config/db.js
+const db = require('./config/db');
 
 const authRoutes         = require('./routes/authRoutes');
 const companiesRoutes    = require('./companies');
 const studentRoutes      = require('./students');
 const badgeRoutes        = require('./badge');
-const mijnProfielRoutes  = require('./Controller/ProfielStudent');
+const mijnProfielRoutes  = require('./Controller/StudentProfiel');
 const bedrijfProfielRoutes = require('./Controller/BedrijfProfiel');
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public', { index: 'public.html' }));
 
-// Middleware om de db pool beschikbaar te maken in req
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+
+console.log('Connecting to MySQL with:');
+console.log('Host:', process.env.DB_HOST);
+console.log('User:', process.env.DB_USER);
+console.log('Password:', process.env.DB_PASSWORD);
+console.log('Database:', process.env.DB_NAME);
+
 app.use((req, res, next) => {
-  req.db = db;  // db is al een promise pool vanuit config/db.js
+  req.db = pool.promise();
   next();
 });
 
@@ -31,9 +49,6 @@ app.use('/api/badges', badgeRoutes);
 app.use('/api/mijnprofiel', mijnProfielRoutes);
 app.use('/api', bedrijfProfielRoutes);
 
-app.get('/api/health', (req, res) => {
-  res.send('API is up and running');
-});
 
 app.get('/api/users', async (req, res) => {
   try {
@@ -141,6 +156,6 @@ app.get('/api/company-details', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Backend listening on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`Server draait op http://localhost:${PORT}`);
 });
