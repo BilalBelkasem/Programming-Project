@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react'; // 👁️ Toegevoegd
 import '../Css/LoginPagina.css';
 import logo from '../../assets/logo Erasmus.png';
 
@@ -9,6 +10,7 @@ const baseURL = 'http://192.168.0.50:5000'; // Jouw backend IP en poort
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
   const [wachtwoord, setWachtwoord] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // 👁️ Toggle state
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ export default function LoginPagina({ onLogin }) {
           setTimeout(() => onLogin(user), 0); // voorkom render loop
         }
 
-        // Redirect op basis van rol
+        // Redirect based on role
         const { role } = user;
         if (role === 'admin') {
           navigate('/admin');
@@ -81,14 +83,22 @@ export default function LoginPagina({ onLogin }) {
 
           <div className="form-group">
             <label htmlFor="password">Wachtwoord</label>
-            <input
-              type="password"
-              id="password"
-              value={wachtwoord}
-              onChange={(e) => setWachtwoord(e.target.value)}
-              required
-              placeholder="Voer je wachtwoord in"
-            />
+            <div className="password-wrapper">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                value={wachtwoord}
+                onChange={(e) => setWachtwoord(e.target.value)}
+                required
+                placeholder="Voer je wachtwoord in"
+              />
+              <div
+                className="pass-icon"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+              </div>
+            </div>
           </div>
 
           {error && <div className="error-message">{error}</div>}
@@ -108,7 +118,7 @@ export default function LoginPagina({ onLogin }) {
               Registreer je bedrijf
             </Link>
             <Link to="/" className="back-button">← Terug naar startpagina</Link>
-            <Link to="/admin" className="admin-button">Admin login</Link>
+         
           </div>
         </div>
       </div>
