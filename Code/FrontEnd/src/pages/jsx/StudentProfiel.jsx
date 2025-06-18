@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../Css/StudentProfiel.css';
 
 export default function ProfielStudent() {
-  const [liked, setLiked] = useState(false);
-
   const student = {
-    name: 'Jan Jansen',
-    school: 'Erasmushogeschool Brussel',
-    direction: 'Toegepaste Informatica',
-    year: '3de Bachelor',
-    linkedin: 'https://linkedin.com/in/jan-jansen',
-    email: 'jan.jansen@student.ehb.be',
-    about: 'Passionate developer specializing in frontend technologies. Currently exploring React ecosystem and looking for internship opportunities.',
-    lookingFor: ['Stage', 'Vast werk', 'Deeltijds werk'],
-    domain: ['Web Development', 'UI/UX Design', 'Cloud Computing'],
-    profilePicture: '',
+    name: '',
+    school: '',
+    direction: '',
+    year: '',
+    linkedin: '',
+    email: '',
+    about: '',
+    lookingFor: [],
+    domain: [],
+    profilePicture: '', // evt. base64 of URL
+  };
+
+  const handleSave = () => {
+    alert('Studentgegevens opgeslagen!');
+    console.log('Opslaan:', student);
   };
 
   const handleLogout = () => {
@@ -30,11 +33,11 @@ export default function ProfielStudent() {
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
-          <NavLink to="/dashboard" className="navLink">Info</NavLink>
-          <NavLink to="/bedrijven" className="navLink">Bedrijven</NavLink>
-          <NavLink to="/plattegrond" className="navLink">Plattegrond</NavLink>
-          <NavLink to="/favorieten" className="navLink">Favorieten</NavLink>
-          <NavLink to="/mijn-profiel" className="navLink active">Mijn profiel</NavLink>
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
         </nav>
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
@@ -48,9 +51,7 @@ export default function ProfielStudent() {
               <div className="circle">[Foto]</div>
             )}
           </div>
-          <div className={`like-button ${liked ? 'liked' : ''}`} title="Like ♥" onClick={() => setLiked(!liked)}>
-            ♥
-          </div>
+          <button className="like-button" title="Like ♥">♥</button>
         </div>
 
         <div className="profile-grid">
@@ -61,10 +62,8 @@ export default function ProfielStudent() {
           <div className="field full"><strong>Email:</strong> {student.email}</div>
           {student.linkedin && (
             <div className="field full">
-              <strong>LinkedIn:</strong>{' '}
-              <a href={student.linkedin} target="_blank" rel="noreferrer" className="link">
-                {student.linkedin}
-              </a>
+              <strong>LinkedIn:</strong>{" "}
+              <a href={student.linkedin} target="_blank" rel="noreferrer">{student.linkedin}</a>
             </div>
           )}
         </div>
@@ -72,6 +71,38 @@ export default function ProfielStudent() {
         <div className="section">
           <h2>Over mezelf</h2>
           <p className="textarea">{student.about || <em>Geen informatie opgegeven</em>}</p>
+        </div>
+
+        <div className="section">
+          <h3>Wat zoek ik?</h3>
+          <div className="checkbox-group">
+            {student.lookingFor.length === 0 ? (
+              <p><em>Geen selectie opgegeven</em></p>
+            ) : (
+              student.lookingFor.map((item, index) => (
+                <label key={index}>
+                  <input type="checkbox" checked disabled />
+                  {item}
+                </label>
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="section">
+          <h3>IT-domeinen</h3>
+          <div className="checkbox-group">
+            {student.domain.length === 0 ? (
+              <p><em>Geen selectie opgegeven</em></p>
+            ) : (
+              student.domain.map((item, index) => (
+                <label key={index}>
+                  <input type="checkbox" checked disabled />
+                  {item}
+                </label>
+              ))
+            )}
+          </div>
         </div>
       </main>
     </div>
