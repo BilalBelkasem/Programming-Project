@@ -28,7 +28,8 @@ export default function GBedrijven({ onLogout }) {
 
   return (
     <div className="pageWrapper">
-      <header className="header">
+     <header className="header">
+      <div className="header-section left">
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav spaced">
           <Link to="/" className="nav-link active">info</Link>
@@ -36,7 +37,10 @@ export default function GBedrijven({ onLogout }) {
           <Link to="/g-plattegrond" className="nav-link">plattegrond</Link>
           <Link to="/login" className="nav-link highlight">login/registeren</Link>
         </nav>
-      </header>
+      </div>
+
+      <div className="header-section right">{/* lege ruimte voor balans */}</div>
+    </header>
 
       <main className="main">
         <h2 className="title">Ontdek bedrijven</h2>

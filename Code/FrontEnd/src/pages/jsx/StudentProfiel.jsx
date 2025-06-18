@@ -1,25 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import '../Css/StudentProfiel.css';
 
 export default function ProfielStudent() {
-  const student = {
-    name: '',
+  // State voor student info (initieel met lege velden)
+  const [student, setStudent] = useState({
+    name: 'Jan Jansen', // voorbeeldnaam
     school: '',
-    direction: '',
+    Richting: '',
     year: '',
     linkedin: '',
     email: '',
     about: '',
     lookingFor: [],
     domain: [],
-    profilePicture: '', // evt. base64 of URL
+    profilePicture: '',
+  });
+
+  // State voor fouten (validatie)
+  const [errors, setErrors] = useState({});
+
+  // Handler voor input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setStudent(prev => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSave = () => {
+    // Simpele validatie email verplicht
+    const newErrors = {};
+    if (!student.email) {
+      newErrors.email = 'Email is verplicht';
+    } else if (!/\S+@\S+\.\S+/.test(student.email)) {
+      newErrors.email = 'Ongeldig emailadres';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return; // stop opslaan
+    }
+
+    setErrors({});
     alert('Studentgegevens opgeslagen!');
     console.log('Opslaan:', student);
+    // Hier kun je evt. een API call doen om te saven
   };
 
   const handleLogout = () => {
@@ -55,11 +83,57 @@ export default function ProfielStudent() {
         </div>
 
         <div className="profile-grid">
-          <div className="field"><strong>Voornaam + Achternaam:</strong> {student.name}</div>
-          <div className="field"><strong>School:</strong> {student.school}</div>
-          <div className="field"><strong>Richting:</strong> {student.direction}</div>
-          <div className="field"><strong>Jaar:</strong> {student.year}</div>
-          <div className="field full"><strong>Email:</strong> {student.email}</div>
+          {/* Naam als read-only input */}
+          <div className="field">
+            <label><strong>Voornaam + Achternaam:</strong></label><br />
+            <div className="readonly-input">{student.name}</div>
+          </div>
+
+
+          <div className="field">
+            <label><strong>School:</strong></label><br />
+            <input
+              type="text"
+              name="school"
+              value={student.school}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="field">
+            <label><strong>Richting:</strong></label><br />
+            <input
+              type="text"
+              name="Richting"
+              value={student.Richting}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="field">
+            <label><strong>Jaar:</strong></label><br />
+            <input
+              type="text"
+              name="year"
+              value={student.year}
+              onChange={handleChange}
+            />
+          </div>
+
+          {/* Email verplicht veld */}
+          <div className="field full">
+            <label><strong>Email:</strong></label><br />
+            <input
+              type="email"
+              name="email"
+              value={student.email}
+              onChange={handleChange}
+              required
+              className={errors.email ? 'input-error' : ''}
+            />
+            {errors.email && <div className="error-text">{errors.email}</div>}
+          </div>
+
           {student.linkedin && (
             <div className="field full">
               <strong>LinkedIn:</strong>{" "}
@@ -70,40 +144,20 @@ export default function ProfielStudent() {
 
         <div className="section">
           <h2>Over mezelf</h2>
-          <p className="textarea">{student.about || <em>Geen informatie opgegeven</em>}</p>
+          <textarea
+            name="about"
+            value={student.about}
+            onChange={handleChange}
+            rows={5}
+            placeholder="Vertel iets over jezelf..."
+          />
         </div>
 
-        <div className="section">
-          <h3>Wat zoek ik?</h3>
-          <div className="checkbox-group">
-            {student.lookingFor.length === 0 ? (
-              <p><em>Geen selectie opgegeven</em></p>
-            ) : (
-              student.lookingFor.map((item, index) => (
-                <label key={index}>
-                  <input type="checkbox" checked disabled />
-                  {item}
-                </label>
-              ))
-            )}
-          </div>
-        </div>
+        {/* ... overige secties ... */}
 
-        <div className="section">
-          <h3>IT-domeinen</h3>
-          <div className="checkbox-group">
-            {student.domain.length === 0 ? (
-              <p><em>Geen selectie opgegeven</em></p>
-            ) : (
-              student.domain.map((item, index) => (
-                <label key={index}>
-                  <input type="checkbox" checked disabled />
-                  {item}
-                </label>
-              ))
-            )}
-          </div>
-        </div>
+        <button onClick={handleSave} className="save-button">
+          Opslaan
+        </button>
       </main>
     </div>
   );
