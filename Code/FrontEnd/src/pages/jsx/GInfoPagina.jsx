@@ -122,9 +122,7 @@ export default function InfoPagina() {
           </div>
   </section>
 
-  <div className="footer-bottom">
-    <p>© 2025 Erasmushogeschool Brussel – Design & Technologie</p>
-  </div>
+ 
 
   <div className="easter-egg">
     <a
