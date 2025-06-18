@@ -27,23 +27,24 @@ export default function GBedrijven({ onLogout }) {
   };
 
   return (
-    <div className="pageWrapper">
-     <header className="header">
-      <div className="header-section left">
-        <img src={logo} alt="Erasmus Logo" className="logo" />
-        <nav className="nav spaced">
-          <Link to="/" className="nav-link active">info</Link>
-          <Link to="/GBedrijven" className="nav-link">bedrijven</Link>
-          <Link to="/g-plattegrond" className="nav-link">plattegrond</Link>
-          <Link to="/login" className="nav-link highlight">login/registeren</Link>
-        </nav>
-      </div>
+    <div className="pagina-wrapper">
+      <header className="header">
+        <div className="header-section left">
+          <img src={logo} alt="Erasmus Logo" className="logo" />
+        </div>
+        <div className="header-section center">
+          <nav className="nav-center">
+            <Link to="/" className="nav-btn">info</Link>
+            <Link to="/GBedrijven" className="nav-btn active">bedrijven</Link>
+            <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
+            <Link to="/login" className="nav-btn">login/registeren</Link>
+          </nav>
+        </div>
+        <div className="header-section right"></div>
+      </header>
 
-      <div className="header-section right">{/* lege ruimte voor balans */}</div>
-    </header>
-
-      <main className="main">
-        <h2 className="title">Ontdek bedrijven</h2>
+      <main className="main-content">
+        <h2 className="page-title">Ontdek bedrijven</h2>
         <div className="bedrijvenContainer">
           {bedrijven.length === 0 ? (
             <p style={{ color: 'gray' }}>Geen bedrijven gevonden...</p>
