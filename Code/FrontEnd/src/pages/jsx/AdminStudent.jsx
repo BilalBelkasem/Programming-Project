@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import logo from '../../assets/logo Erasmus.png';
+import logo from '../../assets/logoerasmus.png';
 import '../../pages/Css/AdminStudent.css';
 import { FaTrash, FaArrowLeft, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';

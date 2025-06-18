@@ -164,3 +164,26 @@
   stroke: #000 !important;
   color: #000 !important;
 }
+
+@media (max-width: 768px) {
+  .register-page {
+    padding: 0.5rem;
+  }
+  .register-box {
+    padding: 1rem;
+    max-width: 100%;
+  }
+  .title {
+    font-size: 1.2rem;
+    margin-bottom: 0.7rem;
+  }
+  .subtitle {
+    font-size: 0.95rem;
+  }
+  .form-label, .form-input, .register-button, .back-text {
+    font-size: 0.95rem;
+  }
+  .register-button {
+    padding: 0.5rem;
+  }
+}
