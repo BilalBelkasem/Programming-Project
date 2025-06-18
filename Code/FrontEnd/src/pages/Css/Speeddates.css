@@ -1,0 +1,291 @@
+/* Pagina-opbouw */
+.speeddates-container {
+  background: #f3f6fc;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Header */
+.header {
+  background: #e5e7eb;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  border-radius: 6px;
+}
+
+.logo {
+  height: 40px;
+  margin-right: 2rem;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  flex-grow: 1;
+}
+
+.navLink {
+  text-decoration: none;
+  color: #111827;
+  font-weight: 500;
+  background: transparent;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+}
+
+.navLink:hover {
+  background: #d1d5db;
+}
+
+.logoutIcon {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #4b5563;
+  transition: color 0.2s ease;
+}
+
+.logoutIcon:hover {
+  color: #1f2937;
+}
+
+/* Titels & zoekbalk */
+.speeddates-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  color: #111827;
+}
+
+.speeddates-subtitle {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.speeddates-search {
+  padding: 0.6rem 1rem;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+/* Grid voor bedrijven */
+.speeddates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+/* Kaarten */
+.company-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 5px solid #6366f1;
+}
+
+.company-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.company-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: #111827;
+}
+
+.company-description {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+}
+
+.company-meta {
+  font-size: 0.85rem;
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.session-badge {
+  display: inline-block;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 9999px;
+  margin-top: 0.5rem;
+  width: fit-content;
+}
+
+/* Modal (tijdslots) */
+.slot-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  z-index: 100;
+}
+
+.slot-modal-content {
+  background: white;
+  padding: 2rem;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.slot-group {
+  margin-top: 1.5rem;
+}
+
+.slot-date {
+  font-weight: 600;
+  color: #4338ca;
+  margin-bottom: 0.5rem;
+}
+
+.slot-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.slot-button {
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+  background-color: #e0e7ff;
+  color: #4338ca;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.slot-button:hover {
+  background-color: #c7d2fe;
+}
+
+.slot-button.disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  border: 1px solid #d1d5db;
+  cursor: not-allowed;
+}
+
+/* Mijn Reservaties */
+.reservations-section {
+  margin-top: 3rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.reservations-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.reservations-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.no-reservations {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.mini-refresh-btn {
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.mini-refresh-btn:hover {
+  background-color: #4f46e5;
+}
+
+.reservations-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.reservation-card {
+  border: 1px solid #d1d5db;
+  padding: 1rem;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.reservation-card h4 {
+  margin-bottom: 0.3rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.reservation-card p {
+  font-size: 0.9rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.reservation-card button {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.reservation-card button:hover {
+  background: #dc2626;
+}

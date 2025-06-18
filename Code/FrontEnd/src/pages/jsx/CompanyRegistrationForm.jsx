@@ -3,6 +3,7 @@ import '../Css/CompanyRegistrationForm.css';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import axios from 'axios';
+import { Eye, EyeOff } from 'lucide-react'; // 👁️ iconen
 
 export default function CompanyRegistrationForm() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ export default function CompanyRegistrationForm() {
     email: '',
     phone_number: '',
     password: '',
+    confirmPassword: '',
     company_name: '',
     website: '',
     sector: '',
@@ -25,13 +27,15 @@ export default function CompanyRegistrationForm() {
     logo: null,
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleChange = (e) => {
     const { name, files, value } = e.target;
 
     if (name === 'logo') {
       const file = files[0];
       if (file) {
-        const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+        const maxSize = 2 * 1024 * 1024;
         if (file.size > maxSize) {
           alert('Het logo mag maximaal 2MB zijn.');
           return;
@@ -45,6 +49,11 @@ export default function CompanyRegistrationForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      alert('Wachtwoorden komen niet overeen.');
+      return;
+    }
 
     const legeVelden = Object.entries(formData).filter(
       ([key, value]) => {
@@ -67,26 +76,16 @@ export default function CompanyRegistrationForm() {
       const response = await axios.post(
         'http://localhost:5000/api/register-company',
         data,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        }
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
 
       alert('Bedrijf succesvol geregistreerd!');
-      console.log('Response:', response.data);
       navigate('/profiel-bedrijf');
     } catch (error) {
-      if (error.response) {
-        console.error('Registratie mislukt:', error.response.data);
-        alert('Registratie mislukt: ' + (error.response.data?.error || 'Onbekende fout'));
-      } else {
-        console.error('Registratie mislukt:', error);
-        alert('Registratie mislukt: onbekende fout');
-      }
+      console.error('Registratie mislukt:', error.response?.data || error);
+      alert('Registratie mislukt: ' + (error.response?.data?.error || 'Onbekende fout'));
     }
-  }; // ✅ DIT WAS DE ONTBREKENDE SLUITENDE ACCOLADE
+  };
 
   return (
     <form onSubmit={handleSubmit} className="form-container">
@@ -99,7 +98,6 @@ export default function CompanyRegistrationForm() {
       {[
         { label: 'E-mailadres', name: 'email' },
         { label: 'Telefoonnummer', name: 'phone_number' },
-        { label: 'Wachtwoord', name: 'password' },
         { label: 'Bedrijfsnaam', name: 'company_name' },
         { label: 'Website of LinkedIn pagina van uw bedrijf', name: 'website' },
         { label: 'Naam Contactpersoon vertegenwoordigers beurs', name: 'booth_contact_name' },
@@ -115,7 +113,6 @@ export default function CompanyRegistrationForm() {
           <label htmlFor={field.name}>{field.label} <span style={{ color: 'red' }}>*</span></label>
           <input
             type={
-              field.name === 'password' ? 'password' :
               field.name.includes('email') ? 'email' :
               field.name === 'phone_number' ? 'tel' :
               'text'
@@ -127,6 +124,35 @@ export default function CompanyRegistrationForm() {
           />
         </div>
       ))}
+
+      {/* Wachtwoord met oogje 👁️ */}
+      <div className="form-group">
+        <label htmlFor="password">Wachtwoord <span style={{ color: 'red' }}>*</span></label>
+        <div className="password-wrapper">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+          <div className="pass-icon" onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+          </div>
+        </div>
+      </div>
+
+      {/* Herhaal wachtwoord (zonder oogje) */}
+      <div className="form-group">
+        <label htmlFor="confirmPassword">Wachtwoord herhalen <span style={{ color: 'red' }}>*</span></label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+        />
+      </div>
 
       <div className="form-group">
         <label htmlFor="sector">Sector waarbinnen het bedrijf actief is:<span style={{ color: 'red' }}>*</span></label>
