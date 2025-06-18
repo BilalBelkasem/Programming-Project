@@ -42,7 +42,7 @@
 /* ========== NAVIGATIE ========== */
 .nav-center {
   display: flex;
-  gap: 40px; /* GELIJKE RUIMTE */
+  gap: 6px;
   align-items: center;
 }
 
@@ -409,4 +409,123 @@
   opacity: 1;
   color: crimson;
   text-shadow: 0 0 2px rgba(255, 0, 0, 0.3);
+}
+
+/* ========== MOBIELE WEERGAVE ========== */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    gap: 0;
+  }
+  .header-section {
+    width: 100%;
+    justify-content: center !important;
+    align-items: center;
+    padding: 0;
+  }
+  .logo {
+    max-height: 40px;
+    margin-bottom: 8px;
+  }
+  .nav-center {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-btn {
+    font-size: 16px;
+    padding: 10px 0;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    border-radius: 20px;
+    margin: 0 auto;
+    display: block;
+  }
+  .main-content {
+    padding: 18px 8px;
+    align-items: stretch;
+  }
+  .page-title {
+    font-size: 20px;
+    margin-bottom: 18px;
+  }
+  .info-banner {
+    height: 180px;
+    min-height: 120px;
+    border-radius: 8px;
+    width: 100%;
+    margin-bottom: 18px;
+  }
+  .footer-content {
+    width: 98%;
+    padding: 18px 8px;
+    font-size: 15px;
+  }
+  .highlight-box {
+    padding: 10px;
+    margin: 12px 0;
+    font-size: 15px;
+  }
+  .why-title {
+    font-size: 16px;
+    margin-top: 18px;
+  }
+  .why-list {
+    padding-left: 18px;
+    font-size: 15px;
+  }
+  .contact-box {
+    padding: 12px;
+    margin-top: 18px;
+    font-size: 15px;
+  }
+  .site-footer {
+    padding: 18px 4px 40px;
+    font-size: 13px;
+    margin-top: 18px;
+  }
+  .footer-columns {
+    flex-direction: column;
+    gap: 10px;
+    max-width: 100%;
+    margin: 0 auto 10px;
+  }
+  .footer-column {
+    min-width: 0;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+  .footer-column h4 {
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  .footer-bottom {
+    font-size: 11px;
+    margin-top: 10px;
+  }
+  .auth-guide, .campus-map {
+    max-width: 100%;
+    margin: 18px 0;
+    padding: 12px 6px;
+  }
+  .auth-title, .map-title {
+    font-size: 16px;
+  }
+  .auth-intro, .map-info {
+    font-size: 14px;
+  }
+  .map-container {
+    border-radius: 6px;
+  }
+  .easter-egg {
+    font-size: 7px;
+    right: 4px;
+    bottom: 2px;
+  }
 }
