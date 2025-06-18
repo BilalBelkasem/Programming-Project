@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import '../Css/LoginPagina.css';
 import logo from '../../assets/logo Erasmus.png';
 
-const baseURL = 'http://192.168.0.50:5000'; // Jouw backend IP en poort
+const baseURL = 'http://10.2.88.62:5173'; // Jouw backend IP en poort
 
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
