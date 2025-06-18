@@ -83,10 +83,27 @@
 
 .field {
   width: 45%;
+  margin-bottom: 15px;
 }
 
 .field.full {
   width: 100%;
+}
+
+.field strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.value-bar {
+  background: #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  min-height: 20px;
+}
+
+.value-bar em {
+  color: #666;
 }
 
 .section {
@@ -181,5 +198,8 @@
   }
   .section h2, .section h3 {
     font-size: 16px;
+  }
+  .value-bar {
+    padding: 12px;
   }
 }
