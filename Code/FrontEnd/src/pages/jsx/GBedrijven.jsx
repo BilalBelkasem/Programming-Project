@@ -2,11 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-<<<<<<< HEAD
 import '../css/Gbedrijveninfopagina.css';
-=======
-import '../Css/Gbedrijveninfopagina.css';
->>>>>>> parent of 15b76a8 (Merge branch 'main' into CestBienMac)
 
 export default function GBedrijven({ onLogout }) {
   const navigate = useNavigate();
