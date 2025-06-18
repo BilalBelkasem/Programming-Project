@@ -236,12 +236,3 @@ body {
     gap: 15px;
   }
 }
-.readonly-input {
-  background-color: #f2f2f2;
-  border: 1px solid #ccc;
-  padding: 8px;
-  border-radius: 4px;
-  font-size: 16px;
-  color: #555;
-  cursor: not-allowed;
-}

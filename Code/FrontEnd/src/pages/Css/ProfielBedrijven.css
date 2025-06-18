@@ -74,7 +74,7 @@ body {
 /* Profile Grid */
 .profile-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;  /* TWEE GELIJKE KOLOMMEN */
+  grid-template-columns: 1fr 1fr;
   gap: 30px;
   margin-bottom: 40px;
 }
@@ -105,6 +105,11 @@ body {
 .field input:focus {
   outline: none;
   border-color: #999;
+}
+
+/* Full-width fields */
+.full {
+  grid-column: 1 / -1;
 }
 
 /* Section Styling */
@@ -202,26 +207,26 @@ body {
   .container {
     padding: 20px 15px;
   }
-
+  
   .profile-grid {
-    grid-template-columns: 1fr; /* MOBIEL EEN KOLOM */
+    grid-template-columns: 1fr;
     gap: 20px;
   }
-
+  
   .circle {
     width: 150px;
     height: 150px;
   }
-
+  
   .nav {
     gap: 20px;
     font-size: 14px;
   }
-
+  
   .header {
     padding: 15px 20px;
   }
-
+  
   .section h2, .section h3 {
     font-size: 18px;
   }
@@ -232,18 +237,18 @@ body {
     flex-direction: column;
     gap: 10px;
   }
-
+  
   .header {
     flex-direction: column;
     gap: 15px;
     text-align: center;
   }
-
+  
   .circle {
     width: 120px;
     height: 120px;
   }
-
+  
   .profile-grid {
     gap: 15px;
   }
