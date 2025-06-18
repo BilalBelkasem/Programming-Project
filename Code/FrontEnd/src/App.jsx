@@ -20,6 +20,8 @@ import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx";
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
 import StudentProfiel from './pages/jsx/StudentProfiel.jsx';
 import BedrijfProfiel from './pages/jsx/BedrijfProfiel.jsx';
+import StudentenLijst from './pages/jsx/StudentenLijst.jsx';
+
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
@@ -84,6 +86,17 @@ export default function App() {
           />
         }
       />
+      <Route
+  path="/studentenlijst"
+  element={
+    isLoggedIn && user?.role === 'bedrijf' ? (
+      <StudentenLijst />
+    ) : (
+      <Navigate to="/login" />
+    )
+  }
+/>
+
 
       <Route path="/bedrijf-registratie" element={<CompanyRegistrationForm />} />
       <Route path="/registreer" element={<ClientRegistration />} />

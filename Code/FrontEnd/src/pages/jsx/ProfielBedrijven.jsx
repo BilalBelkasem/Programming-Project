@@ -92,8 +92,8 @@ export default function ProfielBedrijven() {
         email: formData.email,
         linkedin: formData.linkedin,
         about: formData.about,
-        lookingFor: formData.lookingFor, 
-        domains: formData.domains        
+        lookingFor: formData.lookingFor,
+        domains: formData.domains
       };
 
       await axios.put('http://localhost:5000/api/company-profile', payload, {
@@ -118,14 +118,22 @@ export default function ProfielBedrijven() {
   return (
     <div className="page-wrapper">
       <header className="header">
-        <img src={logo} alt="Erasmus Logo" className="logo" />
-        <nav className="nav">
-          <Link to="/dashboard" className="navLink">Info</Link>
-          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/favorieten" className="navLink">studenten</Link>
-          <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
-        </nav>
-        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+        <div className="header-section left">
+          <img src={logo} alt="Erasmus Logo" className="logo" />
+        </div>
+
+        <div className="header-section center">
+          <nav className="nav-center">
+            <Link to="/dashboard" className="nav-btn">Info</Link>
+            <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
+            <Link to="/studentenlijst" className="nav-btn">Studenten</Link>
+            <Link to="/mijn-profiel" className="nav-btn active">Mijn profiel</Link>
+          </nav>
+        </div>
+
+        <div className="header-section right">
+          <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+        </div>
       </header>
 
       <main className="container">
@@ -135,57 +143,57 @@ export default function ProfielBedrijven() {
             alt="Bedrijfsfoto"
             className="circle"
           />
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handleImageUpload} 
-            className="upload-btn" 
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="upload-btn"
           />
         </div>
 
         <div className="profile-grid">
           <div className="field">
-            <label><strong>voornaamnaam + Achternaam:</strong></label>
-            <input 
-              name="name" 
-              value={formData.name} 
+            <label><strong>Voornaam + Achternaam:</strong></label>
+            <input
+              name="name"
+              value={formData.name}
               onChange={handleChange}
-              placeholder="name"
+              placeholder="Naam"
             />
           </div>
           <div className="field">
             <label><strong>Bedrijfsnaam:</strong></label>
-            <input 
-              name="companyName" 
-              value={formData.companyName} 
+            <input
+              name="companyName"
+              value={formData.companyName}
               onChange={handleChange}
               placeholder="Bedrijfsnaam"
             />
           </div>
           <div className="field">
             <label><strong>Functie:</strong></label>
-            <input 
-              name="function" 
-              value={formData.function} 
+            <input
+              name="function"
+              value={formData.function}
               onChange={handleChange}
               placeholder="Functie"
             />
           </div>
           <div className="field full">
             <label><strong>E-mail:</strong></label>
-            <input 
-              name="email" 
+            <input
+              name="email"
               type="email"
-              value={formData.email} 
+              value={formData.email}
               onChange={handleChange}
               placeholder="E-mail adres"
             />
           </div>
           <div className="field full">
             <label><strong>LinkedIn (optioneel):</strong></label>
-            <input 
-              name="linkedin" 
-              value={formData.linkedin} 
+            <input
+              name="linkedin"
+              value={formData.linkedin}
               onChange={handleChange}
               placeholder="LinkedIn profiel URL"
             />
