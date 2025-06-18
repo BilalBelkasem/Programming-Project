@@ -1,7 +1,7 @@
 // InfoPagina.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/logoerasmus.png';
+import logo from '../../assets/logo Erasmus.png';
 import banner from '../../assets/Banner2.png';
 import '../Css/GInfoPagina.css';
 
@@ -122,7 +122,9 @@ export default function InfoPagina() {
           </div>
   </section>
 
- 
+  <div className="footer-bottom">
+    <p>© 2025 Erasmushogeschool Brussel – Design & Technologie</p>
+  </div>
 
   <div className="easter-egg">
     <a
