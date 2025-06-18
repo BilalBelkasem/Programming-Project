@@ -1,6 +1,5 @@
 const db = require('../config/db');
 
-
 exports.getCompanyProfile = async (req, res) => {
   const userId = req.user.id;
 
@@ -15,13 +14,26 @@ exports.getCompanyProfile = async (req, res) => {
     `, [userId]);
 
     if (rows.length === 0) return res.status(404).json({ error: 'Profiel niet gevonden' });
-    res.json(rows[0]);
+
+    const row = rows[0];
+
+    // ✅ Converteer integers naar booleans
+    res.json({
+      ...row,
+      zoek_jobstudent: row.zoek_jobstudent === 1,
+      zoek_connecties: row.zoek_connecties === 1,
+      zoek_stage: row.zoek_stage === 1,
+      zoek_job: row.zoek_job === 1,
+      domein_data: row.domein_data === 1,
+      domein_netwerking: row.domein_netwerking === 1,
+      domein_ai: row.domein_ai === 1,
+      domein_software: row.domein_software === 1
+    });
   } catch (err) {
     console.error('Fout bij ophalen profiel:', err);
     res.status(500).json({ error: 'Serverfout' });
   }
 };
-
 
 
 exports.updateCompanyProfile = async (req, res) => {
@@ -63,4 +75,3 @@ exports.updateCompanyProfile = async (req, res) => {
     res.status(500).json({ error: 'Serverfout' });
   }
 };
-
