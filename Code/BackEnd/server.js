@@ -1,14 +1,14 @@
-// server.js
 console.log('===> SERVER BESTAND IS GEACTIVEERD');
 const express = require('express');
 const cors = require('cors');
-const multer = require('multer');      // multer toegevoegd
-const upload = multer();                // upload middleware
+const multer = require('multer');
+const upload = multer();
 require('dotenv').config();
 
 const db = require('./config/db');
 
 // Routes importeren
+const authMiddleware       = require('./middleware/authMiddleware');
 const authRoutes           = require('./routes/authRoutes');
 const companiesRoutes      = require('./companies');
 const studentRoutes        = require('./students');
@@ -29,12 +29,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes mounten
+// Routes mounten met auth middleware waar nodig
 app.use('/api', authRoutes);
 app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
-app.use('/api/mijnprofiel', mijnProfielRoutes);
+app.use('/api/mijnprofiel', authMiddleware.authenticateToken, mijnProfielRoutes);
 app.use('/api/student_details', studentDetailsRoutes);
 
 // Extra routes
@@ -84,7 +84,6 @@ app.delete('/api/studenten/:id', async (req, res) => {
   }
 });
 
-// Route met upload middleware voor bedrijfregistratie
 app.post('/api/register-company', upload.single('logo'), async (req, res) => {
   try {
     const logoBuffer = req.file ? req.file.buffer : null;
