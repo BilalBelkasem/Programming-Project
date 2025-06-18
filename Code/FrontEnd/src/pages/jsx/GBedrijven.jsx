@@ -93,29 +93,35 @@ export default function GBedrijven({ onLogout }) {
             <span style={{ marginLeft: 8 }}>{dropdownOpen ? '\u25B2' : '\u25BC'}</span>
           </button>
           {dropdownOpen && (
-            <div className="dropdown-menu" style={{ position: 'absolute', top: 48, left: 0, background: '#ddd', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', padding: 18, zIndex: 10, minWidth: 220 }}>
-              <div style={{ marginBottom: 10, fontWeight: 'bold', fontSize: 15 }}>Type Kans</div>
-              {TYPE_KANS.map((opt) => (
-                <label key={opt.key} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                  <input
-                    type="checkbox"
-                    checked={selectedFilters.includes(opt.key)}
-                    onChange={() => handleFilterChange(opt.key)}
-                  />
-                  {opt.label}
-                </label>
-              ))}
-              <div style={{ margin: '12px 0 6px 0', fontWeight: 'bold', fontSize: 15 }}>IT Domein</div>
-              {IT_DOMEIN.map((opt) => (
-                <label key={opt.key} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-                  <input
-                    type="checkbox"
-                    checked={selectedFilters.includes(opt.key)}
-                    onChange={() => handleFilterChange(opt.key)}
-                  />
-                  {opt.label}
-                </label>
-              ))}
+            <div className="dropdown-menu">
+              <div className="filter-section">
+                <div className="filter-section-title">Type Kans</div>
+                {TYPE_KANS.map((opt) => (
+                  <div className="filter-option" key={opt.key}>
+                    <input
+                      type="checkbox"
+                      id={opt.key}
+                      checked={selectedFilters.includes(opt.key)}
+                      onChange={() => handleFilterChange(opt.key)}
+                    />
+                    <label htmlFor={opt.key}>{opt.label}</label>
+                  </div>
+                ))}
+              </div>
+              <div className="filter-section">
+                <div className="filter-section-title">IT Domein</div>
+                {IT_DOMEIN.map((opt) => (
+                  <div className="filter-option" key={opt.key}>
+                    <input
+                      type="checkbox"
+                      id={opt.key}
+                      checked={selectedFilters.includes(opt.key)}
+                      onChange={() => handleFilterChange(opt.key)}
+                    />
+                    <label htmlFor={opt.key}>{opt.label}</label>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>
