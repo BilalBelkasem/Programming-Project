@@ -191,27 +191,50 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .container {
-    padding: 20px 15px;
-  }
-  
-  .form-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .circle {
-    width: 150px;
-    height: 150px;
-  }
-  
-  .nav {
-    gap: 20px;
-    font-size: 14px;
-  }
-  
   .header {
-    padding: 15px 20px;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 8px;
+    gap: 0;
+  }
+  .logo {
+    height: 32px;
+    margin-bottom: 8px;
+  }
+  .nav {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+  .navLink {
+    font-size: 15px;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
+  }
+  .container {
+    padding: 10px 4px;
+    max-width: 100%;
+  }
+  .profile-picture .circle {
+    width: 120px;
+    height: 120px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+  .left, .right {
+    gap: 8px;
+  }
+  .section label {
+    font-size: 15px;
   }
 }
 

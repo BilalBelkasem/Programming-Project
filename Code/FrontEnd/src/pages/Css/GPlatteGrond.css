@@ -156,3 +156,52 @@
   font-weight: bold;
   margin-right: 0.5rem;
 }
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 8px;
+    gap: 0;
+  }
+  .logo {
+    max-height: 40px;
+    margin-bottom: 8px;
+  }
+  .nav-center {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-btn {
+    font-size: 15px;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
+  }
+  .uplattegrond-kader {
+    padding: 0.5rem;
+  }
+  .uplattegrond-content-box {
+    flex-direction: column;
+    gap: 0.5rem;
+    height: auto;
+  }
+  .uplattegrond-image, .uplattegrond-legend-box {
+    width: 100%;
+    height: auto;
+    margin-bottom: 8px;
+  }
+  .legend-title {
+    font-size: 1rem;
+  }
+  .legend-item {
+    font-size: 0.95rem;
+  }
+}

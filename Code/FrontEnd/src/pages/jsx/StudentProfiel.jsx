@@ -55,15 +55,36 @@ export default function ProfielStudent() {
         </div>
 
         <div className="profile-grid">
-          <div className="field"><strong>Voornaam + Achternaam:</strong> {student.name}</div>
-          <div className="field"><strong>School:</strong> {student.school}</div>
-          <div className="field"><strong>Richting:</strong> {student.direction}</div>
-          <div className="field"><strong>Jaar:</strong> {student.year}</div>
-          <div className="field full"><strong>Email:</strong> {student.email}</div>
+          <div className="field">
+            <div className="value-bar">
+              {student.name || "Voornaam + Achternaam:"}
+            </div>
+          </div>
+          <div className="field">
+            <div className="value-bar">
+              {student.school || "School:"}
+            </div>
+          </div>
+          <div className="field">
+            <div className="value-bar">
+              {student.direction || "Richting:"}
+            </div>
+          </div>
+          <div className="field">
+            <div className="value-bar">
+              {student.year || "Jaar:"}
+            </div>
+          </div>
+          <div className="field full">
+            <div className="value-bar">
+              {student.email || "Email:"}
+            </div>
+          </div>
           {student.linkedin && (
             <div className="field full">
-              <strong>LinkedIn:</strong>{" "}
-              <a href={student.linkedin} target="_blank" rel="noreferrer">{student.linkedin}</a>
+              <div className="value-bar">
+                <a href={student.linkedin} target="_blank" rel="noreferrer">{student.linkedin}</a>
+              </div>
             </div>
           )}
         </div>

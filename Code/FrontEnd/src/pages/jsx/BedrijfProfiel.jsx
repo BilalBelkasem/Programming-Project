@@ -48,7 +48,6 @@ export default function BedrijfProfiel() {
         </div>
 
         <div className="profile-grid">
-          <div className="field"><strong>Naam contactpersoon:</strong> {bedrijf.name || <em>–</em>}</div>
           <div className="field"><strong>Bedrijfsnaam:</strong> {bedrijf.companyName || <em>–</em>}</div>
           <div className="field"><strong>Functie:</strong> {bedrijf.function || <em>–</em>}</div>
           <div className="field"><strong>E-mail:</strong> {bedrijf.email || <em>–</em>}</div>
