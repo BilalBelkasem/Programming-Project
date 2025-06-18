@@ -101,12 +101,19 @@
               <label>Email:</label>
               <input type="text" readOnly value={displayValue(student?.email, 'Email')} />
             </div>
-            {student?.linkedin_url && (
-              <div className="field full">
-                <label>LinkedIn:</label>
+            <div className="field full">
+              <label>LinkedIn:</label>
+              <input 
+                type="url" 
+                readOnly 
+                value={student?.linkedin_url || ''} 
+                placeholder="LinkedIn URL niet ingevuld" 
+              />
+              {student?.linkedin_url && (
                 <a href={student.linkedin_url} target="_blank" rel="noreferrer">{student.linkedin_url}</a>
-              </div>
-            )}
+              )}
+            </div>
+
           </div>
 
           <div className="section">

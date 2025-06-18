@@ -2,24 +2,19 @@
 console.log('===> SERVER BESTAND IS GEACTIVEERD');
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer');      // multer toegevoegd
+const upload = multer();                // upload middleware
 require('dotenv').config();
 
 const db = require('./config/db');
-<<<<<<< Updated upstream
-const authRoutes = require('./routes/authRoutes'); // ✅ Alle routes hier gebundeld
-=======
 
-// Route imports
-const authRoutes         = require('./routes/authRoutes');
-const companiesRoutes    = require('./companies');
-const studentRoutes      = require('./students');
-const badgeRoutes        = require('./badge');
-const mijnProfielRoutes  = require('./Controller/mijnprofiel');
-const studentDetailsRoutes = require('./Controller/studentDetails'); // <-- nieuw
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+// Routes importeren
+const authRoutes           = require('./routes/authRoutes');
+const companiesRoutes      = require('./companies');
+const studentRoutes        = require('./students');
+const badgeRoutes          = require('./badge');
+const mijnProfielRoutes    = require('./Controller/mijnprofiel');
+const studentDetailsRoutes = require('./Controller/studentDetails');
 
 const app = express();
 
@@ -28,48 +23,24 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public', { index: 'public.html' }));
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-// DB beschikbaar maken in elke request
-=======
-// Expose db per request
->>>>>>> Stashed changes
-=======
-// Expose db per request
->>>>>>> Stashed changes
+// DB beschikbaar maken per request
 app.use((req, res, next) => {
   req.db = db;
   next();
 });
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-// ✅ Alle routes zitten hierin: login, registratie, profiel, studenten, bedrijven, favorieten, enz.
-app.use('/api', authRoutes);
-
-// Gezondheidstest (optioneel)
-app.get('/api/health', (req, res) => {
-  res.send('API is up and running');
-});
-
-// Server starten
-=======
-=======
->>>>>>> Stashed changes
-// Mount routes
+// Routes mounten
 app.use('/api', authRoutes);
 app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/mijnprofiel', mijnProfielRoutes);
-app.use('/api/student_details', studentDetailsRoutes); // <-- nieuw
+app.use('/api/student_details', studentDetailsRoutes);
 
 // Extra routes
 app.get('/api/users', async (req, res) => {
   try {
-    const [users] = await req.db.query(
-      'SELECT id, name FROM users WHERE role = "student"'
-    );
+    const [users] = await req.db.query('SELECT id, name FROM users WHERE role = "student"');
     res.json(users);
   } catch (err) {
     console.error('Users route error:', err);
@@ -113,6 +84,7 @@ app.delete('/api/studenten/:id', async (req, res) => {
   }
 });
 
+// Route met upload middleware voor bedrijfregistratie
 app.post('/api/register-company', upload.single('logo'), async (req, res) => {
   try {
     const logoBuffer = req.file ? req.file.buffer : null;
@@ -166,7 +138,6 @@ app.post('/api/register-company', upload.single('logo'), async (req, res) => {
   }
 });
 
->>>>>>> Stashed changes
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
