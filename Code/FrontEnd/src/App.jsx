@@ -20,7 +20,6 @@ import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx";
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
 import StudentProfiel from '../src/pages/jsx/StudentProfiel.jsx';
 import BedrijfProfiel from './pages/jsx/BedrijfProfiel.jsx';
-import Speeddates from './pages/jsx/Speeddates.jsx'; // ✅ NIEUW
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
@@ -122,9 +121,9 @@ export default function App() {
         path="/admin/badges"
         element={isLoggedIn && user?.role === 'admin' ? <AdminBadge /> : <Navigate to="/login" />}
       />
-
       <Route path="/studentprofiel" element={<StudentProfiel />} />
       <Route path="/bedrijfprofiel" element={<BedrijfProfiel />} />
+
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
 
@@ -159,14 +158,7 @@ export default function App() {
           )
         }
       />
-      <Route
-        path="/speeddates"
-        element={
-          <ProtectedRoute role={['student', 'bedrijf']}>
-            <Speeddates />
-          </ProtectedRoute>
-        }
-      />
+      
     </Routes>
   );
 }

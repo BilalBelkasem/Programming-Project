@@ -1,12 +1,13 @@
-// bedrijvenController.js
+const db = require('../config/db');
 
 exports.getBedrijven = async (req, res) => {
   try {
-    const [rows] = await req.db.execute(
-      'SELECT id, company_name, sector FROM companies_details'
-    );
+    const [rows, fields] = await db.execute(
+        'SELECT id, company_name, sector FROM companies_details'
+      );
+      
 
-    console.log("✅ Resultaat van de database:", rows);
+    console.log("✅ Resultaat van de database:", rows); // logging
 
     if (!Array.isArray(rows)) {
       console.error("❌ rows is geen array! Inhoud:", rows);
