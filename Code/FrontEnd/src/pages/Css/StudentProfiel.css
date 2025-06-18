@@ -188,42 +188,48 @@
 /* ✅ Mobiele weergave */
 @media (max-width: 768px) {
   .header {
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 10px 20px;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 8px;
+    gap: 0;
   }
-
   .logo {
-    height: 35px;
+    height: 32px;
+    margin-bottom: 8px;
   }
-
   .nav {
-    gap: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
     width: 100%;
+    align-items: center;
+    margin: 0;
+    padding: 0;
   }
-
   .navLink {
-    font-size: 14px;
-    padding: 4px 0;
+    font-size: 15px;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
   }
-
-  .logoutIcon {
-    font-size: 20px;
-    margin-left: auto;
-  }
-
   .container {
-    padding: 20px 15px;
+    padding: 10px 4px;
+    max-width: 100%;
   }
-
-  .profile-grid .field,
-  .checkbox-label {
+  .profile-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .profile-grid {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .field {
     width: 100%;
   }
-
-  .save-button {
-    width: 100%;
+  .section h2, .section h3 {
+    font-size: 16px;
   }
 }
