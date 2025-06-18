@@ -69,46 +69,44 @@ export default function ProfielStudent({ user }) {
         : [...prev[field], value]
     }));
   };
-const handleSubmit = async () => {
-  if (!user || !user.id) {
-    alert('Geen gebruiker ingelogd!');
-    return;
-  }
 
-  // Zorg dat je de correcte property names gebruikt
-  const updatedData = {
-    name: formData.name,
-    email: formData.email,
-    school: formData.school,
-    direction: formData.direction,
-    year: formData.year,
-    about: formData.about,
-    linkedin: formData.linkedin,
-    lookingFor: formData.lookingFor,  // array, bv ["Jobstudent", "Stage"]
-    domain: formData.domain,          // array, bv ["Data", "Software"]
-  };
-
-  try {
-    const res = await fetch(`/api/mijnprofiel/${user.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedData)
-    });
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error("Server response:", errorText);
-      throw new Error('Update mislukt');
+  const handleSubmit = async () => {
+    if (!user || !user.id) {
+      alert('Geen gebruiker ingelogd!');
+      return;
     }
 
-    alert('Wijzigingen succesvol bevestigd!');
-  } catch (err) {
-    console.error(err);
-    alert('Fout bij opslaan van profielgegevens');
-  }
-};
+    const updatedData = {
+      name: formData.name,
+      email: formData.email,
+      school: formData.school,
+      direction: formData.direction,
+      year: formData.year,
+      about: formData.about,
+      linkedin: formData.linkedin,
+      lookingFor: formData.lookingFor,
+      domain: formData.domain,
+    };
 
+    try {
+      const res = await fetch(`/api/mijnprofiel/${user.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      });
 
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Server response:", errorText);
+        throw new Error('Update mislukt');
+      }
+
+      alert('Wijzigingen succesvol bevestigd!');
+    } catch (err) {
+      console.error(err);
+      alert('Fout bij opslaan van profielgegevens');
+    }
+  };
 
   const handleLogout = () => {
     alert('Uitgelogd');
@@ -123,17 +121,23 @@ const handleSubmit = async () => {
   return (
     <div className="page-wrapper">
       <header className="header">
-        <img src={logo} alt="Erasmus Logo" className="logo" />
+        <div className="header-section left">
+          <img src={logo} alt="Erasmus Logo" className="logo" />
+        </div>
 
-        <nav className="nav">
-          <Link to="/dashboard" className="navLink">Info</Link>
-          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
-          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/favorieten" className="navLink">Favorieten</Link>
-          <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
-        </nav>
+        <div className="header-section center">
+          <nav className="nav-center">
+            <Link to="/dashboard" className="nav-btn">Info</Link>
+            <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
+            <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
+            <Link to="/favorieten" className="nav-btn">Favorieten</Link>
+            <Link to="/mijn-profiel" className="nav-btn active">Mijn profiel</Link>
+          </nav>
+        </div>
 
-        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+        <div className="header-section right">
+          <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
+        </div>
       </header>
 
       <div className="container">
@@ -187,26 +191,25 @@ const handleSubmit = async () => {
                 </label>
               ))}
             </div>
-           <div className="section">
 
-            <label>Wat zoekt u?</label>
-            <div className="checkbox-group">
-            {["Jobstudent", "Connecties", "Stage", "Job"].map(option => (
-              <label key={option}>
-                <input
-                  type="checkbox"
-                  value={option}
-                  checked={formData.lookingFor.includes(option)}
-                  onChange={(e) => handleCheckboxChange(e, "lookingFor")}
-                />
-                {option}
-              </label>
-            ))}
+            <div className="section">
+              <label>Wat zoekt u?</label>
+              <div className="checkbox-group">
+                {["Jobstudent", "Connecties", "Stage", "Job"].map(option => (
+                  <label key={option}>
+                    <input
+                      type="checkbox"
+                      value={option}
+                      checked={formData.lookingFor.includes(option)}
+                      onChange={(e) => handleCheckboxChange(e, "lookingFor")}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-        
-      </div>
 
         <div className="section">
           <label>About</label>
