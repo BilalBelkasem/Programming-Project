@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../../assets/logo Erasmus.png';
+import logo from '../../assets/logoerasmus.png';
 import '../Css/bedrijveninfopagina.css';
 
 export default function UBedrijven({ onLogout }) {

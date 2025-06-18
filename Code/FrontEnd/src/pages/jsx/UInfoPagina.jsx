@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../../assets/logo Erasmus.png';
+import logo from '../../assets/logoerasmus.png';
 import banner from '../../assets/Banner C.png';
 import '../Css/UInfoPagina.css';
 

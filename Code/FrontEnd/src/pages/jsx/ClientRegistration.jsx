@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import '../Css/ClientRegistration.css';
-import logo from '../../assets/logo Erasmus.png';
+import logo from '../../assets/logoerasmus.png';
 
 const Register = () => {
   const [form, setForm] = useState({

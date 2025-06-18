@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/logo Erasmus.png';
+import logo from '../../assets/logoerasmus.png';
 import '../Css/ProfielStudent.css';
 
 export default function ProfielStudent({ user }) {
