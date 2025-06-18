@@ -11,7 +11,7 @@ const authRoutes         = require('./routes/authRoutes');
 const companiesRoutes    = require('./companies');
 const studentRoutes      = require('./students');
 const badgeRoutes        = require('./badge');
-const mijnProfielRoutes  = require('./Controller/StudentProfiel');
+const mijnProfielRoutes  = require('./Controller/mijnprofiel');
 const bedrijfProfielRoutes = require('./Controller/BedrijfProfiel');
 
 
