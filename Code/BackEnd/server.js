@@ -16,6 +16,9 @@ const studentRoutes      = require('./students');
 const badgeRoutes        = require('./badge');
 const mijnProfielRoutes  = require('./Controller/mijnprofiel');
 const studentDetailsRoutes = require('./Controller/studentDetails'); // <-- nieuw
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 const app = express();
@@ -26,7 +29,11 @@ app.use(express.json());
 app.use(express.static('public', { index: 'public.html' }));
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 // DB beschikbaar maken in elke request
+=======
+// Expose db per request
+>>>>>>> Stashed changes
 =======
 // Expose db per request
 >>>>>>> Stashed changes
@@ -35,6 +42,7 @@ app.use((req, res, next) => {
   next();
 });
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 // ✅ Alle routes zitten hierin: login, registratie, profiel, studenten, bedrijven, favorieten, enz.
 app.use('/api', authRoutes);
@@ -46,6 +54,8 @@ app.get('/api/health', (req, res) => {
 
 // Server starten
 =======
+=======
+>>>>>>> Stashed changes
 // Mount routes
 app.use('/api', authRoutes);
 app.use('/api/companies', companiesRoutes);
