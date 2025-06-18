@@ -220,22 +220,10 @@ export default function ProfielStudent({ user }) {
                 </label>
               ))}
             </div>
-          </div>
-        </div>
+           <div className="section">
 
-        <div className="section">
-          <label>About</label>
-          <textarea
-            name="about"
-            value={formData.about}
-            onChange={handleChange}
-            placeholder="Schrijf iets over jezelf..."
-          ></textarea>
-        </div>
-
-        <div className="section">
-          <label>Wat zoekt u?</label>
-          <div className="checkbox-group">
+            <label>Wat zoekt u?</label>
+            <div className="checkbox-group">
             {["Jobstudent", "Connecties", "Stage", "Job"].map(option => (
               <label key={option}>
                 <input
@@ -247,7 +235,20 @@ export default function ProfielStudent({ user }) {
                 {option}
               </label>
             ))}
+            </div>
           </div>
+        </div>
+        
+      </div>
+
+        <div className="section">
+          <label>About</label>
+          <textarea
+            name="about"
+            value={formData.about}
+            onChange={handleChange}
+            placeholder="Schrijf iets over jezelf..."
+          ></textarea>
         </div>
 
         <button
