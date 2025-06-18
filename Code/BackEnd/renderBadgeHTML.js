@@ -27,10 +27,21 @@ async function renderBadgeHTML(data, student = null) {
     if (student) {
       name = data.name || student.name || "Unknown";
       title = `${student.education || ""}`;
+      organization = student.school || "";
+    } else {
+      name = data.user_name || data.name || "Unknown";
+      title = data.sector || "";
+      organization = data.company_name || "";
+    }
+    roleText = "Student Badge";
   }
 
+  console.log("QR URL for badge:", qrUrl);
+  console.log("Badge name:", name, "| title:", title, "| org:", organization);
+  qrDataURL = await QRCode.toDataURL(qrUrl);
+
   return `
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -121,8 +132,14 @@ async function renderBadgeHTML(data, student = null) {
     </div>
 
     <div class="content">
-      ${title ? `<p><strong>${title}</strong></p>` : ''}
-      ${organization ? `<p>${organization}</p>` : ''}
+      ${
+        title
+          ? `<p>
+            <strong>${title}</strong>
+          </p>`
+          : ""
+      }
+      ${organization ? `<p>${organization}</p>` : ""}
       <p class="role-text">${roleText}</p>
     </div>
 
@@ -133,7 +150,7 @@ async function renderBadgeHTML(data, student = null) {
   </div>
 </body>
 </html>
-  `;
+`;
 }
 
 module.exports = renderBadgeHTML;
