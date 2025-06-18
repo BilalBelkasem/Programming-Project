@@ -1,20 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../Css/ProfielBedrijven.css';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
+import axios from 'axios';
 
-export default function ProfielBedrijven() {
+export default function ProfielBedrijven({ user }) {
   const [formData, setFormData] = useState({
-    name: '',
+    booth_contact_name: '',
+    booth_contact_email: '',
+    invoice_contact_name: '',
+    invoice_contact_email: '',
     companyName: '',
-    function: '',
-    email: '',
-    linkedin: '',
+    website: '',
     about: '',
+    phone_number: '', // toegevoegd
     lookingFor: [],
     domains: [],
     profilePicture: null,
   });
+
+  useEffect(() => {
+    if (!user || !user.id) {
+      window.location.href = '/login';
+      return;
+    }
+
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get(`/api/company-details/user/${user.id}`);
+
+        setFormData({
+          booth_contact_name: data.booth_contact_name || '',
+          booth_contact_email: data.booth_contact_email || '',
+          invoice_contact_name: data.invoice_contact_name || '',
+          invoice_contact_email: data.invoice_contact_email || '',
+          companyName: data.company_name || '',
+          website: data.website || '',
+          about: data.about || '',
+          phone_number: data.phone_number || '', // toegevoegd
+          profilePicture: data.logo || null,
+          lookingFor: Array.isArray(data.lookingFor) ? data.lookingFor : [],
+          domains: Array.isArray(data.domains) ? data.domains : [],
+        });
+      } catch (error) {
+        console.error('Fout bij ophalen company details:', error);
+        alert('Kon profiel niet laden.');
+      }
+    };
+
+    fetchData();
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,9 +76,36 @@ export default function ProfielBedrijven() {
     }));
   };
 
-  const handleSubmit = () => {
-    alert('Wijzigingen bevestigd!');
-    console.log(formData);
+  const handleSubmit = async () => {
+    if (!user || !user.id) {
+      alert('Je bent niet ingelogd');
+      return;
+    }
+
+    const payload = {
+      booth_contact_name: formData.booth_contact_name,
+      booth_contact_email: formData.booth_contact_email,
+      invoice_contact_name: formData.invoice_contact_name,
+      invoice_contact_email: formData.invoice_contact_email,
+      company_name: formData.companyName,
+      website: formData.website,
+      about: formData.about,
+      phone_number: formData.phone_number, // toegevoegd
+      lookingFor: formData.lookingFor,
+      domains: formData.domains,
+    };
+
+    try {
+      await axios.put(`/api/company-details/${user.id}`, payload);
+      alert('Wijzigingen succesvol opgeslagen!');
+    } catch (error) {
+      if (error.response) {
+        console.error("Server error:", error.response.data);
+      } else {
+        console.error(error.message);
+      }
+      alert('Er is iets misgegaan bij opslaan');
+    }
   };
 
   const handleLogout = () => {
@@ -52,6 +114,10 @@ export default function ProfielBedrijven() {
     window.location.href = '/login';
   };
 
+  if (!user || user.role !== 'bedrijf') {
+    return <p>Je bent niet ingelogd als bedrijf.</p>;
+  }
+
   return (
     <div className="page-wrapper">
       <header className="header">
@@ -59,7 +125,7 @@ export default function ProfielBedrijven() {
         <nav className="nav">
           <Link to="/dashboard" className="navLink">Info</Link>
           <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/favorieten" className="navLink">studenten</Link>
+          <Link to="/favorieten" className="navLink">Studenten</Link>
           <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
         </nav>
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
@@ -72,61 +138,85 @@ export default function ProfielBedrijven() {
             alt="Bedrijfsfoto"
             className="circle"
           />
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handleImageUpload} 
-            className="upload-btn" 
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="upload-btn"
           />
         </div>
 
         <div className="profile-grid">
           <div className="field">
-            <label><strong>voornaamnaam + Achternaam:</strong></label>
-            <input 
-              name="name" 
-              value={formData.name} 
-              onChange={handleChange}
-              placeholder="name"
-            />
-          </div>
-                <div className="field">
             <label><strong>Bedrijfsnaam:</strong></label>
-            <input 
-              name="companyName" 
-              value={formData.companyName} 
+            <input
+              name="companyName"
+              value={formData.companyName}
               onChange={handleChange}
               placeholder="Bedrijfsnaam"
             />
           </div>
           <div className="field">
-            <label><strong>Functie:</strong></label>
-            <input 
-              name="function" 
-              value={formData.function} 
+            <label><strong>Website / LinkedIn URL:</strong></label>
+            <input
+              name="website"
+              value={formData.website}
               onChange={handleChange}
-              placeholder="Functie"
+              placeholder="Website of LinkedIn URL"
             />
           </div>
-          <div className="field full">
-            <label><strong>E-mail:</strong></label>
-            <input 
-              name="email" 
+
+          <div className="field">
+            <label><strong>Algemene contactpersoon naam:</strong></label>
+            <input
+              name="booth_contact_name"
+              value={formData.booth_contact_name}
+              onChange={handleChange}
+              placeholder="Naam contactpersoon"
+            />
+          </div>
+          <div className="field">
+            <label><strong>Algemene contactpersoon email:</strong></label>
+            <input
+              name="booth_contact_email"
               type="email"
-              value={formData.email} 
+              value={formData.booth_contact_email}
               onChange={handleChange}
-              placeholder="E-mail adres"
+              placeholder="Email contactpersoon"
             />
           </div>
-          <div className="field full">
-            <label><strong>LinkedIn (optioneel):</strong></label>
-            <input 
-              name="linkedin" 
-              value={formData.linkedin} 
+
+          <div className="field">
+            <label><strong>Facturatie contactpersoon naam:</strong></label>
+            <input
+              name="invoice_contact_name"
+              value={formData.invoice_contact_name}
               onChange={handleChange}
-              placeholder="LinkedIn profiel URL"
+              placeholder="Naam facturatiecontact"
             />
           </div>
+          <div className="field">
+            <label><strong>Facturatie email:</strong></label>
+            <input
+              name="invoice_contact_email"
+              type="email"
+              value={formData.invoice_contact_email}
+              onChange={handleChange}
+              placeholder="Email facturatie"
+            />
+          </div>
+        </div>
+
+        {/* Phone number above 'Over het bedrijf' */}
+        <div className="field">
+          <label><strong>Telefoonnummer verantwoordelijke:</strong></label>
+          <input
+            name="phone_number"
+            type="text"
+            value={formData.phone_number}
+            onChange={handleChange}
+            placeholder="Telefoonnummer verantwoordelijke"
+          />
         </div>
 
         <div className="section">
