@@ -12,7 +12,7 @@ const BedrijvenController = require('../Controller/BedrijvenController'); // ✅
 const studentAdmin = require('../Controller/StudentAdmin');
 const bedrijfAdmin = require('../Controller/BedrijfAdmin');
 const CompanyProfileController = require('../Controller/companyProfileController');
-
+const MijnProfielController = require('../Controller/mijnprofiel');
 
 // PUBLIC ROUTES
 router.post('/register', StudentRegistratieController.register);
@@ -25,7 +25,9 @@ router.get('/studenten', authenticateToken, studentAdmin.getAllStudents);
 router.get('/bedrijven', authenticateToken,  bedrijfAdmin.getAllCompanies);
 router.delete('/bedrijven/:id', authenticateToken, bedrijfAdmin.deleteCompany);
 router.get('/company-profile', authenticateToken, isCompany, CompanyProfileController.getCompanyProfile);
-router.put('/company-profile', authenticateToken, isCompany, CompanyProfileController.updateCompanyProfile);
+router.put('/company-profile', authenticateToken, CompanyProfileController.updateCompanyProfile);
+router.get('/mijnprofiel', authenticateToken, MijnProfielController.getStudentProfile);
+router.put('/mijnprofiel', authenticateToken, MijnProfielController.updateStudentProfile);
 
 
 router.get('/profile', authenticateToken, (req, res) => {
@@ -39,5 +41,6 @@ router.delete('/favorieten/:companyId', FavorietenController.deleteFavoriet);
 
 // ✅ BEDRIJVEN ROUTE
 router.get('/open-bedrijven', BedrijvenController.getBedrijven);
+
 
 module.exports = router;
