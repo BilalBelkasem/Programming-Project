@@ -35,10 +35,20 @@ export default function ProfielBedrijven() {
           companyName: data.company_name || '',
           function: data.function || '',
           email: data.email || '',
-          linkedin: data.linkedin || '',
+          linkedin: data.linkedin_url || '',
           about: data.about || '',
-          lookingFor: data.looking_for?.split(',') || [],
-          domains: data.domains?.split(',') || [],
+          lookingFor: [
+            ...(data.zoek_jobstudent ? ['Jobstudent'] : []),
+            ...(data.zoek_connecties ? ['Connecties'] : []),
+            ...(data.zoek_stage ? ['Stage'] : []),
+            ...(data.zoek_voltijd ? ['Voltijds personeel'] : [])
+          ],
+          domains: [
+            ...(data.domein_data ? ['Data'] : []),
+            ...(data.domein_netwerking ? ['Netwerking'] : []),
+            ...(data.domein_ai ? ['AI / Robotica'] : []),
+            ...(data.domein_software ? ['Software'] : [])
+          ],
           profilePicture: null
         }));
       } catch (err) {
@@ -79,12 +89,11 @@ export default function ProfielBedrijven() {
       const payload = {
         name: formData.name,
         company_name: formData.companyName,
-        function: formData.function,
         email: formData.email,
         linkedin: formData.linkedin,
         about: formData.about,
-        looking_for: formData.lookingFor.join(','),
-        domains: formData.domains.join(',')
+        lookingFor: formData.lookingFor, 
+        domains: formData.domains        
       };
 
       await axios.put('http://localhost:5000/api/company-profile', payload, {
