@@ -4,8 +4,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import '../Css/LoginPagina.css';
 import logo from '../../assets/logo Erasmus.png';
 
-const baseURL = 'http://192.168.0.50:5000'; // Jouw backend IP en poort
-
 export default function LoginPagina({ onLogin }) {
   const [email, setEmail] = useState('');
   const [wachtwoord, setWachtwoord] = useState('');
@@ -19,7 +17,7 @@ export default function LoginPagina({ onLogin }) {
     setIsLoading(true);
 
     try {
-      const response = await axios.post(`${baseURL}/api/login`, {
+      const response = await axios.post('http://localhost:5000/api/login', {
         email,
         password: wachtwoord,
       });
@@ -27,15 +25,16 @@ export default function LoginPagina({ onLogin }) {
       if (response.data?.token && response.data?.user) {
         const { token, user } = response.data;
 
-        // Save token and user in localStorage
+        // Save to localStorage
         localStorage.setItem('token', token);
         localStorage.setItem('user', JSON.stringify(user));
 
+        // Avoid loops from parent useEffect
         if (typeof onLogin === 'function') {
-          setTimeout(() => onLogin(user), 0); // voorkom render loop
+          setTimeout(() => onLogin(user), 0); // ❗ prevent render loop
         }
 
-        // Redirect op basis van rol
+        // Redirect based on role
         const { role } = user;
         if (role === 'admin') {
           navigate('/admin');
