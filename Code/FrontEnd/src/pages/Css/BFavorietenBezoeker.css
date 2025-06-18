@@ -100,3 +100,50 @@
 .actionButton.secondary:hover {
   background-color: #019875;
 }
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 8px;
+    gap: 0;
+  }
+  .logo {
+    height: 32px;
+    margin-bottom: 8px;
+  }
+  .nav {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+  .navLink {
+    font-size: 15px;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
+  }
+  .main {
+    padding: 10px 4px;
+  }
+  .studentenContainer {
+    flex-direction: column !important;
+    gap: 10px;
+    width: 100%;
+    padding: 0;
+  }
+  .studentCard {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+  }
+  .title {
+    font-size: 20px;
+  }
+}

@@ -13,30 +13,74 @@
 
 .header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  background-color: #dcdcdc;
-  padding: 10px 20px;
-  border-bottom: 2px solid #ccc;
+  align-items: center;
+  padding: 20px 60px;
+  background-color: #f9f9f9;
+}
+
+.header-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.header-section.left {
+  justify-content: flex-start;
+}
+.header-section.center {
+  justify-content: center;
+}
+.header-section.right {
+  justify-content: flex-end;
 }
 
 .logo {
-  height: 40px;
+  max-height: 60px;
+  object-fit: contain;
 }
 
-.nav {
+/* NAVIGATIEKNOPPEN */
+.nav-center {
   display: flex;
-  justify-content: space-evenly;
-  flex-grow: 1;
-  margin: 0 40px;
+  gap: 40px;
+  align-items: center;
 }
 
-.navLink {
+.nav-btn {
   text-decoration: none;
-  color: #000000;
-  font-weight: bold;
+  color: black;
   font-size: 16px;
-  padding: 8px 12px;
+  font-weight: bold;
+  padding: 10px 16px;
+  border-radius: 6px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-btn.active {
+  background-color: #C8102E;
+  color: white;
+  border-radius: 20px;
+}
+
+.nav-btn:not(.active):hover {
+  color: #C8102E;
+}
+
+.nav-btn:not(.active)::after {
+  content: "";
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  left: 0;
+  bottom: 0;
+  background-color: #C8102E;
+  transition: width 0.3s ease;
+}
+
+.nav-btn:not(.active):hover::after {
+  width: 100%;
 }
 
 .logoutIcon {
@@ -112,4 +156,51 @@
 /* ❤️ Als het bedrijf geliket is */
 .likeButton.liked {
   color: red; /* rood als geliket */
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px;
+    gap: 0;
+  }
+  .logo {
+    height: 32px;
+    margin-bottom: 8px;
+  }
+  .nav {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+  .navLink {
+    font-size: 15px;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
+  }
+  .main {
+    padding: 12px 4px;
+    margin-top: 20px;
+  }
+  .bedrijvenContainer {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+    max-width: 100%;
+    padding: 0;
+  }
+  .bedrijfCard {
+    padding: 10px;
+    font-size: 15px;
+  }
+  .title {
+    font-size: 20px;
+  }
 }
