@@ -11,6 +11,8 @@ const FavorietenController = require('../Controller/FavorietenController');
 const BedrijvenController = require('../Controller/BedrijvenController'); // ✅ dit toegevoegd
 const studentAdmin = require('../Controller/StudentAdmin');
 const bedrijfAdmin = require('../Controller/BedrijfAdmin');
+const CompanyProfileController = require('../Controller/companyProfileController');
+
 
 // PUBLIC ROUTES
 router.post('/register', StudentRegistratieController.register);
@@ -22,6 +24,9 @@ router.get('/protected', authenticateToken, StudentRegistratieController.getProt
 router.get('/studenten', authenticateToken, studentAdmin.getAllStudents);
 router.get('/bedrijven', authenticateToken,  bedrijfAdmin.getAllCompanies);
 router.delete('/bedrijven/:id', authenticateToken, bedrijfAdmin.deleteCompany);
+router.get('/company-profile', authenticateToken, isCompany, CompanyProfileController.getCompanyProfile);
+router.put('/company-profile', authenticateToken, isCompany, CompanyProfileController.updateCompanyProfile);
+
 
 router.get('/profile', authenticateToken, (req, res) => {
   res.json({ message: 'Protected profile route for logged-in user', user: req.user });
