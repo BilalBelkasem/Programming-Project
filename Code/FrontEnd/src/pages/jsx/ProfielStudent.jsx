@@ -17,8 +17,6 @@ export default function ProfielStudent({ user }) {
     profilePicture: null,
   });
 
-  const [errors, setErrors] = useState({});
-
   useEffect(() => {
     if (user && user.id) {
       fetch(`/api/mijnprofiel/${user.id}`)
@@ -47,22 +45,8 @@ export default function ProfielStudent({ user }) {
     }
   }, [user]);
 
-  const validateEmail = (email) => {
-    if (!email) return "Email is verplicht";
-    const re = /\S+@\S+\.\S+/;
-    if (!re.test(email)) return "Ongeldig emailadres";
-    return "";
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Bij email: meteen validatie doen
-    if (name === 'email') {
-      const emailError = validateEmail(value);
-      setErrors(prev => ({ ...prev, email: emailError }));
-    }
-
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -85,51 +69,46 @@ export default function ProfielStudent({ user }) {
         : [...prev[field], value]
     }));
   };
+const handleSubmit = async () => {
+  if (!user || !user.id) {
+    alert('Geen gebruiker ingelogd!');
+    return;
+  }
 
-  const handleSubmit = async () => {
-    const emailError = validateEmail(formData.email);
-    if (emailError) {
-      setErrors(prev => ({ ...prev, email: emailError }));
-      alert('Vul een geldig emailadres in.');
-      return;
-    }
-
-    if (!user || !user.id) {
-      alert('Geen gebruiker ingelogd!');
-      return;
-    }
-
-    const updatedData = {
-      name: formData.name,
-      email: formData.email,
-      school: formData.school,
-      direction: formData.direction,
-      year: formData.year,
-      about: formData.about,
-      linkedin: formData.linkedin,
-      lookingFor: formData.lookingFor,
-      domain: formData.domain,
-    };
-
-    try {
-      const res = await fetch(`/api/mijnprofiel/${user.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedData)
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Server response:", errorText);
-        throw new Error('Update mislukt');
-      }
-
-      alert('Wijzigingen succesvol bevestigd!');
-    } catch (err) {
-      console.error(err);
-      alert('Fout bij opslaan van profielgegevens');
-    }
+  // Zorg dat je de correcte property names gebruikt
+  const updatedData = {
+    name: formData.name,
+    email: formData.email,
+    school: formData.school,
+    direction: formData.direction,
+    year: formData.year,
+    about: formData.about,
+    linkedin: formData.linkedin,
+    lookingFor: formData.lookingFor,  // array, bv ["Jobstudent", "Stage"]
+    domain: formData.domain,          // array, bv ["Data", "Software"]
   };
+
+  try {
+    const res = await fetch(`/api/mijnprofiel/${user.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedData)
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("Server response:", errorText);
+      throw new Error('Update mislukt');
+    }
+
+    alert('Wijzigingen succesvol bevestigd!');
+  } catch (err) {
+    console.error(err);
+    alert('Fout bij opslaan van profielgegevens');
+  }
+};
+
+
 
   const handleLogout = () => {
     alert('Uitgelogd');
@@ -170,12 +149,7 @@ export default function ProfielStudent({ user }) {
         <div className="form-grid">
           <div className="left">
             <label>Voornaam + Achternaam</label>
-            <input
-              name="name"
-              value={formData.name}
-              readOnly
-              className="readonly-input"
-            />
+            <input name="name" value={formData.name} onChange={handleChange} />
 
             <label>School (optioneel)</label>
             <input name="school" value={formData.school} onChange={handleChange} />
@@ -191,15 +165,8 @@ export default function ProfielStudent({ user }) {
             <label>LinkedIn (optioneel)</label>
             <input name="linkedin" value={formData.linkedin} onChange={handleChange} />
 
-            <label>Email <span style={{ color: 'red' }}>*</span></label>
-            <input
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={errors.email ? 'input-error' : ''}
-              required
-            />
-            {errors.email && <div className="error-text">{errors.email}</div>}
+            <label>Email</label>
+            <input name="email" value={formData.email} onChange={handleChange} />
           </div>
 
           <div className="right">
@@ -251,14 +218,7 @@ export default function ProfielStudent({ user }) {
           ></textarea>
         </div>
 
-        <button
-          className="confirm-btn"
-          onClick={handleSubmit}
-          disabled={!!errors.email || !formData.email}
-          title={(!formData.email || errors.email) ? "Vul een geldig emailadres in" : ""}
-        >
-          Bevestig wijzigingen
-        </button>
+        <button className="confirm-btn" onClick={handleSubmit}>Bevestig wijzigingen</button>
       </div>
     </div>
   );

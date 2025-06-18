@@ -33,6 +33,6 @@ router.get('/favorieten/:studentId', FavorietenController.getFavorieten);
 router.delete('/favorieten/:companyId', FavorietenController.deleteFavoriet);
 
 // ✅ BEDRIJVEN ROUTE
-router.get('/bedrijven', BedrijvenController.getBedrijven);
+router.get('/open-bedrijven', BedrijvenController.getBedrijven);
 
 module.exports = router;
