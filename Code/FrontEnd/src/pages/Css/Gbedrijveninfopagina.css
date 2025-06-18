@@ -1,4 +1,13 @@
-/* HEADER CONTAINER */
+/* === ALGEMENE PAGINAOPMAAK === */
+.pageWrapper {
+  background-color: #f8f8f8;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === HEADER === */
 .header {
   display: flex;
   align-items: center;
@@ -7,23 +16,20 @@
   padding: 20px 60px;
 }
 
-/* LOGO */
 .logo {
   height: auto;
   max-height: 80px;
   object-fit: contain;
 }
 
-/* NAVIGATION LINKS */
-.nav-links {
+/* === NAVIGATIE === */
+.nav {
   display: flex;
-  gap: 40px; /* ruimte tussen knoppen */
+  gap: 40px;
   align-items: center;
-  margin-right: 200px;
 }
 
-/* ALGEMENE KNOPSTIJL */
-.nav-btn {
+.nav-link {
   text-decoration: none;
   color: black;
   font-size: 16px;
@@ -34,20 +40,17 @@
   transition: all 0.3s ease;
 }
 
-/* ACTIEVE KNOP */
-.nav-btn.active {
+.nav-link.active {
   background-color: #C8102E;
   color: white;
   border-radius: 20px;
 }
 
-/* HOVER (enkel op niet-actieve knoppen) */
-.nav-btn:not(.active):hover {
+.nav-link:not(.active):hover {
   color: #C8102E;
 }
 
-/* HOVER-ONDERLIJNING */
-.nav-btn:not(.active)::after {
+.nav-link:not(.active)::after {
   content: "";
   position: absolute;
   width: 0%;
@@ -58,54 +61,66 @@
   transition: width 0.3s ease;
 }
 
-.nav-btn:not(.active):hover::after {
+.nav-link:not(.active):hover::after {
   width: 100%;
 }
-  .main {
-    padding: 40px;
-  }
-  
-  .title {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  .bedrijvenContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  
-  .bedrijfCard {
-    background-color: #f5f5f5;
-    padding: 20px;
-    border-radius: 10px;
-    width: 250px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .bedrijfNaam {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 8px;
-  }
-  
-  .bedrijfBeschrijving {
-    margin-bottom: 10px;
-    color: #555;
-  }
-  
-  .tagContainer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-  
-  .tag {
-    background-color: #ddd;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-  }
-  
+
+/* === MAIN CONTENT === */
+.main {
+  padding: 40px 80px;
+  flex: 1;
+}
+
+.title {
+  font-size: 28px;
+  margin-bottom: 30px;
+  color: #C8102E;
+  text-align: center;
+}
+
+.bedrijvenContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+}
+
+.bedrijfCard {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 260px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.bedrijfCard:hover {
+  transform: translateY(-4px);
+}
+
+.bedrijfNaam {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #2d3436;
+}
+
+.bedrijfBeschrijving {
+  margin-bottom: 12px;
+  color: #555;
+  font-size: 14px;
+}
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  background-color: #eee;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #444;
+}

@@ -30,7 +30,7 @@ export default function UPlatteGrond({ onLogout }) {
           <Link to="/bedrijven" className="navLink">Bedrijven</Link>
           <Link to="/plattegrond" className="navLink">Plattegrond</Link>
           <Link to="/favorieten" className="navLink">Favorieten</Link>
-          <Link to="/mijn-profiel" className="navLink">mijn profiel</Link>
+          <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
         </nav>
 
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
