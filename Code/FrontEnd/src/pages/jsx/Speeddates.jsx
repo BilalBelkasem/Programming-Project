@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../../assets/logo Erasmus.png';
+import logo from '../../assets/logoerasmus.png';
 import '../Css/Speeddates.css';
 
 const Speeddates = () => {

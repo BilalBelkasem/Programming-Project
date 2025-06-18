@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import plattegrondImg from "../../assets/plattegrond.png";
-import logo from "../../assets/logo Erasmus.png";
+import logo from "../../assets/logoerasmus.png";
 import "../Css/GPlatteGrond.css";
 
 const legendItems = [
@@ -15,7 +15,7 @@ export default function GPlatteGrond({ onLogout }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    if (onLogout) onLogout(); // roep App.jsx logout functie aan
+    if (onLogout) onLogout();
     navigate("/login");
   };
 
@@ -23,14 +23,20 @@ export default function GPlatteGrond({ onLogout }) {
     <div className="uplattegrond-wrapper">
       {/* Header */}
       <header className="header">
-        <img src={logo} alt="Erasmus Logo" className="logo" />
+        <div className="header-section left">
+          <img src={logo} alt="Erasmus Logo" className="logo" />
+        </div>
 
-        <nav className="nav-links">
-  <Link to="/" className="nav-btn">info</Link>
-  <Link to="/GBedrijven" className="nav-btn">bedrijven</Link>
-  <Link to="/g-plattegrond" className="nav-btn active">plattegrond</Link>
-  <Link to="/login" className="nav-btn">login/registeren</Link>
-</nav>
+        <div className="header-section center">
+          <nav className="nav-center">
+            <Link to="/" className="nav-btn">info</Link>
+            <Link to="/GBedrijven" className="nav-btn">bedrijven</Link>
+            <Link to="/g-plattegrond" className="nav-btn active">plattegrond</Link>
+            <Link to="/login" className="nav-btn">login/registeren</Link>
+          </nav>
+        </div>
+
+        <div className="header-section right"></div>
       </header>
 
       {/* Inhoud */}

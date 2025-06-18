@@ -1,7 +1,7 @@
 import React from 'react';
 import '../Css/UProfielBedrijfView.css';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/logo Erasmus.png'; // pas het pad aan indien nodig
+import logo from '../../assets/logoerasmus.png'; // pas het pad aan indien nodig
 
 export default function UBedrijfView({ company }) {
   if (!company) {

@@ -1,70 +1,66 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../../assets/logo Erasmus.png';
-import '../css/UBedrijven.css';
+import logo from '../../assets/logoerasmus.png';
+import '../css/Gbedrijveninfopagina.css';
+import axios from 'axios';
 
-export default function UBedrijven({ onLogout }) {
+export default function GBedrijven({ onLogout }) {
   const navigate = useNavigate();
+  const [bedrijven, setBedrijven] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/open-bedrijven');
+        setBedrijven(res.data);
+      } catch (err) {
+        console.error('Fout bij ophalen bedrijven:', err);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleLogout = () => {
     if (onLogout) onLogout();
     navigate("/login");
   };
 
-  const bedrijven = [
-    {
-      id: 1,
-      naam: 'TechNova',
-      beschrijving: 'Wij zijn gespecialiseerd in AI-oplossingen voor de zorgsector.',
-      tags: ['AI', 'Healthcare', 'Backend'],
-    },
-    {
-      id: 2,
-      naam: 'WebFlex',
-      beschrijving: 'Frontend development agency met focus op React en UX design.',
-      tags: ['Frontend', 'React', 'UX/UI'],
-    },
-    {
-      id: 3,
-      naam: 'DataCore',
-      beschrijving: 'Big Data platformen en analyses voor de retailsector.',
-      tags: ['Data', 'Backend', 'Retail'],
-    },
-    {
-      id: 4,
-      naam: 'colruyt',
-      beschrijving: 'onderhoud van alle sysemen',
-      tags: ['Data', 'Retail'],
-    }
-  ];
-
   return (
-    <div className="pageWrapper">
+    <div className="pagina-wrapper">
       <header className="header">
-        <img src={logo} alt="Erasmus Logo" className="logo" />
-        <nav className="nav spaced">
-        <Link to="/" className="nav-link active">info</Link>
-        <Link to="/GBedrijven" className="nav-link">bedrijven</Link>
-        <Link to="/g-plattegrond" className="nav-link">plattegrond</Link>
-        <Link to="/login" className="nav-link highlight">login/registeren</Link>
-        </nav>
+        <div className="header-section left">
+          <img src={logo} alt="Erasmus Logo" className="logo" />
+        </div>
+        <div className="header-section center">
+          <nav className="nav-center">
+            <Link to="/" className="nav-btn">info</Link>
+            <Link to="/GBedrijven" className="nav-btn active">bedrijven</Link>
+            <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
+            <Link to="/login" className="nav-btn">login/registeren</Link>
+          </nav>
+        </div>
+        <div className="header-section right"></div>
       </header>
 
-      <main className="main">
-        <h2 className="title">Ontdek bedrijven</h2>
+      <main className="main-content">
+        <h2 className="page-title">Ontdek bedrijven</h2>
         <div className="bedrijvenContainer">
-          {bedrijven.map((bedrijf) => (
-            <div key={bedrijf.id} className="bedrijfCard">
-              <h3 className="bedrijfNaam">{bedrijf.naam}</h3>
-              <p className="bedrijfBeschrijving">{bedrijf.beschrijving}</p>
-              <div className="tagContainer">
-                {bedrijf.tags.map((tag, index) => (
-                  <span key={index} className="tag">{tag}</span>
-                ))}
+          {bedrijven.length === 0 ? (
+            <p style={{ color: 'gray' }}>Geen bedrijven gevonden...</p>
+          ) : (
+            bedrijven.map((bedrijf) => (
+              <div key={bedrijf.id} className="bedrijfCard">
+                <h3 className="bedrijfNaam">{bedrijf.company_name}</h3>
+                <p className="bedrijfBeschrijving">{bedrijf.sector}</p>
+                <div className="tagContainer">
+                  {bedrijf.tags?.split(',').map((tag, index) => (
+                    <span key={index} className="tag">{tag.trim()}</span>
+                  ))}
+                </div>
               </div>
-              {/* Like knop verwijderd */}
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </main>
     </div>

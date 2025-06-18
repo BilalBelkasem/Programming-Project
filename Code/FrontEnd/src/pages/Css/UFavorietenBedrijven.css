@@ -112,3 +112,50 @@
 .actionButton:hover {
   background-color: #c0392b !important; /* Donkerder rood */
 }
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px;
+    gap: 0;
+  }
+  .logo {
+    height: 32px;
+    margin-bottom: 8px;
+  }
+  .nav {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+  .navLink {
+    font-size: 15px;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
+  }
+  .main {
+    padding: 12px 4px;
+    margin-top: 20px;
+  }
+  .bedrijvenContainer {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+    max-width: 100%;
+    padding: 0;
+  }
+  .bedrijfCard {
+    padding: 10px;
+    font-size: 15px;
+  }
+  .title {
+    font-size: 20px;
+  }
+}

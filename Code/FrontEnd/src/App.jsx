@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import GInfoPagina from './pages/jsx/GInfoPagina.jsx';
 import UInfoPagina from './pages/jsx/UInfoPagina.jsx';
@@ -18,9 +18,8 @@ import UPlatteGrond from './pages/jsx/UPlatteGrond.jsx';
 import UFavorietenBedrijven from './pages/jsx/UFavorietenBedrijven.jsx';
 import GPlatteGrond from "./pages/jsx/GPlatteGrond.jsx"; 
 import BFavorietenStudenten from './pages/jsx/BFavorietenBezoeker.jsx';
-import StudentProfiel from '../src/pages/jsx/StudentProfiel.jsx';
+import StudentProfiel from './pages/jsx/StudentProfiel.jsx';
 import BedrijfProfiel from './pages/jsx/BedrijfProfiel.jsx';
-import Speeddates from './pages/jsx/Speeddates.jsx'; // ✅ NIEUW
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
@@ -44,14 +43,6 @@ export default function App() {
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUser(null);
-  };
-
-  const ProfileRedirect = () => {
-    if (!isLoggedIn || !user) return <Navigate to="/login" />;
-    if (user.role === 'student') return <Navigate to={`/mijn-profiel`} />;
-    if (user.role === 'bedrijf') return <Navigate to={`/mijn-profiel`} />;
-    if (user.role === 'admin') return <Navigate to="/admin" />;
-    return <Navigate to="/login" />;
   };
 
   function ProtectedRoute({ children, role, idParam }) {
@@ -82,17 +73,17 @@ export default function App() {
     <Routes>
       <Route path="/" element={<GInfoPagina />} />
 
- <Route
-  path="/login"
-  element={
-    <LoginPagina
-      onLogin={(userData) => {
-        setUser(userData);
-        setIsLoggedIn(true);
-      }}
-    />
-  }
-/>
+      <Route
+        path="/login"
+        element={
+          <LoginPagina
+            onLogin={(userData) => {
+              setUser(userData);
+              setIsLoggedIn(true);
+            }}
+          />
+        }
+      />
 
       <Route path="/bedrijf-registratie" element={<CompanyRegistrationForm />} />
       <Route path="/registreer" element={<ClientRegistration />} />
@@ -123,7 +114,10 @@ export default function App() {
         element={isLoggedIn && user?.role === 'admin' ? <AdminBadge /> : <Navigate to="/login" />}
       />
 
+      {/* ✅ Beide studentprofielroutes */}
       <Route path="/studentprofiel" element={<StudentProfiel />} />
+      <Route path="/studentprofiel/:id" element={<StudentProfiel />} />
+
       <Route path="/bedrijfprofiel" element={<BedrijfProfiel />} />
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
@@ -157,14 +151,6 @@ export default function App() {
           ) : (
             <Navigate to="/login" />
           )
-        }
-      />
-      <Route
-        path="/speeddates"
-        element={
-          <ProtectedRoute role={['student', 'bedrijf']}>
-            <Speeddates />
-          </ProtectedRoute>
         }
       />
     </Routes>

@@ -1,32 +1,51 @@
 .uplattegrond-wrapper {
   background-color: #f8f8f8;
   font-family: sans-serif;
-
 }
 
-/* HERGEBRUIK header layout van UBedrijven */
-/* HEADER CONTAINER */
+/* ========== HEADER STRUCTUUR ========== */
+
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px 60px;
+  background-color: #f9f9f9;
 }
 
-.nav-links {
+/* Structuur in 3 zones */
+.header-section {
+  flex: 1;
   display: flex;
-  gap: 80px;
-  margin-right: 200px;
+  align-items: center;
+}
+
+.header-section.left {
+  justify-content: flex-start;
+}
+
+.header-section.center {
+  justify-content: center;
+}
+
+.header-section.right {
+  justify-content: flex-end;
 }
 
 /* LOGO */
 .logo {
-  height: auto;
-  max-height: 100px;
+  max-height: 60px;
+  max-width: 120px;
   object-fit: contain;
 }
 
-
+/* NAV LINKS CENTRAAL */
+.nav-center {
+  display: flex;
+  gap: 200px;
+  align-items: center;
+  justify-content: center;
+}
 
 /* ALGEMENE KNOPSTIJL */
 .nav-btn {
@@ -47,12 +66,12 @@
   border-radius: 20px;
 }
 
-/* HOVER (enkel op niet-actieve knoppen) */
+/* HOVER EFFECT */
 .nav-btn:not(.active):hover {
   color: #C8102E;
 }
 
-/* HOVER-ONDERLIJNING */
+/* HOVER ONDERSTREPING */
 .nav-btn:not(.active)::after {
   content: "";
   position: absolute;
@@ -68,8 +87,8 @@
   width: 100%;
 }
 
+/* ========== PLATTEGROND CONTENT ========== */
 
-/* KAART + LEGENDE */
 .uplattegrond-kader {
   margin: 1rem;
   padding: 1.5rem;
@@ -78,7 +97,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* TITEL */
 .uplattegrond-title-box {
   margin-bottom: 1rem;
   background-color: #f0f0f0;
@@ -93,14 +111,12 @@
   color: #222;
 }
 
-/* INHOUD VERDELING */
 .uplattegrond-content-box {
   display: flex;
   gap: 1rem;
   height: calc(100vh - 200px);
 }
 
-/* PLATTEGROND */
 .uplattegrond-image {
   width: 75%;
   height: 100%;
@@ -109,7 +125,6 @@
   border: 1px solid #ddd;
 }
 
-/* LEGENDE */
 .uplattegrond-legend-box {
   width: 25%;
   background-color: #fafafa;
@@ -140,4 +155,53 @@
 .legend-number {
   font-weight: bold;
   margin-right: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 8px;
+    gap: 0;
+  }
+  .logo {
+    max-height: 40px;
+    margin-bottom: 8px;
+  }
+  .nav-center {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-btn {
+    font-size: 15px;
+    width: 90%;
+    max-width: 320px;
+    text-align: center;
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
+  }
+  .uplattegrond-kader {
+    padding: 0.5rem;
+  }
+  .uplattegrond-content-box {
+    flex-direction: column;
+    gap: 0.5rem;
+    height: auto;
+  }
+  .uplattegrond-image, .uplattegrond-legend-box {
+    width: 100%;
+    height: auto;
+    margin-bottom: 8px;
+  }
+  .legend-title {
+    font-size: 1rem;
+  }
+  .legend-item {
+    font-size: 0.95rem;
+  }
 }
