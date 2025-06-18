@@ -65,6 +65,22 @@ export default function InfoPagina() {
             <h3>Meer info of vragen?</h3>
             <p><a href="mailto:carlijn.fronik@ehb.be">carlijn.fronik@ehb.be</a></p>
           </div>
+  </section>
+
+  <div className="footer-bottom">
+    <p>© 2025 Erasmushogeschool Brussel – Design & Technologie</p>
+  </div>
+
+  <div className="easter-egg">
+    <a
+      href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      don't klik
+    </a>
+  </div>
+</footer>
         </div>
       </footer>
     </div>
