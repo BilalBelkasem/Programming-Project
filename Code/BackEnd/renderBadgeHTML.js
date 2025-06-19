@@ -1,29 +1,47 @@
-const QRCode = require('qrcode');
+const QRCode = require("qrcode");
+
+// CHANGE THIS to your computer's local IP address for mobile QR scanning
+const LOCAL_IP = "localhost"; // <-- Vervang dit door jouw lokale IP!
+const FRONTEND_PORT = "5173";
 
 async function renderBadgeHTML(data, student = null) {
-  const isNewFormat = student === null;
+  let qrDataURL, name, title, organization, roleText, qrUrl;
 
-  let qrDataURL, name, title, organization, roleText;
-
-  if (isNewFormat) {
-    name = data.user_name || 'Unknown';
-    title = data.sector || '';
-    organization = data.company_name || '';
-    qrDataURL = await QRCode.toDataURL(
-      data.website || `https://careerlaunch.be/verify/${data.id}`
-    );
-    // Role badge text
-    roleText = data.role === 'bedrijf' ? 'Exhibitor Badge' : 'Badge';
+  // Dynamisch: bedrijf of student
+  if (
+    (data.role && data.role === "bedrijf") ||
+    (!student && data.company_name)
+  ) {
+    // Bedrijf
+    qrUrl = `http://${LOCAL_IP}:${FRONTEND_PORT}/bedrijfprofiel/${data.id}`;
+    name = data.user_name || "Unknown";
+    title = data.sector || "";
+    organization = data.company_name || "";
+    roleText = "Exhibitor Badge";
   } else {
-    name = data.name;
-    title = `${student.education}`;
-    organization = student.school;
-    qrDataURL = await QRCode.toDataURL(`https://careerlaunch.be/student/${data.id}`);
-    roleText = 'Student Badge';
+    // Student
+    // Gebruik altijd het juiste ID
+    const studentId =
+      student && student.user_id ? student.user_id : data.id || data.user_id;
+    qrUrl = `http://${LOCAL_IP}:${FRONTEND_PORT}/studentprofiel/${studentId}`;
+    if (student) {
+      name = data.name || student.name || "Unknown";
+      title = `${student.education || ""}`;
+      organization = student.school || "";
+    } else {
+      name = data.user_name || data.name || "Unknown";
+      title = data.sector || "";
+      organization = data.company_name || "";
+    }
+    roleText = "Student Badge";
   }
 
+  console.log("QR URL for badge:", qrUrl);
+  console.log("Badge name:", name, "| title:", title, "| org:", organization);
+  qrDataURL = await QRCode.toDataURL(qrUrl);
+
   return `
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html>
 <head>
   <style>
@@ -114,8 +132,14 @@ async function renderBadgeHTML(data, student = null) {
     </div>
 
     <div class="content">
-      ${title ? `<p><strong>${title}</strong></p>` : ''}
-      ${organization ? `<p>${organization}</p>` : ''}
+      ${
+        title
+          ? `<p>
+            <strong>${title}</strong>
+          </p>`
+          : ""
+      }
+      ${organization ? `<p>${organization}</p>` : ""}
       <p class="role-text">${roleText}</p>
     </div>
 
@@ -126,7 +150,7 @@ async function renderBadgeHTML(data, student = null) {
   </div>
 </body>
 </html>
-  `;
+`;
 }
 
 module.exports = renderBadgeHTML;

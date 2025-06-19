@@ -1,4 +1,4 @@
- import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logoerasmus.png';
 import '../Css/BedrijfProfiel.css';
@@ -48,13 +48,27 @@ export default function BedrijfProfiel() {
         </div>
 
         <div className="profile-grid">
-          <div className="field"><strong>Bedrijfsnaam:</strong> {bedrijf.companyName || <em>–</em>}</div>
-          <div className="field"><strong>Functie:</strong> {bedrijf.function || <em>–</em>}</div>
-          <div className="field"><strong>E-mail:</strong> {bedrijf.email || <em>–</em>}</div>
+          <div className="field">
+            <div className="value-bar">
+              {bedrijf.companyName || "Bedrijfsnaam:"}
+            </div>
+          </div>
+          <div className="field">
+            <strong>Contactpersoon:</strong>
+            <div className="value-bar">
+              {bedrijf.function || <em>–</em>}
+            </div>
+          </div>
+          <div className="field">
+            <div className="value-bar">
+              {bedrijf.email || "E-mail:"}
+            </div>
+          </div>
           {bedrijf.linkedin && (
             <div className="field full">
-              <strong>LinkedIn:</strong>{" "}
-              <a href={bedrijf.linkedin} target="_blank" rel="noreferrer">{bedrijf.linkedin}</a>
+              <div className="value-bar">
+                <a href={bedrijf.linkedin} target="_blank" rel="noreferrer">{bedrijf.linkedin}</a>
+              </div>
             </div>
           )}
         </div>

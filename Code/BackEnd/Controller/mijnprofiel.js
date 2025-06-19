@@ -1,6 +1,9 @@
-const db = require('../config/db');
+const express = require('express');
+const router = express.Router();
 
-exports.getStudentProfile = async (req, res) => {
+// Je hoeft db hier niet te importeren, want je gebruikt req.db (komt uit server.js middleware)
+
+const getStudentProfile = async (req, res) => {
   const userId = req.user.id;
 
   try {
@@ -35,7 +38,7 @@ exports.getStudentProfile = async (req, res) => {
   }
 };
 
-exports.updateStudentProfile = async (req, res) => {
+const updateStudentProfile = async (req, res) => {
   const userId = req.user.id;
   const {
     name, email, school, education, year, about, linkedin_url,
@@ -96,3 +99,10 @@ exports.updateStudentProfile = async (req, res) => {
     res.status(500).json({ error: 'Serverfout' });
   }
 };
+
+// Koppel de functies aan routes
+router.get('/', getStudentProfile);
+router.put('/', updateStudentProfile);
+
+// Export de router
+module.exports = router;
