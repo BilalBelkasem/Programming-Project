@@ -13,8 +13,7 @@ export default function ProfielBedrijven() {
     linkedin: '',
     about: '',
     lookingFor: [],
-    domains: [],
-    profilePicture: null,
+    domains: []
   });
 
   const navigate = useNavigate();
@@ -48,8 +47,7 @@ export default function ProfielBedrijven() {
             ...(data.domein_netwerking ? ['Netwerking'] : []),
             ...(data.domein_ai ? ['AI / Robotica'] : []),
             ...(data.domein_software ? ['Software'] : [])
-          ],
-          profilePicture: null
+          ]
         }));
       } catch (err) {
         console.error('Profiel ophalen mislukt:', err);
@@ -64,15 +62,6 @@ export default function ProfielBedrijven() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData(prev => ({
-        ...prev,
-        profilePicture: URL.createObjectURL(file),
-      }));
-    }
-  };
 
   const handleCheckboxChange = (e, field) => {
     const value = e.target.value;
@@ -129,20 +118,6 @@ export default function ProfielBedrijven() {
       </header>
 
       <main className="container">
-        <div className="profile-picture">
-          <img
-            src={formData.profilePicture || '/company-placeholder.jpg'}
-            alt="Bedrijfsfoto"
-            className="circle"
-          />
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handleImageUpload} 
-            className="upload-btn" 
-          />
-        </div>
-
         <div className="profile-grid">
           <div className="field">
             <label><strong>voornaamnaam + Achternaam:</strong></label>

@@ -14,8 +14,7 @@ export default function ProfielStudent({ user }) {
     email: '',
     about: '',
     lookingFor: [],
-    domains: [],
-    profilePicture: null,
+    domains: []
   });
 
   useEffect(() => {
@@ -29,6 +28,7 @@ export default function ProfielStudent({ user }) {
           const domains = [];
           if (data.domain_data) domains.push("Data");
           if (data.domain_networking) domains.push("Netwerking");
+          
           if (data.domain_ai) domains.push("AI / Robotica");
           if (data.domain_software) domains.push("Software");
 
@@ -48,7 +48,6 @@ export default function ProfielStudent({ user }) {
             about: data.about || '',
             lookingFor,
             domains,
-            profilePicture: null,
           });
         })
         .catch(err => {
@@ -140,15 +139,6 @@ export default function ProfielStudent({ user }) {
 
       <main className="main-content">
         <div className="container">
-          <div className="profile-picture">
-            <img
-              src={formData.profilePicture || '/profile.jpg'}
-              alt="Profile"
-              className="circle"
-            />
-            <input type="file" accept="image/*" onChange={handleImageUpload} className="upload-btn" />
-          </div>
-
           <div className="form-grid">
             <div className="left">
               <label>Voornaam + Achternaam</label>
