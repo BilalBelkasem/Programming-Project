@@ -27,16 +27,20 @@ const Speeddates = () => {
   }, []);
 
   const handleNewReservationClick = (company) => {
-    setSelectedCompany(company);
-    axios.get(`/api/companies/${company._id}/slots`)
-      .then(res => {
-        const available = res.data.filter(slot => 
-          !myReservations.some(r => r.slot._id === slot._id)
-        );
-        setAvailableSlots(available);
-      })
-      .catch(err => console.error(err));
-  };
+  setSelectedCompany(company);
+  axios.get(`/api/companies/${company._id}/slots`)
+    .then(res => {
+      const available = res.data.filter(slot => {
+        // Filter out slots that are already reserved
+        const isAvailable = !myReservations.some(r => r.slot._id === slot._id);
+        // Filter for fixed date (March 13, 2026)
+        const slotDate = new Date(slot.datetime).toISOString().split('T')[0];
+        return isAvailable && slotDate === '2026-03-13';
+      });
+      setAvailableSlots(available);
+    })
+    .catch(err => console.error(err));
+};
 
   const handleReservation = (slot) => {
     axios.post('/api/reservations', {
@@ -61,15 +65,16 @@ const Speeddates = () => {
     navigate("/login");
   };
 
-  const formatDateTime = (datetime) => {
-    const d = new Date(datetime);
-    return {
-      date: d.toLocaleDateString('nl-NL', {
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-      }),
-      time: d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
-    };
+const formatDateTime = (datetime) => {
+  const d = new Date(datetime);
+  return {
+    date: d.toLocaleDateString('nl-NL', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+    }),
+    time: d.getHours().toString().padStart(2, '0') + ':' + 
+          d.getMinutes().toString().padStart(2, '0')
   };
+};
 
   const groupSlotsByDate = (slots) => {
     return slots.reduce((acc, slot) => {

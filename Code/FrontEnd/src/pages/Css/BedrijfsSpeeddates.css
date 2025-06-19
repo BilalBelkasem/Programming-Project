@@ -1,0 +1,191 @@
+/* Header styles */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.logo {
+  height: 50px;
+  width: auto;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #4338ca;
+  font-weight: 600;
+  flex-grow: 1;
+  text-align: center;
+}
+
+.logoutIcon {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.2s;
+}
+
+.logoutIcon:hover {
+  color: #4338ca;
+}
+
+/* Main content */
+.speeddates-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.speeddates-subtitle {
+  color: #6b7280;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Timeslot generator */
+.timeslot-generator {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 2rem;
+}
+
+.timeslot-generator h2 {
+  margin-top: 0;
+  color: #4338ca;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.fixed-date {
+  padding: 0.5rem;
+  color: #111827;
+  font-weight: 500;
+}
+
+.form-group input {
+  padding: 0.6rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 300px;
+  font-size: 1rem;
+}
+
+.generate-btn {
+  background-color: #6366f1;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1rem;
+  transition: background-color 0.2s;
+}
+
+.generate-btn:hover {
+  background-color: #4f46e5;
+}
+
+.generate-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.info-text {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+/* Slots section */
+.slots-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 2rem;
+}
+
+.slots-section h2 {
+  color: #4338ca;
+  margin-top: 0;
+}
+
+.slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.slot-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #f9fafb;
+}
+
+.slot-time {
+  font-family: monospace;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+  color: #111827;
+}
+
+.delete-slot-btn {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.delete-slot-btn:hover {
+  background-color: #fecaca;
+}
+
+.no-slots {
+  color: #6b7280;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* Time input styling (24-hour format) */
+.time-input-24h {
+  font-family: monospace;
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hide AM/PM in time inputs */
+.time-input-24h::-webkit-datetime-edit-ampm-field {
+  display: none;
+}
+
+/* Firefox time input styling */
+input[type="time"] {
+  -moz-appearance: textfield;
+}
