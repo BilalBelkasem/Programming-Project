@@ -119,7 +119,7 @@ export default function App() {
         }
       />
 
-      <Route path="/bedrijfprofiel" element={<BedrijfProfiel />} />
+      <Route path="/bedrijfprofiel/:id" element={<BedrijfProfiel />} />
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
 

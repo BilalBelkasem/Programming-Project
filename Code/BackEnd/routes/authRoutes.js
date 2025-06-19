@@ -18,6 +18,7 @@ const MijnProfielController = require('../Controller/mijnprofiel');
 router.post('/register', StudentRegistratieController.register);
 router.post('/register-company', BedrijfRegistratieController.registerCompany);
 router.post('/login', LoginController.login);
+router.get('/bedrijfprofiel/:id', CompanyProfileController.getCompanyProfileById);
 
 // PROTECTED ROUTES
 router.get('/protected', authenticateToken, StudentRegistratieController.getProtectedData);
