@@ -1,17 +1,20 @@
-// server.js
+console.log('===> SERVER BESTAND IS GEACTIVEERD');
 const express = require('express');
 const cors = require('cors');
+const multer = require('multer');
+const upload = multer();
 require('dotenv').config();
 
 const db = require('./config/db');
 
-// Route imports
-const authRoutes         = require('./routes/authRoutes');
-const companiesRoutes    = require('./companies');
-const studentRoutes      = require('./students');
-const badgeRoutes        = require('./badge');
-const mijnProfielRoutes  = require('./Controller/mijnprofiel');
-
+// Routes importeren
+const authMiddleware       = require('./middleware/authMiddleware');
+const authRoutes           = require('./routes/authRoutes');
+const companiesRoutes      = require('./companies');
+const studentRoutes        = require('./students');
+const badgeRoutes          = require('./badge');
+const mijnProfielRoutes    = require('./Controller/mijnprofiel');
+const studentDetailsRoutes = require('./Controller/studentDetails');
 
 const app = express();
 
@@ -20,13 +23,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public', { index: 'public.html' }));
 
-// DB beschikbaar maken in elke request
+// DB beschikbaar maken per request
 app.use((req, res, next) => {
   req.db = db;
   next();
 });
 
-// ✅ Alle routes zitten hierin: login, registratie, profiel, studenten, bedrijven, favorieten, enz.
+// Routes mounten met auth middleware waar nodig
 app.use('/api', authRoutes);
 app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
