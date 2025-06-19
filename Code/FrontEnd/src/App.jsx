@@ -143,9 +143,9 @@ export default function App() {
         element={
           isLoggedIn && user ? (
             user.role === 'student' ? (
-              <UFavorietenBedrijven favorieten={[]} onUnsave={() => {}} />
+              <UFavorietenBedrijven onLogout={handleLogout} />
             ) : user.role === 'bedrijf' ? (
-              <BFavorietenStudenten favorieten={[]} onUnsave={() => {}} />
+              <UFavorietenBedrijven onLogout={handleLogout} />
             ) : (
               <Navigate to="/login" replace />
             )

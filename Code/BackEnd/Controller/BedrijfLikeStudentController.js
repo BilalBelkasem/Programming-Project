@@ -58,4 +58,30 @@ router.get('/check', async (req, res) => {
   }
 });
 
+// Haal alle favoriete studenten van een bedrijf op
+router.get('/favorites/:companyId', async (req, res) => {
+  const { companyId } = req.params;
+  try {
+    const [rows] = await req.db.query(
+      `SELECT 
+         u.id, 
+         u.name AS full_name, 
+         s.school, 
+         s.education, 
+         s.year, 
+         s.about, 
+         s.linkedin_url
+       FROM favorites f
+       JOIN users u ON f.student_id = u.id
+       LEFT JOIN students_details s ON s.user_id = u.id
+       WHERE f.company_id = ? AND f.bedrijf_liked_student = 1`,
+      [companyId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error('SQL-fout bij ophalen favoriete studenten:', err);
+    res.status(500).json({ error: 'Fout bij ophalen favoriete studenten', details: err.message });
+  }
+});
+
 module.exports = router; 
