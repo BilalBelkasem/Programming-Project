@@ -14,26 +14,18 @@ export default function UInfoPagina({ onLogout }) {
 
   return (
     <div className="pagina-wrapper">
-      {/* Header met logout */}
+      {/* Header */}
       <header className="header">
-        <div className="header-section left">
-          <img src={logo} alt="Erasmus Logo" className="logo" />
-        </div>
-
-        <div className="header-section center">
-          <nav className="nav-center">
-            <Link to="/dashboard" className="nav-btn active">info</Link>
-            <Link to="/bedrijven" className="nav-btn">bedrijven</Link>
-            <Link to="/speeddates" className="nav-btn">speeddates</Link>
-            <Link to="/plattegrond" className="nav-btn">plattegrond</Link>
-            <Link to="/favorieten" className="nav-btn">favorieten</Link>
-            <Link to="/mijn-profiel" className="nav-btn">mijn profiel</Link>
-          </nav>
-        </div>
-
-        <div className="header-section right">
-          <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
-        </div>
+        <img src={logo} alt="Erasmus Logo" className="logo" />
+        <nav className="nav">
+          <Link to="/dashboard" className="navLink">Info</Link>
+          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
+          <Link to="/speeddates" className="navLink">Speeddates</Link>
+          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
+          <Link to="/favorieten" className="navLink">Favorieten</Link>
+          <Link to="/mijn-profiel" className="navLink">Mijn Profiel</Link>
+        </nav>
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
       {/* Main banner + info */}
