@@ -75,103 +75,99 @@ const Speeddates = () => {
   };
 
   return (
-    <div className="speeddates-container">
-
-      {/* HEADER */}
+    <div className="pagina-wrapper">
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
-          <Link to="/dashboard" className="navLink">Info</Link>
-          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
-          <Link to="/speeddates" className="navLink">Speeddates</Link>
-          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/UFavorietenBedrijven" className="navLink">Favorieten</Link>
-          <Link to="/mijn-profiel" className="navLink">Mijn Profiel</Link>
+          <Link to="/dashboard" className="nav-btn">Info</Link>
+          <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
+          <Link to="/speeddates" className="nav-btn active">Speeddates</Link>
+          <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
+          <Link to="/favorieten" className="nav-btn">Favorieten</Link>
+          <Link to="/mijn-profiel" className="nav-btn">Mijn Profiel</Link>
         </nav>
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
-      {/* TITEL + SEARCH */}
-      <h1 className="speeddates-title">Speeddate Reservaties</h1>
-      <p className="speeddates-subtitle">Reserveer je speeddate met innovatieve bedrijven</p>
-      <input
-        className="speeddates-search"
-        type="text"
-        value={searchQuery}
-        placeholder="Zoek bedrijf, locatie, of industrie..."
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
+      <main className="main-content">
+        <h1 className="speeddates-title">Speeddate Reservaties</h1>
+        <p className="speeddates-subtitle">Reserveer je speeddate met innovatieve bedrijven</p>
+        <input
+          className="speeddates-search"
+          type="text"
+          value={searchQuery}
+          placeholder="Zoek bedrijf, locatie, of industrie..."
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
 
-      {/* BEDRIJVEN GRID */}
-      <div className="speeddates-grid">
-        {filteredCompanies.map(c => (
-          <div key={c._id} className="company-card" onClick={() => handleCompanyClick(c)}>
-            <h3 className="company-name">{c.name}</h3>
-            <p className="company-description">{c.description}</p>
-            <div className="company-meta">
-              <span>{c.industry}</span>
-              <span>{c.location}</span>
-              <span>{c.contact}</span>
-            </div>
-            <span className="session-badge">5 min sessies</span>
-          </div>
-        ))}
-      </div>
-
-      {/* SLOT MODAL */}
-      {selectedCompany && (
-        <div className="slot-modal">
-          <div className="slot-modal-content">
-            <button className="close-btn" onClick={() => setSelectedCompany(null)}>×</button>
-            <h2>{selectedCompany.name}</h2>
-            {Object.entries(groupSlotsByDate(timeSlots)).map(([date, slots]) => (
-              <div key={date} className="slot-group">
-                <h4 className="slot-date">{formatDateTime(slots[0].datetime).date}</h4>
-                <div className="slot-list">
-                  {slots.map(slot => {
-                    const { time } = formatDateTime(slot.datetime);
-                    return (
-                      <button
-                        key={slot._id}
-                        disabled={!slot.available}
-                        className={`slot-button ${slot.available ? '' : 'disabled'}`}
-                        onClick={() => handleReservation(slot)}
-                      >
-                        {time}
-                      </button>
-                    );
-                  })}
-                </div>
+        <div className="speeddates-grid">
+          {filteredCompanies.map(c => (
+            <div key={c._id} className="company-card" onClick={() => handleCompanyClick(c)}>
+              <h3 className="company-name">{c.name}</h3>
+              <p className="company-description">{c.description}</p>
+              <div className="company-meta">
+                <span>{c.industry}</span>
+                <span>{c.location}</span>
+                <span>{c.contact}</span>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* RESERVATIES */}
-      <div className="reservations-section">
-        <div className="reservations-header">
-          <h2 className="reservations-title">📅 Mijn Reservaties</h2>
-          <button className="mini-refresh-btn" onClick={() => window.location.reload()}>↻</button>
+              <span className="session-badge">5 min sessies</span>
+            </div>
+          ))}
         </div>
 
-        {myReservations.length === 0 ? (
-          <p className="no-reservations">Je hebt nog geen reservaties gemaakt.</p>
-        ) : (
-          <div className="reservations-list">
-            {myReservations.map(r => {
-              const { date, time } = formatDateTime(r.slot.datetime);
-              return (
-                <div key={r._id} className="reservation-card">
-                  <h4>{r.company.name}</h4>
-                  <p>{date} om {time}</p>
-                  <button onClick={() => handleCancelReservation(r._id)}>Annuleren</button>
+        {selectedCompany && (
+          <div className="slot-modal">
+            <div className="slot-modal-content">
+              <button className="close-btn" onClick={() => setSelectedCompany(null)}>×</button>
+              <h2>{selectedCompany.name}</h2>
+              {Object.entries(groupSlotsByDate(timeSlots)).map(([date, slots]) => (
+                <div key={date} className="slot-group">
+                  <h4 className="slot-date">{formatDateTime(slots[0].datetime).date}</h4>
+                  <div className="slot-list">
+                    {slots.map(slot => {
+                      const { time } = formatDateTime(slot.datetime);
+                      return (
+                        <button
+                          key={slot._id}
+                          disabled={!slot.available}
+                          className={`slot-button ${slot.available ? '' : 'disabled'}`}
+                          onClick={() => handleReservation(slot)}
+                        >
+                          {time}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         )}
-      </div>
+
+        <div className="reservations-section">
+          <div className="reservations-header">
+            <h2 className="reservations-title">📅 Mijn Reservaties</h2>
+            <button className="mini-refresh-btn" onClick={() => window.location.reload()}>↻</button>
+          </div>
+
+          {myReservations.length === 0 ? (
+            <p className="no-reservations">Je hebt nog geen reservaties gemaakt.</p>
+          ) : (
+            <div className="reservations-list">
+              {myReservations.map(r => {
+                const { date, time } = formatDateTime(r.slot.datetime);
+                return (
+                  <div key={r._id} className="reservation-card">
+                    <h4>{r.company.name}</h4>
+                    <p>{date} om {time}</p>
+                    <button onClick={() => handleCancelReservation(r._id)}>Annuleren</button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 };

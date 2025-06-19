@@ -35,9 +35,7 @@ export default function UBedrijven({ onLogout }) {
         setBedrijven(bedrijvenRes.data);
 
         const favorietenRes = await axios.get(`http://localhost:5000/api/favorieten/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const geliketeIds = favorietenRes.data.map((bedrijf) => bedrijf.id);
         setFavorieten(geliketeIds);
@@ -54,14 +52,8 @@ export default function UBedrijven({ onLogout }) {
         setDropdownOpen(false);
       }
     }
-    if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [dropdownOpen]);
 
   const handleFilterChange = (key) => {
@@ -72,7 +64,7 @@ export default function UBedrijven({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) onLogout();
-    navigate("/login");
+    navigate('/login');
   };
 
   const filteredBedrijven = selectedFilters.length === 0
@@ -89,9 +81,7 @@ export default function UBedrijven({ onLogout }) {
     try {
       if (isFavoriet) {
         await axios.delete(`http://localhost:5000/api/favorieten/${bedrijfId}?student_id=${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setFavorieten(prev => prev.filter(id => id !== bedrijfId));
       } else {
@@ -99,9 +89,7 @@ export default function UBedrijven({ onLogout }) {
           student_id: user.id,
           company_id: bedrijfId
         }, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setFavorieten(prev => [...prev, bedrijfId]);
       }
@@ -111,55 +99,34 @@ export default function UBedrijven({ onLogout }) {
   };
 
   return (
-    <div className="pageWrapper">
+    <div className="pagina-wrapper">
       <header className="header">
-        <div className="header-section left">
-          <img src={logo} alt="Erasmus Logo" className="logo" />
-        </div>
-
-        <div className="header-section center">
-          <nav className="nav-center">
-            <Link to="/dashboard" className="nav-btn">Info</Link>
-            <Link to="/bedrijven" className="nav-btn active">Bedrijven</Link>
-            <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
-            <Link to="/favorieten" className="nav-btn">Favorieten</Link>
-            <Link to="/mijn-profiel" className="nav-btn">Mijn profiel</Link>
-          </nav>
-        </div>
-
-        <div className="header-section right">
-          <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
-        </div>
+        <img src={logo} alt="Erasmus Logo" className="logo" />
+        <nav className="nav">
+          <Link to="/dashboard" className="nav-btn">Info</Link>
+          <Link to="/bedrijven" className="nav-btn active">Bedrijven</Link>
+          <Link to="/speeddates" className="nav-btn">Speeddates</Link>
+          <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
+          <Link to="/favorieten" className="nav-btn">Favorieten</Link>
+          <Link to="/mijn-profiel" className="nav-btn">Mijn Profiel</Link>
+        </nav>
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
-      <main className="main">
+      <main className="main-content">
         <h2 className="title">Ontdek bedrijven</h2>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 24 }}>
-          <div className="custom-dropdown-filter" ref={dropdownRef} style={{ position: 'relative' }}>
-            <button
-              className="dropdown-toggle"
-              onClick={() => setDropdownOpen((open) => !open)}
-              style={{ padding: '10px 18px', borderRadius: 8, border: '1px solid #bbb', background: '#eee', fontWeight: 'bold', fontSize: 18, minWidth: 160, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: 220 }}
-            >
-              Filter
-              <span style={{ marginLeft: 8 }}>{dropdownOpen ? '\u25B2' : '\u25BC'}</span>
-            </button>
-            {dropdownOpen && (
-              <div className="dropdown-menu" style={{ position: 'absolute', top: '100%', left: 0, background: '#ddd', borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', padding: 18, zIndex: 10, minWidth: 220, textAlign: 'left' }}>
-                <div style={{ marginBottom: 10, fontWeight: 'bold', fontSize: 15 }}>Type Kans</div>
+
+        <div className="filter-wrapper" ref={dropdownRef}>
+          <button className="dropdown-toggle" onClick={() => setDropdownOpen(!dropdownOpen)}>
+            Filter <span>{dropdownOpen ? '▲' : '▼'}</span>
+          </button>
+
+          {dropdownOpen && (
+            <div className="dropdown-menu">
+              <div className="dropdown-group">
+                <div className="group-title">Type Kans</div>
                 {TYPE_KANS.map((opt) => (
-                  <label key={opt.key} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, textAlign: 'left', width: '100%' }}>
-                    <input
-                      type="checkbox"
-                      checked={selectedFilters.includes(opt.key)}
-                      onChange={() => handleFilterChange(opt.key)}
-                    />
-                    {opt.label}
-                  </label>
-                ))}
-                <div style={{ margin: '12px 0 6px 0', fontWeight: 'bold', fontSize: 15 }}>IT Domein</div>
-                {IT_DOMEIN.map((opt) => (
-                  <label key={opt.key} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, textAlign: 'left', width: '100%' }}>
+                  <label key={opt.key} className="filter-label">
                     <input
                       type="checkbox"
                       checked={selectedFilters.includes(opt.key)}
@@ -169,12 +136,26 @@ export default function UBedrijven({ onLogout }) {
                   </label>
                 ))}
               </div>
-            )}
-          </div>
+              <div className="dropdown-group">
+                <div className="group-title">IT Domein</div>
+                {IT_DOMEIN.map((opt) => (
+                  <label key={opt.key} className="filter-label">
+                    <input
+                      type="checkbox"
+                      checked={selectedFilters.includes(opt.key)}
+                      onChange={() => handleFilterChange(opt.key)}
+                    />
+                    {opt.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+
         <div className="bedrijvenContainer">
           {filteredBedrijven.length === 0 ? (
-            <p style={{ color: 'gray' }}>Geen bedrijven gevonden...</p>
+            <p className="no-bedrijven">Geen bedrijven gevonden...</p>
           ) : (
             filteredBedrijven.map((bedrijf) => (
               <div key={bedrijf.id} className="bedrijfCard">

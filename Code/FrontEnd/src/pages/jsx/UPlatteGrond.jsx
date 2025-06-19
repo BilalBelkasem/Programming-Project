@@ -20,40 +20,32 @@ export default function UPlatteGrond({ onLogout }) {
   };
 
   return (
-    <div className="uplattegrond-wrapper">
-      {/* Nieuwe gestylede header */}
+    <div className="pagina-wrapper">
+      {/* Gestylede header */}
       <header className="header">
-        <div className="header-section left">
-          <img src={logo} alt="Erasmus Logo" className="logo" />
-        </div>
-
-        <div className="header-section center">
-          <nav className="nav-center">
-            <Link to="/dashboard" className="nav-btn">Info</Link>
-            <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
-            <Link to="/plattegrond" className="nav-btn active">Plattegrond</Link>
-            <Link to="/favorieten" className="nav-btn">Favorieten</Link>
-            <Link to="/mijn-profiel" className="nav-btn">Mijn profiel</Link>
-          </nav>
-        </div>
-
-        <div className="header-section right">
-          <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
-        </div>
+        <img src={logo} alt="Erasmus Logo" className="logo" />
+        <nav className="nav">
+          <Link to="/dashboard" className="nav-btn">Info</Link>
+          <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
+          <Link to="/speeddates" className="nav-btn">Speeddates</Link>
+          <Link to="/plattegrond" className="nav-btn active">Plattegrond</Link>
+          <Link to="/favorieten" className="nav-btn">Favorieten</Link>
+          <Link to="/mijn-profiel" className="nav-btn">Mijn Profiel</Link>
+        </nav>
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
-      {/* Inhoud */}
-      <div className="uplattegrond-kader">
-        <div className="uplattegrond-title-box">
-          <h1 className="uplattegrond-title">Plattegrond</h1>
-        </div>
-        <div className="uplattegrond-content-box">
+      {/* Inhoud plattegrond */}
+      <main className="main-content">
+        <h1 className="title">Plattegrond</h1>
+        <div className="plattegrond-container">
           <img
             src={plattegrondImg}
             alt="Plattegrond van de Career Launch"
-            className="uplattegrond-image"
+            className="plattegrond-image"
           />
-          <div className="uplattegrond-legend-box">
+
+          <div className="legend-box">
             <h2 className="legend-title">Legenda</h2>
             <ul className="legend-list">
               {legendItems.map((item) => (
@@ -64,7 +56,7 @@ export default function UPlatteGrond({ onLogout }) {
             </ul>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
