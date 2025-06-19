@@ -23,6 +23,7 @@ router.get('/bedrijfprofiel/:id', CompanyProfileController.getCompanyProfileById
 // PROTECTED ROUTES
 router.get('/protected', authenticateToken, StudentRegistratieController.getProtectedData);
 router.get('/studenten', authenticateToken, studentAdmin.getAllStudents);
+router.delete('/studenten/:id', authenticateToken, studentAdmin.deleteStudent);
 router.get('/bedrijven', authenticateToken,  bedrijfAdmin.getAllCompanies);
 router.delete('/bedrijven/:id', authenticateToken, bedrijfAdmin.deleteCompany);
 router.get('/company-profile', authenticateToken, isCompany, CompanyProfileController.getCompanyProfile);
