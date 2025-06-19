@@ -8,7 +8,6 @@ export default function ProfielBedrijven() {
   const [formData, setFormData] = useState({
     name: '',
     companyName: '',
-    function: '',
     email: '',
     linkedin: '',
     about: '',
