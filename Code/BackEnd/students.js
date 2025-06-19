@@ -5,7 +5,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const [students] = await req.db.query(`
-      SELECT u.id, u.name, s.school, s.richting, s.jaar, u.email
+      SELECT u.id, u.name, s.school, s.education, s.year, u.email
       FROM users u
       JOIN students_details s ON u.id = s.user_id
       WHERE u.role = 'student'
