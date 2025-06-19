@@ -113,7 +113,7 @@ export default function App() {
       <Route
         path="/studentprofiel/:id"
         element={
-          <ProtectedRoute role={['admin', 'student']} idParam={true}>
+          <ProtectedRoute role={['admin', 'student', 'bedrijf']} idParam={true}>
             <StudentProfiel />
           </ProtectedRoute>
         }
