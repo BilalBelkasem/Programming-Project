@@ -34,7 +34,7 @@ export default function ProfielBedrijven() {
           companyName: data.company_name || '',
           function: data.function || '',
           email: data.email || '',
-          linkedin: data.linkedin_url || '',
+          linkedin: data.linkedin || data.website || '', 
           about: data.about || '',
           lookingFor: [
             ...(data.zoek_jobstudent ? ['Jobstudent'] : []),
@@ -135,15 +135,6 @@ export default function ProfielBedrijven() {
               value={formData.companyName} 
               onChange={handleChange}
               placeholder="Bedrijfsnaam"
-            />
-          </div>
-          <div className="field">
-            <label><strong>Functie:</strong></label>
-            <input 
-              name="function" 
-              value={formData.function} 
-              onChange={handleChange}
-              placeholder="Functie"
             />
           </div>
           <div className="field full">

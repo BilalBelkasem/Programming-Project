@@ -20,6 +20,7 @@ exports.getCompanyProfile = async (req, res) => {
     // ✅ Converteer integers naar booleans
     res.json({
       ...row,
+      linkedin: row.website,
       zoek_jobstudent: row.zoek_jobstudent === 1,
       zoek_connecties: row.zoek_connecties === 1,
       zoek_stage: row.zoek_stage === 1,
