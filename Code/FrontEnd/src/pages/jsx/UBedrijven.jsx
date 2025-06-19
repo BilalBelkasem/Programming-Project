@@ -158,12 +158,21 @@ export default function UBedrijven({ onLogout }) {
             <p className="no-bedrijven">Geen bedrijven gevonden...</p>
           ) : (
             filteredBedrijven.map((bedrijf) => (
-              <div key={bedrijf.id} className="bedrijfCard">
+              <div
+                key={bedrijf.id}
+                className="bedrijfCard"
+                onClick={() => navigate(`/bedrijfprofiel/${bedrijf.user_id}`)}
+                style={{ cursor: 'pointer', position: 'relative' }}
+              >
                 <h3 className="bedrijfNaam">{bedrijf.company_name}</h3>
                 <p className="bedrijfBeschrijving">{bedrijf.sector}</p>
                 <button
-                  onClick={() => toggleLike(bedrijf.id)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Zorgt ervoor dat klik op hartje NIET navigeert
+                    toggleLike(bedrijf.id);
+                  }}
                   className={`likeButton ${favorieten.includes(bedrijf.id) ? 'liked' : ''}`}
+                  style={{ position: 'absolute', top: '10px', right: '10px' }}
                 >
                   ♥
                 </button>

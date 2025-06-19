@@ -3,7 +3,7 @@
 exports.getBedrijven = async (req, res) => {
   try {
     const [rows] = await req.db.execute(
-      'SELECT id, company_name, sector FROM companies_details'
+      'SELECT id, company_name, sector,user_id FROM companies_details'
     );
 
     console.log("✅ Resultaat van de database:", rows);
