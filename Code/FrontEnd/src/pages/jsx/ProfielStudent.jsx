@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logoerasmus.png';
 import '../Css/ProfielStudent.css';
+import axios from 'axios';
 
 export default function ProfielStudent({ user }) {
   const [formData, setFormData] = useState({
@@ -13,18 +14,34 @@ export default function ProfielStudent({ user }) {
     email: '',
     about: '',
     lookingFor: [],
-    domain: [],
+    domains: [],
     profilePicture: null,
   });
 
   useEffect(() => {
     if (user && user.id) {
-      fetch(`/api/mijnprofiel/${user.id}`)
+      const token = localStorage.getItem('token');
+      axios.get('/api/mijnprofiel', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
         .then(res => {
-          if (!res.ok) throw new Error('Failed to fetch profile');
-          return res.json();
-        })
-        .then(data => {
+          const data = res.data;
+
+          
+          const domains = [];
+          if (data.domain_data) domains.push("Data");
+          if (data.domain_networking) domains.push("Netwerking");
+          if (data.domain_ai) domains.push("AI / Robotica");
+          if (data.domain_software) domains.push("Software");
+
+          const lookingFor = [];
+          if (data.interest_jobstudent) lookingFor.push("Jobstudent");
+          if (data.interest_connect) lookingFor.push("Connecties");
+          if (data.interest_stage) lookingFor.push("Stage");
+          if (data.interest_job) lookingFor.push("Job");
+
           setFormData({
             name: data.name || '',
             school: data.school || '',
@@ -33,8 +50,8 @@ export default function ProfielStudent({ user }) {
             linkedin: data.linkedin_url || '',
             email: data.email || '',
             about: data.about || '',
-            lookingFor: data.lookingFor || [],
-            domain: data.domain || [],
+            lookingFor,
+            domains,
             profilePicture: null,
           });
         })
@@ -85,21 +102,17 @@ export default function ProfielStudent({ user }) {
       about: formData.about,
       linkedin: formData.linkedin,
       lookingFor: formData.lookingFor,
-      domain: formData.domain,
+      domains: formData.domains,
     };
 
     try {
-      const res = await fetch(`/api/mijnprofiel/${user.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedData)
+      const token = localStorage.getItem('token');
+      await axios.put('/api/mijnprofiel', updatedData, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
       });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Server response:", errorText);
-        throw new Error('Update mislukt');
-      }
 
       alert('Wijzigingen succesvol bevestigd!');
     } catch (err) {
@@ -184,8 +197,8 @@ export default function ProfielStudent({ user }) {
                   <input
                     type="checkbox"
                     value={option}
-                    checked={formData.domain.includes(option)}
-                    onChange={(e) => handleCheckboxChange(e, "domain")}
+                    checked={formData.domains.includes(option)}
+                    onChange={(e) => handleCheckboxChange(e, "domains")}
                   />
                   {option}
                 </label>

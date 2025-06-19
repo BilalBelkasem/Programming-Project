@@ -67,16 +67,11 @@ export default function CompanyRegistrationForm() {
       return;
     }
 
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      data.append(key, value);
-    });
-
     try {
       const response = await axios.post(
         'http://localhost:5000/api/register-company',
-        data,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        formData, // send as JSON
+        { headers: { 'Content-Type': 'application/json' } }
       );
 
       alert('Bedrijf succesvol geregistreerd!');
@@ -173,17 +168,6 @@ export default function CompanyRegistrationForm() {
           <option value="Marketing, full service">Marketing, full service</option>
           <option value="Andere">Andere</option>
         </select>
-      </div>
-
-      <div className="form-group">
-        <label htmlFor="logo">Upload uw bedrijfslogo</label>
-        <input
-          type="file"
-          id="logo"
-          name="logo"
-          accept="image/*"
-          onChange={handleChange}
-        />
       </div>
 
       <button type="submit" className="form-button">Registreren</button>

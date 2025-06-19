@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../Css/ProfielBedrijven.css';
-import { Link } from 'react-router-dom';
-import logo from '../../assets/logoerasmus.png';
+import { Link, useNavigate } from 'react-router-dom';
+import logo from '../../assets/logo Erasmus.png';
+import axios from 'axios';
 
 export default function ProfielBedrijven() {
   const [formData, setFormData] = useState({
@@ -15,6 +16,48 @@ export default function ProfielBedrijven() {
     domains: [],
     profilePicture: null,
   });
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/company-profile', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        const data = res.data;
+        setFormData(prev => ({
+          ...prev,
+          name: data.name || '',
+          companyName: data.company_name || '',
+          function: data.function || '',
+          email: data.email || '',
+          linkedin: data.linkedin_url || '',
+          about: data.about || '',
+          lookingFor: [
+            ...(data.zoek_jobstudent ? ['Jobstudent'] : []),
+            ...(data.zoek_connecties ? ['Connecties'] : []),
+            ...(data.zoek_stage ? ['Stage'] : []),
+            ...(data.zoek_voltijd ? ['Voltijds personeel'] : [])
+          ],
+          domains: [
+            ...(data.domein_data ? ['Data'] : []),
+            ...(data.domein_netwerking ? ['Netwerking'] : []),
+            ...(data.domein_ai ? ['AI / Robotica'] : []),
+            ...(data.domein_software ? ['Software'] : [])
+          ],
+          profilePicture: null
+        }));
+      } catch (err) {
+        console.error('Profiel ophalen mislukt:', err);
+      }
+    };
+
+    fetchProfile();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,9 +84,29 @@ export default function ProfielBedrijven() {
     }));
   };
 
-  const handleSubmit = () => {
-    alert('Wijzigingen bevestigd!');
-    console.log(formData);
+  const handleSubmit = async () => {
+    try {
+      const payload = {
+        name: formData.name,
+        company_name: formData.companyName,
+        email: formData.email,
+        linkedin: formData.linkedin,
+        about: formData.about,
+        lookingFor: formData.lookingFor, 
+        domains: formData.domains        
+      };
+
+      await axios.put('http://localhost:5000/api/company-profile', payload, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      alert('Profiel succesvol bijgewerkt!');
+    } catch (error) {
+      console.error('Update fout:', error);
+      alert('Er ging iets mis bij het bijwerken.');
+    }
   };
 
   const handleLogout = () => {
@@ -90,7 +153,7 @@ export default function ProfielBedrijven() {
               placeholder="name"
             />
           </div>
-                <div className="field">
+          <div className="field">
             <label><strong>Bedrijfsnaam:</strong></label>
             <input 
               name="companyName" 
