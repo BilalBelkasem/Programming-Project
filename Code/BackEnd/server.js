@@ -13,6 +13,7 @@ const studentRoutes        = require('./students');
 const badgeRoutes          = require('./badge');
 const mijnProfielRoutes    = require('./Controller/mijnprofiel');
 const studentDetailsRoutes = require('./Controller/studentDetails');
+const bedrijfLikeStudentRoutes = require('./Controller/BedrijfLikeStudentController');
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/mijnprofiel', authMiddleware.authenticateToken, mijnProfielRoutes);
 app.use('/api/student_details', studentDetailsRoutes);
+app.use('/api/bedrijf-like-student', bedrijfLikeStudentRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;

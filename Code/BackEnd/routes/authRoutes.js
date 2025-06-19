@@ -39,6 +39,10 @@ router.get('/profile', authenticateToken, (req, res) => {
 router.post('/favorieten', FavorietenController.addFavoriet);
 router.get('/favorieten/:studentId', FavorietenController.getFavorieten);
 router.delete('/favorieten/:companyId', FavorietenController.deleteFavoriet);
+// Bedrijf liket student
+router.post('/favorieten/bedrijf-like', FavorietenController.bedrijfLikeStudent);
+router.delete('/favorieten/bedrijf-unlike', FavorietenController.bedrijfUnlikeStudent);
+router.get('/favorieten/check-bedrijf-like', FavorietenController.checkBedrijfLikeStudent);
 
 // BEDRIJVEN ROUTE
 router.get('/open-bedrijven', BedrijvenController.getBedrijven);
