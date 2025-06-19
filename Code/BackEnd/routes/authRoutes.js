@@ -26,8 +26,7 @@ router.get('/bedrijven', authenticateToken,  bedrijfAdmin.getAllCompanies);
 router.delete('/bedrijven/:id', authenticateToken, bedrijfAdmin.deleteCompany);
 router.get('/company-profile', authenticateToken, isCompany, CompanyProfileController.getCompanyProfile);
 router.put('/company-profile', authenticateToken, CompanyProfileController.updateCompanyProfile);
-router.get('/mijnprofiel', authenticateToken, MijnProfielController.getStudentProfile);
-router.put('/mijnprofiel', authenticateToken, MijnProfielController.updateStudentProfile);
+
 
 
 router.get('/profile', authenticateToken, (req, res) => {
@@ -39,7 +38,7 @@ router.post('/favorieten', FavorietenController.addFavoriet);
 router.get('/favorieten/:studentId', FavorietenController.getFavorieten);
 router.delete('/favorieten/:companyId', FavorietenController.deleteFavoriet);
 
-// ✅ BEDRIJVEN ROUTE
+// BEDRIJVEN ROUTE
 router.get('/open-bedrijven', BedrijvenController.getBedrijven);
 
 
