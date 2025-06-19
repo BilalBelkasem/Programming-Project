@@ -15,7 +15,7 @@ const studentRoutes        = require('./students');
 const badgeRoutes          = require('./badge');
 const mijnProfielRoutes    = require('./Controller/mijnprofiel');
 const companySpeeddatesRoutes = require('./routes/companySpeeddates');
-
+const reservationsRoutes = require('./routes/reservationsRoutes'); 
 
 const app = express();
 
@@ -51,9 +51,8 @@ app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/mijnprofiel', mijnProfielRoutes);
 app.use('/api/company/speeddates', companySpeeddatesRoutes);
+app.use('/api/reservations', reservationsRoutes);
 
-
-console.log('Routes mounted: /api/company/speeddates');
 
 
 // Example: récupérer tous les users étudiants
@@ -170,6 +169,7 @@ app.post(
     }
   }
 );
+
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

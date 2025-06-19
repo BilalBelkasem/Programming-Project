@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../../assets/logoerasmus.png';
+import logo from '../../assets/logo Erasmus.png';
 import '../Css/Speeddates.css';
 
 const Speeddates = () => {
@@ -14,50 +14,85 @@ const Speeddates = () => {
 
   const navigate = useNavigate();
 
+  // In your Speeddates.jsx component
   useEffect(() => {
-    // Fetch companies
-    axios.get('/api/companies')
-      .then(res => setCompanies(res.data))
-      .catch(err => console.error(err));
-
-    // Fetch user reservations
-    axios.get('/api/reservations/user/me')
-      .then(res => setMyReservations(res.data))
-      .catch(err => console.error(err));
-  }, []);
+    const fetchData = async () => {
+      try {
+        const res = await axios.get('/api/reservations/me');
+        console.log('Response:', res.data); // Log response
+        setMyReservations(res.data);
+      } catch (err) {
+        console.error('Full error:', err);
+        console.error('Error response:', err.response); // Log detailed error
+        if (err.response?.status === 401) navigate('/login');
+      }
+    };
+    fetchData();
+  }, [navigate]);
 
   const handleNewReservationClick = (company) => {
-  setSelectedCompany(company);
-  axios.get(`/api/companies/${company._id}/slots`)
-    .then(res => {
-      const available = res.data.filter(slot => {
-        // Filter out slots that are already reserved
-        const isAvailable = !myReservations.some(r => r.slot._id === slot._id);
-        // Filter for fixed date (March 13, 2026)
-        const slotDate = new Date(slot.datetime).toISOString().split('T')[0];
-        return isAvailable && slotDate === '2026-03-13';
-      });
-      setAvailableSlots(available);
-    })
-    .catch(err => console.error(err));
-};
+    const companyId = company.id || company._id || company.user_id;
+    if (!companyId) {
+      console.error('Invalid company object:', company);
+      alert('Cannot load slots - missing company ID');
+      return;
+    }
 
-  const handleReservation = (slot) => {
-    axios.post('/api/reservations', {
-      slotId: slot._id,
-      companyId: selectedCompany._id,
-    }).then(res => {
-      setMyReservations(prev => [...prev, res.data]);
-      setAvailableSlots(prev => prev.filter(s => s._id !== slot._id));
-    }).catch(err => {
-      console.error('Error creating reservation:', err);
-      alert('Er is een fout opgetreden bij het maken van de reservatie');
-    });
+    setSelectedCompany(company);
+    axios.get(`/api/companies/${companyId}/slots`)
+      .then(res => {
+        const available = res.data.filter(slot => {
+          const isAvailable = !myReservations.some(r =>
+            (r.slot?.id === slot.id) || (r.slot?._id === slot._id)
+          );
+          const slotDate = new Date(slot.datetime).toISOString().split('T')[0];
+          return isAvailable && slotDate === '2026-03-13';
+        });
+        setAvailableSlots(available);
+      })
+      .catch(err => {
+        console.error('Error fetching slots:', err);
+        alert('Error loading available time slots');
+      });
   };
 
-  const handleCancelReservation = (id) => {
-    axios.delete(`/api/reservations/${id}`)
-      .then(() => setMyReservations(prev => prev.filter(r => r._id !== id)));
+  // For creating reservations
+  const handleReservation = async (slot) => {
+    try {
+      const res = await axios.post('/api/reservations', {
+        slotId: slot.id
+      });
+
+      setMyReservations(prev => [...prev, {
+        id: res.data.id,
+        slot_id: slot.id,
+        start_time: res.data.slot.start_time,
+        end_time: res.data.slot.end_time,
+        company: {
+          id: res.data.companyId,
+          name: res.data.slot.company_name
+        }
+      }]);
+
+      setAvailableSlots(prev => prev.filter(s => s.id !== slot.id));
+    } catch (err) {
+      console.error('Error creating reservation:', err);
+      alert(err.response?.data?.error || 'Reservation failed');
+    }
+  };
+
+  const handleCancelReservation = async (id) => {
+    try {
+      await axios.delete(`/api/reservations/${id}`);
+      setMyReservations(prev => prev.filter(r => r.id !== id));
+      if (selectedCompany) {
+        // Refresh available slots
+        handleNewReservationClick(selectedCompany);
+      }
+    } catch (err) {
+      console.error('Error cancelling reservation:', err);
+      alert('Annuleren mislukt');
+    }
   };
 
   const handleLogout = () => {
@@ -65,17 +100,25 @@ const Speeddates = () => {
     navigate("/login");
   };
 
-const formatDateTime = (datetime) => {
-  const d = new Date(datetime);
-  return {
-    date: d.toLocaleDateString('nl-NL', {
-      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-    }),
-    time: d.getHours().toString().padStart(2, '0') + ':' + 
-          d.getMinutes().toString().padStart(2, '0')
-  };
-};
+  const formatDateTime = (datetime) => {
+    // If datetime is already in "HH:mm" format (from backend)
+    if (typeof datetime === 'string' && datetime.match(/^\d{2}:\d{2}$/)) {
+      return {
+        time: datetime,
+        date: '13 maart 2026' // Hardcoded date
+      };
+    }
 
+    // If it's a Date object
+    const d = new Date(datetime);
+    const hours = d.getHours().toString().padStart(2, '0');
+    const minutes = d.getMinutes().toString().padStart(2, '0');
+
+    return {
+      date: '13 maart 2026', // Hardcoded date
+      time: `${hours}:${minutes}`
+    };
+  };
   const groupSlotsByDate = (slots) => {
     return slots.reduce((acc, slot) => {
       const key = new Date(slot.datetime).toDateString();
@@ -121,19 +164,19 @@ const formatDateTime = (datetime) => {
       {/* Companies grid */}
       <div className="speeddates-grid">
         {filteredCompanies.map(c => (
-          <div key={c._id} className="company-card">
+          <div key={c.id} className="company-card">
             <div className="company-card-header">
               <div className='company-header'>
-              <h3 className="company-name">{c.name}</h3>
-              <button 
-                className="new-reservation-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleNewReservationClick(c);
-                }}
-              >
-                +
-              </button>
+                <h3 className="company-name">{c.name}</h3>
+                <button
+                  className="new-reservation-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleNewReservationClick(c);
+                  }}
+                >
+                  +
+                </button>
               </div>
             </div>
             <p className="company-description">{c.description}</p>
@@ -153,7 +196,7 @@ const formatDateTime = (datetime) => {
           <div className="slot-modal-content">
             <button className="close-btn" onClick={() => setSelectedCompany(null)}>×</button>
             <h2>Reserveer bij {selectedCompany.name}</h2>
-            
+
             {availableSlots.length > 0 ? (
               Object.entries(groupSlotsByDate(availableSlots)).map(([date, slots]) => (
                 <div key={date} className="slot-group">

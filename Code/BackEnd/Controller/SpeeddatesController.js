@@ -12,6 +12,31 @@ app.get('/api/companies/:companyId/slots', async (req, res) => {
     res.status(500).json({ error: 'Server error fetching timeslots' });
   }
 });
+// Get all available slots for students
+app.get('/api/student/speeddates', async (req, res) => {
+  try {
+    const [slots] = await req.db.query(`
+      SELECT t.id, t.start_time, t.end_time, 
+             c.id as company_id, c.company_name, c.sector
+      FROM timeslots t
+      JOIN companies_details c ON t.company_id = c.id
+      WHERE t.available = 1
+      ORDER BY t.start_time
+    `);
+    
+    // Format times for frontend
+    const formattedSlots = slots.map(slot => ({
+      ...slot,
+      start_time: slot.start_time.substring(0, 5), // "HH:MM"
+      end_time: slot.end_time.substring(0, 5)
+    }));
+    
+    res.json(formattedSlots);
+  } catch (err) {
+    console.error('Error fetching available slots:', err);
+    res.status(500).json({ error: 'Server error fetching slots' });
+  }
+});
 
 // Create a new reservation
 app.post('/api/reservations', async (req, res) => {

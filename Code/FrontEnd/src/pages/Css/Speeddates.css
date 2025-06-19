@@ -1,10 +1,11 @@
 /* Pagina-opbouw */
 .speeddates-container {
-  background: #f3f6fc;
-  min-height: 100vh;
-  padding: 2rem;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Arial', sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
+
 
 /* Header */
 .header {
