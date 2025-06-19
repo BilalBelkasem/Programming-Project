@@ -158,7 +158,7 @@ export default function App() {
       <Route
         path="/speeddates"
         element={
-          <ProtectedRoute role={['student', 'bedrijf']}>
+          <ProtectedRoute role={['student']}>
             <Speeddates />
           </ProtectedRoute>
         }
@@ -166,7 +166,7 @@ export default function App() {
       <Route
         path="/bedrijf/speeddates"
         element={
-          <ProtectedRoute role="bedrijf">
+          <ProtectedRoute role={['bedrijf']}>
             <BedrijfsSpeeddates />
           </ProtectedRoute>
         }

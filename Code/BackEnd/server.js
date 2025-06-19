@@ -14,7 +14,8 @@ const companiesRoutes      = require('./companies');
 const studentRoutes        = require('./students');
 const badgeRoutes          = require('./badge');
 const mijnProfielRoutes    = require('./Controller/mijnprofiel');
-const studentDetailsRoutes = require('./Controller/studentDetails');
+const companySpeeddatesRoutes = require('./routes/companySpeeddates');
+
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/mijnprofiel', mijnProfielRoutes);
+app.use('/api/company/speeddates', companySpeeddatesRoutes)
 
 // Example: récupérer tous les users étudiants
 app.get('/api/users', async (req, res) => {
