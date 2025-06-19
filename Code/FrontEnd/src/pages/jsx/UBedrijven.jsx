@@ -1,13 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logoerasmus.png';
 import '../css/UBedrijven.css';
 import axios from 'axios';
 
+const TYPE_KANS = [
+  { key: 'zoek_jobstudent', label: 'Jobstudent' },
+  { key: 'zoek_connecties', label: 'Connecties' },
+  { key: 'zoek_stage', label: 'Stage' },
+  { key: 'zoek_job', label: 'Job' },
+];
+const IT_DOMEIN = [
+  { key: 'domein_data', label: 'Data' },
+  { key: 'domein_software', label: 'Software' },
+  { key: 'domein_netwerking', label: 'Netwerking' },
+  { key: 'domein_ai', label: 'Robotica / AI' },
+];
+
 export default function UBedrijven({ onLogout }) {
   const navigate = useNavigate();
   const [bedrijven, setBedrijven] = useState([]);
   const [favorieten, setFavorieten] = useState([]);
+  const [selectedFilters, setSelectedFilters] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -19,9 +35,7 @@ export default function UBedrijven({ onLogout }) {
         setBedrijven(bedrijvenRes.data);
 
         const favorietenRes = await axios.get(`http://localhost:5000/api/favorieten/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         const geliketeIds = favorietenRes.data.map((bedrijf) => bedrijf.id);
         setFavorieten(geliketeIds);
@@ -32,10 +46,32 @@ export default function UBedrijven({ onLogout }) {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen]);
+
+  const handleFilterChange = (key) => {
+    setSelectedFilters((prev) =>
+      prev.includes(key) ? prev.filter((f) => f !== key) : [...prev, key]
+    );
+  };
+
   const handleLogout = () => {
     if (onLogout) onLogout();
-    navigate("/login");
+    navigate('/login');
   };
+
+  const filteredBedrijven = selectedFilters.length === 0
+    ? bedrijven
+    : bedrijven.filter((bedrijf) =>
+        selectedFilters.some((filter) => bedrijf[filter] === 1)
+      );
 
   const toggleLike = async (bedrijfId) => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -45,9 +81,7 @@ export default function UBedrijven({ onLogout }) {
     try {
       if (isFavoriet) {
         await axios.delete(`http://localhost:5000/api/favorieten/${bedrijfId}?student_id=${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setFavorieten(prev => prev.filter(id => id !== bedrijfId));
       } else {
@@ -55,9 +89,7 @@ export default function UBedrijven({ onLogout }) {
           student_id: user.id,
           company_id: bedrijfId
         }, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setFavorieten(prev => [...prev, bedrijfId]);
       }
@@ -67,34 +99,65 @@ export default function UBedrijven({ onLogout }) {
   };
 
   return (
-    <div className="pageWrapper">
+    <div className="pagina-wrapper">
       <header className="header">
-        <div className="header-section left">
-          <img src={logo} alt="Erasmus Logo" className="logo" />
-        </div>
-
-        <div className="header-section center">
-          <nav className="nav-center">
-            <Link to="/dashboard" className="nav-btn">Info</Link>
-            <Link to="/bedrijven" className="nav-btn active">Bedrijven</Link>
-            <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
-            <Link to="/favorieten" className="nav-btn">Favorieten</Link>
-            <Link to="/mijn-profiel" className="nav-btn">Mijn profiel</Link>
-          </nav>
-        </div>
-
-        <div className="header-section right">
-          <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
-        </div>
+        <img src={logo} alt="Erasmus Logo" className="logo" />
+        <nav className="nav">
+          <Link to="/dashboard" className="nav-btn">Info</Link>
+          <Link to="/bedrijven" className="nav-btn active">Bedrijven</Link>
+          <Link to="/speeddates" className="nav-btn">Speeddates</Link>
+          <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
+          <Link to="/favorieten" className="nav-btn">Favorieten</Link>
+          <Link to="/mijn-profiel" className="nav-btn">Mijn Profiel</Link>
+        </nav>
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
-      <main className="main">
+      <main className="main-content">
         <h2 className="title">Ontdek bedrijven</h2>
+
+        <div className="filter-wrapper" ref={dropdownRef}>
+          <button className="dropdown-toggle" onClick={() => setDropdownOpen(!dropdownOpen)}>
+            Filter <span>{dropdownOpen ? '▲' : '▼'}</span>
+          </button>
+
+          {dropdownOpen && (
+            <div className="dropdown-menu">
+              <div className="dropdown-group">
+                <div className="group-title">Type Kans</div>
+                {TYPE_KANS.map((opt) => (
+                  <label key={opt.key} className="filter-label">
+                    <input
+                      type="checkbox"
+                      checked={selectedFilters.includes(opt.key)}
+                      onChange={() => handleFilterChange(opt.key)}
+                    />
+                    {opt.label}
+                  </label>
+                ))}
+              </div>
+              <div className="dropdown-group">
+                <div className="group-title">IT Domein</div>
+                {IT_DOMEIN.map((opt) => (
+                  <label key={opt.key} className="filter-label">
+                    <input
+                      type="checkbox"
+                      checked={selectedFilters.includes(opt.key)}
+                      onChange={() => handleFilterChange(opt.key)}
+                    />
+                    {opt.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="bedrijvenContainer">
-          {bedrijven.length === 0 ? (
-            <p style={{ color: 'gray' }}>Geen bedrijven gevonden...</p>
+          {filteredBedrijven.length === 0 ? (
+            <p className="no-bedrijven">Geen bedrijven gevonden...</p>
           ) : (
-            bedrijven.map((bedrijf) => (
+            filteredBedrijven.map((bedrijf) => (
               <div key={bedrijf.id} className="bedrijfCard">
                 <h3 className="bedrijfNaam">{bedrijf.company_name}</h3>
                 <p className="bedrijfBeschrijving">{bedrijf.sector}</p>

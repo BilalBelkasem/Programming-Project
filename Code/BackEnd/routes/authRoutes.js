@@ -18,10 +18,12 @@ const MijnProfielController = require('../Controller/mijnprofiel');
 router.post('/register', StudentRegistratieController.register);
 router.post('/register-company', BedrijfRegistratieController.registerCompany);
 router.post('/login', LoginController.login);
+router.get('/bedrijfprofiel/:id', CompanyProfileController.getCompanyProfileById);
 
 // PROTECTED ROUTES
 router.get('/protected', authenticateToken, StudentRegistratieController.getProtectedData);
 router.get('/studenten', authenticateToken, studentAdmin.getAllStudents);
+router.delete('/studenten/:id', authenticateToken, studentAdmin.deleteStudent);
 router.get('/bedrijven', authenticateToken,  bedrijfAdmin.getAllCompanies);
 router.delete('/bedrijven/:id', authenticateToken, bedrijfAdmin.deleteCompany);
 router.get('/company-profile', authenticateToken, isCompany, CompanyProfileController.getCompanyProfile);
@@ -37,6 +39,10 @@ router.get('/profile', authenticateToken, (req, res) => {
 router.post('/favorieten', FavorietenController.addFavoriet);
 router.get('/favorieten/:studentId', FavorietenController.getFavorieten);
 router.delete('/favorieten/:companyId', FavorietenController.deleteFavoriet);
+// Bedrijf liket student
+router.post('/favorieten/bedrijf-like', FavorietenController.bedrijfLikeStudent);
+router.delete('/favorieten/bedrijf-unlike', FavorietenController.bedrijfUnlikeStudent);
+router.get('/favorieten/check-bedrijf-like', FavorietenController.checkBedrijfLikeStudent);
 
 // BEDRIJVEN ROUTE
 router.get('/open-bedrijven', BedrijvenController.getBedrijven);

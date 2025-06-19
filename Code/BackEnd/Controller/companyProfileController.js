@@ -20,6 +20,7 @@ exports.getCompanyProfile = async (req, res) => {
     // ✅ Converteer integers naar booleans
     res.json({
       ...row,
+      linkedin: row.website,
       zoek_jobstudent: row.zoek_jobstudent === 1,
       zoek_connecties: row.zoek_connecties === 1,
       zoek_stage: row.zoek_stage === 1,
@@ -72,6 +73,40 @@ exports.updateCompanyProfile = async (req, res) => {
     res.json({ message: 'Profiel bijgewerkt' });
   } catch (err) {
     console.error('Fout bij opslaan profiel:', err);
+    res.status(500).json({ error: 'Serverfout' });
+  }
+};
+
+// Publiek profiel ophalen op basis van id
+exports.getCompanyProfileById = async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const [rows] = await req.db.query(`
+      SELECT u.name, u.email, c.company_name, c.about, c.website, c.sector, c.street, c.postal_code,
+             c.zoek_jobstudent, c.zoek_connecties, c.zoek_stage, c.zoek_job,
+             c.domein_data, c.domein_netwerking, c.domein_ai, c.domein_software
+      FROM users u
+      JOIN companies_details c ON c.user_id = u.id
+      WHERE u.id = ? AND u.role = 'bedrijf'
+    `, [userId]);
+
+    if (rows.length === 0) return res.status(404).json({ error: 'Profiel niet gevonden' });
+
+    const row = rows[0];
+    res.json({
+      ...row,
+      zoek_jobstudent: row.zoek_jobstudent === 1,
+      zoek_connecties: row.zoek_connecties === 1,
+      zoek_stage: row.zoek_stage === 1,
+      zoek_job: row.zoek_job === 1,
+      domein_data: row.domein_data === 1,
+      domein_netwerking: row.domein_netwerking === 1,
+      domein_ai: row.domein_ai === 1,
+      domein_software: row.domein_software === 1
+    });
+  } catch (err) {
+    console.error('Fout bij ophalen publiek bedrijfsprofiel:', err);
     res.status(500).json({ error: 'Serverfout' });
   }
 };
