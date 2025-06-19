@@ -24,11 +24,25 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static('public', { index: 'public.html' }));
 
+app.get('/server-status', (req, res) => {
+  res.json({ status: 'online', timestamp: new Date() });
+});
+
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'Test successful',
+    database: 'connected',
+    authenticated: !!req.headers.authorization
+  });
+});
+
+
 // DB beschikbaar maken per request
 app.use((req, res, next) => {
   req.db = db;
   next();
 });
+
 
 // Routes mounten met auth middleware waar nodig
 app.use('/api', authRoutes);
@@ -36,7 +50,11 @@ app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/mijnprofiel', mijnProfielRoutes);
-app.use('/api/company/speeddates', companySpeeddatesRoutes)
+app.use('/api/company/speeddates', companySpeeddatesRoutes);
+
+
+console.log('Routes mounted: /api/company/speeddates');
+
 
 // Example: récupérer tous les users étudiants
 app.get('/api/users', async (req, res) => {
@@ -153,7 +171,20 @@ app.post(
   }
 );
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
+});
+// Tijdelijk test endpoint - verwijderen na testen
+// Vervang je test endpoint hiermee
+app.get('/api/test', (req, res) => {
+  console.log('Test endpoint reached');
+  res.json({ 
+    message: 'Test successful',
+    routes: [
+      '/api/company/speeddates',
+      '/api/companies',
+      '/api/students'
+    ]
+  });
 });
