@@ -19,22 +19,35 @@ exports.getAllCompanies = async (req, res) => {
 
 
 exports.deleteCompany = async (req, res) => {
-  const companyId = req.params.id;
-  console.log(`DELETE request ontvangen voor company id: ${companyId}`);
+  const companyUserId = req.params.id;
+  console.log(`DELETE request ontvangen voor company id: ${companyUserId}`);
 
   const connection = await db.getConnection();
   try {
     await connection.beginTransaction();
 
-    
-    await connection.query('DELETE FROM companies_details WHERE user_id = ?', [companyId]);
+    // 1. Get the companies_details.id for this user
+    const [rows] = await connection.query(
+      'SELECT id FROM companies_details WHERE user_id = ?',
+      [companyUserId]
+    );
+    if (rows.length === 0) {
+      throw new Error('Company not found');
+    }
+    const companyId = rows[0].id;
 
-    
-    await connection.query('DELETE FROM users WHERE id = ?', [companyId]);
+    // 2. Delete all favorites referencing this company
+    await connection.query('DELETE FROM favorites WHERE company_id = ?', [companyId]);
+
+    // 3. Delete from other related tables if needed (e.g. timeslots)
+    await connection.query('DELETE FROM timeslots WHERE company_id = ?', [companyId]);
+
+    // 4. Delete company details and user
+    await connection.query('DELETE FROM companies_details WHERE user_id = ?', [companyUserId]);
+    await connection.query('DELETE FROM users WHERE id = ?', [companyUserId]);
 
     await connection.commit();
-
-    console.log(`Bedrijf met id ${companyId} succesvol verwijderd.`);
+    console.log(`Bedrijf met id ${companyUserId} succesvol verwijderd.`);
     res.json({ message: 'Bedrijf succesvol verwijderd' });
   } catch (err) {
     await connection.rollback();
