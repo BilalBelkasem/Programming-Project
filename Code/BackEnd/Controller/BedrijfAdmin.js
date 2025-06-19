@@ -1,59 +1,64 @@
 const db = require('../config/db');
 
 
-exports.getAllCompanies = async (req, res) => {
+exports.getAllCompanies = (req, res) => {
   const sql = `
     SELECT users.id, users.name AS naam, companies_details.company_name
     FROM users
     JOIN companies_details ON companies_details.user_id = users.id
     WHERE users.role = 'bedrijf'
   `;
-  try {
-    const [result] = await db.query(sql);
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.error('Fout bij ophalen bedrijven:', err);
+      return res.status(500).json({ error: err.message });
+    }
     res.json(result);
-  } catch (err) {
-    console.error('Fout bij ophalen bedrijven:', err);
-    res.status(500).json({ error: err.message });
-  }
+  });
 };
 
 
-exports.deleteCompany = async (req, res) => {
-  const companyUserId = req.params.id;
-  console.log(`DELETE request ontvangen voor company id: ${companyUserId}`);
+exports.deleteCompany = (req, res) => {
+  const companyId = req.params.id;
+  console.log(`DELETE request ontvangen voor company id: ${companyId}`);
 
-  const connection = await db.getConnection();
-  try {
-    await connection.beginTransaction();
-
-    // 1. Get the companies_details.id for this user
-    const [rows] = await connection.query(
-      'SELECT id FROM companies_details WHERE user_id = ?',
-      [companyUserId]
-    );
-    if (rows.length === 0) {
-      throw new Error('Company not found');
+  db.beginTransaction(err => {
+    if (err) {
+      console.error('Fout bij starten transaction:', err);
+      return res.status(500).json({ error: 'Fout bij starten database transaction' });
     }
-    const companyId = rows[0].id;
 
-    // 2. Delete all favorites referencing this company
-    await connection.query('DELETE FROM favorites WHERE company_id = ?', [companyId]);
+    // Step 1: Delete from companies_details
+    db.query('DELETE FROM companies_details WHERE user_id = ?', [companyId], (err) => {
+      if (err) {
+        console.error('Fout bij verwijderen company details:', err);
+        return db.rollback(() => {
+          res.status(500).json({ error: 'Fout bij verwijderen company details: ' + err.message });
+        });
+      }
 
-    // 3. Delete from other related tables if needed (e.g. timeslots)
-    await connection.query('DELETE FROM timeslots WHERE company_id = ?', [companyId]);
+      // Step 2: Delete from users
+      db.query('DELETE FROM users WHERE id = ?', [companyId], (err2) => {
+        if (err2) {
+          console.error('Fout bij verwijderen gebruiker:', err2);
+          return db.rollback(() => {
+            res.status(500).json({ error: 'Fout bij verwijderen gebruiker: ' + err2.message });
+          });
+        }
 
-    // 4. Delete company details and user
-    await connection.query('DELETE FROM companies_details WHERE user_id = ?', [companyUserId]);
-    await connection.query('DELETE FROM users WHERE id = ?', [companyUserId]);
+        db.commit(commitErr => {
+          if (commitErr) {
+            console.error('Fout bij commit van transaction:', commitErr);
+            return db.rollback(() => {
+              res.status(500).json({ error: 'Fout bij commit van transaction' });
+            });
+          }
 
-    await connection.commit();
-    console.log(`Bedrijf met id ${companyUserId} succesvol verwijderd.`);
-    res.json({ message: 'Bedrijf succesvol verwijderd' });
-  } catch (err) {
-    await connection.rollback();
-    console.error('Fout bij verwijderen bedrijf:', err);
-    res.status(500).json({ error: 'Fout bij verwijderen bedrijf: ' + err.message });
-  } finally {
-    connection.release();
-  }
+          console.log(`Bedrijf met id ${companyId} succesvol verwijderd.`);
+          res.json({ message: 'Bedrijf succesvol verwijderd' });
+        });
+      });
+    });
+  });
 };
