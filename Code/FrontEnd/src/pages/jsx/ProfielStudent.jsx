@@ -41,7 +41,7 @@ export default function ProfielStudent({ user }) {
           setFormData({
             name: data.name || '',
             school: data.school || '',
-            direction: data.education || '',
+            direction: data.education || data.richting || '',
             year: data.year || '',
             linkedin: data.linkedin_url || '',
             email: data.email || '',
@@ -97,9 +97,22 @@ export default function ProfielStudent({ user }) {
       domains: formData.domains,
     };
 
+    // When preparing the payload for update:
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      school: formData.school,
+      education: formData.direction || formData.education || '', // use the correct field name
+      year: formData.year,
+      about: formData.about,
+      linkedin: formData.linkedin,
+      lookingFor: formData.lookingFor,
+      domains: formData.domains,
+    };
+
     try {
       const token = localStorage.getItem('token');
-      await axios.put('/api/mijnprofiel', updatedData, {
+      await axios.put('/api/mijnprofiel', payload, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
