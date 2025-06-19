@@ -24,6 +24,7 @@ export default function UInfoPagina({ onLogout }) {
           <nav className="nav-center">
             <Link to="/dashboard" className="nav-btn active">info</Link>
             <Link to="/bedrijven" className="nav-btn">bedrijven</Link>
+            <Link to="/speeddates" className="nav-btn">speeddates</Link>
             <Link to="/plattegrond" className="nav-btn">plattegrond</Link>
             <Link to="/favorieten" className="nav-btn">favorieten</Link>
             <Link to="/mijn-profiel" className="nav-btn">mijn profiel</Link>
