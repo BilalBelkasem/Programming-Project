@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 13, 2025 at 10:05 AM
+-- Generation Time: Jun 21, 2025 at 11:33 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,8 +18,282 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `career_launch`
+-- Database: `career_launch_2026`
 --
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `AnnuleerSpeeddate` (IN `speeddate_id_param` INT)   BEGIN
+    DECLARE is_reserved BOOLEAN DEFAULT FALSE;
+    
+    -- Controleer of de speeddate gereserveerd is
+    SELECT bezet = 1 INTO is_reserved
+    FROM speeddates 
+    WHERE date_id = speeddate_id_param;
+    
+    IF is_reserved THEN
+        -- Annuleer de reservering
+        UPDATE speeddates 
+        SET student_id = NULL, 
+            bezet = 0, 
+            gereserveerd_op = NULL
+        WHERE date_id = speeddate_id_param;
+        
+        SELECT 'SUCCESS' as status, 'Speeddate reservering geannuleerd' as message;
+    ELSE
+        SELECT 'ERROR' as status, 'Speeddate is niet gereserveerd' as message;
+    END IF;
+    
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GenereerSpeeddatesVoorAlleBedrijven` ()   BEGIN
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE company_id_var INT;
+    DECLARE start_time TIME;
+    DECLARE end_time TIME;
+    DECLARE session_duration INT;
+    DECLARE current_time_slot TIME;
+    DECLARE company_cursor CURSOR FOR SELECT id FROM companies_details;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+    
+    -- Haal de actieve configuratie op
+    SELECT start_uur, eind_uur, sessie_duur_minuten 
+    INTO start_time, end_time, session_duration
+    FROM speeddates_config 
+    WHERE actief = 1 
+    LIMIT 1;
+    
+    -- Verwijder alle bestaande speeddates
+    DELETE FROM speeddates;
+    
+    -- Loop door alle bedrijven
+    OPEN company_cursor;
+    
+    read_loop: LOOP
+        FETCH company_cursor INTO company_id_var;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+        
+        -- Genereer speeddate slots voor dit bedrijf
+        SET current_time_slot = start_time;
+        
+        WHILE current_time_slot < end_time DO
+            INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, bezet)
+            VALUES (
+                company_id_var,
+                current_time_slot,
+                ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60)),
+                0
+            );
+            
+            -- Ga naar volgende tijdsslot
+            SET current_time_slot = ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60));
+        END WHILE;
+        
+    END LOOP;
+    
+    CLOSE company_cursor;
+    
+    SELECT 'SUCCESS' as status, 'Speeddates succesvol gegenereerd voor alle bedrijven' as message;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `GenereerSpeeddatesVoorBedrijf` (IN `company_id_param` INT)   BEGIN
+    DECLARE start_time TIME;
+    DECLARE end_time TIME;
+    DECLARE session_duration INT;
+    DECLARE current_time_slot TIME;
+    
+    -- Haal de actieve configuratie op
+    SELECT start_uur, eind_uur, sessie_duur_minuten 
+    INTO start_time, end_time, session_duration
+    FROM speeddates_config 
+    WHERE actief = 1 
+    LIMIT 1;
+    
+    -- Verwijder bestaande speeddates voor dit bedrijf
+    DELETE FROM speeddates WHERE company_id = company_id_param;
+    
+    -- Genereer nieuwe speeddate slots
+    SET current_time_slot = start_time;
+    
+    WHILE current_time_slot < end_time DO
+        INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, bezet)
+        VALUES (
+            company_id_param,
+            current_time_slot,
+            ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60)),
+            0
+        );
+        
+        -- Ga naar volgende tijdsslot
+        SET current_time_slot = ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60));
+    END WHILE;
+    
+    SELECT 'SUCCESS' as status, CONCAT('Speeddates succesvol gegenereerd voor bedrijf ID: ', company_id_param) as message;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ReserveerSpeeddate` (IN `speeddate_id_param` INT, IN `student_id_param` INT)   BEGIN
+    DECLARE is_available BOOLEAN DEFAULT FALSE;
+    DECLARE current_company_id INT;
+    
+    -- Controleer of de speeddate beschikbaar is
+    SELECT bezet = 0, company_id INTO is_available, current_company_id
+    FROM speeddates 
+    WHERE date_id = speeddate_id_param;
+    
+    IF is_available THEN
+        -- Reserveer de speeddate
+        UPDATE speeddates 
+        SET student_id = student_id_param, 
+            bezet = 1, 
+            gereserveerd_op = NOW()
+        WHERE date_id = speeddate_id_param;
+        
+        SELECT 'SUCCESS' as status, 'Speeddate succesvol gereserveerd' as message;
+    ELSE
+        SELECT 'ERROR' as status, 'Speeddate is niet beschikbaar' as message;
+    END IF;
+    
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ResetAlleSpeeddates` ()   BEGIN
+    UPDATE speeddates 
+    SET student_id = NULL,
+        bezet = 0,
+        gereserveerd_op = NULL;
+    
+    SELECT 'SUCCESS' as status, 'Alle speeddates zijn gereset naar beschikbaar' as message;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `SynchroniseerSpeeddatesMetConfig` ()   BEGIN
+    DECLARE v_start_uur TIME;
+    DECLARE v_eind_uur TIME;
+    DECLARE v_sessie_duur INT;
+    DECLARE v_company_id INT;
+    DECLARE v_huidige_tijd TIME;
+    DECLARE v_eind_tijd_sessie TIME;
+    DECLARE done INT DEFAULT FALSE;
+
+    -- Cursor om door alle bedrijven te lussen.
+    DECLARE cur_companies CURSOR FOR SELECT id FROM companies_details;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    -- Haal de actieve configuratie op.
+    SELECT start_uur, eind_uur, sessie_duur_minuten
+    INTO v_start_uur, v_eind_uur, v_sessie_duur
+    FROM speeddates_config WHERE actief = 1 LIMIT 1;
+
+    -- Markeer geboekte afspraken die buiten het nieuwe tijdsbestek vallen als geannuleerd.
+    UPDATE speeddates
+    SET
+        status = 'cancelled_by_admin',
+        cancellation_reason = 'De beschikbare tijden voor speeddates zijn gewijzigd door de organisatie.'
+    WHERE
+        status = 'booked'
+        AND (begin_tijd < v_start_uur OR eind_tijd > v_eind_uur);
+
+    -- Verwijder alle nog beschikbare (niet-geboekte) tijdslots, want deze worden opnieuw gegenereerd.
+    DELETE FROM speeddates WHERE status = 'available';
+
+    -- Loop door alle bedrijven om nieuwe, beschikbare tijdslots te genereren.
+    OPEN cur_companies;
+
+    read_loop: LOOP
+        FETCH cur_companies INTO v_company_id;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        SET v_huidige_tijd = v_start_uur;
+
+        -- Genereer de nieuwe slots.
+        WHILE v_huidige_tijd < v_eind_uur DO
+            SET v_eind_tijd_sessie = ADDTIME(v_huidige_tijd, MAKETIME(0, v_sessie_duur, 0));
+
+            IF v_eind_tijd_sessie <= v_eind_uur THEN
+                -- Voeg alleen een nieuw, beschikbaar slot toe als er op dit tijdstip nog geen
+                -- (geboekt of geannuleerd) slot bestaat voor dit bedrijf.
+                IF NOT EXISTS (SELECT 1 FROM speeddates WHERE company_id = v_company_id AND begin_tijd = v_huidige_tijd) THEN
+                    INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, status)
+                    VALUES (v_company_id, v_huidige_tijd, v_eind_tijd_sessie, 'available');
+                END IF;
+            END IF;
+
+            SET v_huidige_tijd = v_eind_tijd_sessie;
+        END WHILE;
+    END LOOP;
+
+    CLOSE cur_companies;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ToonSpeeddatesOverzicht` ()   BEGIN
+    SELECT 
+        cd.company_name,
+        COUNT(s.date_id) as totaal_slots,
+        SUM(CASE WHEN s.bezet = 0 THEN 1 ELSE 0 END) as beschikbaar,
+        SUM(CASE WHEN s.bezet = 1 THEN 1 ELSE 0 END) as gereserveerd,
+        ROUND((SUM(CASE WHEN s.bezet = 1 THEN 1 ELSE 0 END) / COUNT(s.date_id)) * 100, 2) as bezettingsgraad_percentage
+    FROM companies_details cd
+    LEFT JOIN speeddates s ON cd.id = s.company_id
+    GROUP BY cd.id, cd.company_name
+    ORDER BY cd.company_name;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateSpeeddatesConfiguratie` (IN `start_uur_param` TIME, IN `eind_uur_param` TIME, IN `sessie_duur_minuten_param` INT)   BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'ERROR' as status, 'Fout bij het updaten van de configuratie' as message;
+    END;
+    
+    START TRANSACTION;
+    
+    -- Update de configuratie
+    UPDATE speeddates_config 
+    SET start_uur = start_uur_param,
+        eind_uur = eind_uur_param,
+        sessie_duur_minuten = sessie_duur_minuten_param,
+        aangepast_op = NOW()
+    WHERE actief = 1;
+    
+    -- Synchroniseer automatisch alle speeddates
+    CALL SynchroniseerSpeeddatesMetConfig();
+    
+    COMMIT;
+    
+    SELECT 'SUCCESS' as status, 'Configuratie succesvol bijgewerkt en speeddates gesynchroniseerd' as message;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `VerwijderOudeSpeeddates` ()   BEGIN
+    DECLARE aantal_verwijderd INT DEFAULT 0;
+    
+    DELETE FROM speeddates 
+    WHERE company_id NOT IN (SELECT id FROM companies_details);
+    
+    SET aantal_verwijderd = ROW_COUNT();
+    
+    SELECT 'SUCCESS' as status, CONCAT(aantal_verwijderd, ' oude speeddates verwijderd') as message;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ZoekBeschikbareSpeeddates` (IN `zoek_tijd` TIME)   BEGIN
+    SELECT 
+        s.date_id,
+        cd.company_name,
+        s.begin_tijd,
+        s.eind_tijd,
+        s.bezet
+    FROM speeddates s
+    JOIN companies_details cd ON s.company_id = cd.id
+    WHERE s.bezet = 0 
+    AND s.begin_tijd >= zoek_tijd
+    ORDER BY s.begin_tijd
+    LIMIT 20;
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -43,20 +317,77 @@ CREATE TABLE `companies_details` (
   `invoice_contact_email` varchar(100) DEFAULT NULL,
   `po_number` varchar(50) DEFAULT NULL,
   `vat_number` varchar(50) DEFAULT NULL,
-  `logo` blob DEFAULT NULL
+  `logo` varchar(255) DEFAULT NULL,
+  `zoek_jobstudent` tinyint(1) DEFAULT 0,
+  `zoek_stage` tinyint(1) DEFAULT 0,
+  `zoek_connecties` tinyint(1) DEFAULT 0,
+  `zoek_job` tinyint(1) DEFAULT 0,
+  `domein_data` tinyint(1) DEFAULT 0,
+  `domein_netwerking` tinyint(1) DEFAULT 0,
+  `domein_ai` tinyint(1) DEFAULT 0,
+  `domein_software` tinyint(1) DEFAULT 0,
+  `about` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `companies_details`
 --
 
-INSERT INTO `companies_details` (`id`, `user_id`, `company_name`, `sector`, `website`, `phone_number`, `street`, `postal_code`, `city`, `booth_contact_name`, `booth_contact_email`, `invoice_contact_name`, `invoice_contact_email`, `po_number`, `vat_number`, `logo`) VALUES
-(1, 3, 'TechCorp', 'IT Consultancy', 'https://techcorp.be', '+32012345678', 'Main Street 6', '1000', 'Brussel', 'Bob Tech', 'bob@techcorp.be', 'Finance TechCorp', 'factuur@techcorp.be', 'PO1234', 'BE0123456789', ''),
-(2, 4, 'SmartSolutions', 'Softwareontwikkeling', 'https://smartsolutions.be', '+32098765432', 'Innovationlaan 3', '2000', 'Antwerpen', 'Eva Manager', 'eva@smartsolutions.be', 'Boekhouding Smart', 'boekhouding@smartsolutions.be', 'PO5678', 'BE9876543210', '');
-INSERT INTO `companies_details` (`id`, `user_id`, `company_name`, `sector`, `website`, `phone_number`, `street`, `postal_code`, `city`, `booth_contact_name`, `booth_contact_email`, `invoice_contact_name`, `invoice_contact_email`, `po_number`, `vat_number`, `logo`) VALUES
-(3, 14, 'jelleINC', 'Hardware & embedded systemen', 'https://www.linkedin.com/in/jelle-schroeven-2b4526352/', '0494104303', 'Lokvogelstraat 30', '1020', 'Laeken', 'jelle schroef', 'yolofangamer@gmail.com', 'jelle schroeven', 'yolofangamer@gmail.com', NULL, 'BE 3876486483', 0x89504e470d0a1a0a0000000d4948445200000346000001ad080600000032386470000000017352474200aece1ce90000000467414d410000b18f0bfc6105000000097048597300000ec300000ec301c76fa86400006c0249444154785eeddd797c54e5ddfffff72c5941c20e52022e808048ad5bef82da82d056fbd32aad558abd6b5182a5dfba60b1ad752916effbb65444bda502a2dead5669945aad5b11d282c1ba60ad404088454944b24048c8324966e6fcfe98edcc993393992440f0bc9e8fc7793c9273aeb35de73acb67ce755dc725c910000000003898db3a02000000009c86c00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801008e59f9f9f9cacfcfd7800103ac93d2969f9fafc2c242eb680080c3b82419d691000067282c2c547e7ebe2a2a2ad4dcdc6c9ddc63e5e7e7ebf4d34fd7c0810325492e974b8d8d8d6a6969d1071f7ca0fdfbf75b67b1555858a833ce38436eb75b0d0d0d5ab76e9d350900c0213c927e691d0900f8ec3bfdf4d33561c2040d1e3c5883070fd6be7dfbd4dede6e4dd6e39c72ca29fae217bfa83e7dfa28100848920cc3505e5e9efaf6edab7efdfa292b2babc3e0a8b0b050e79c738efc7ebf82c1a0727272545b5bab9696166b5200800350950e001ce8f4d34fd7983163d4dedeaef6f676f5ead54b797979d6643dce800103346edc380583c18420ceeff7cbe7f3a977efde1a376e5ccaea7591a0a8adad2d6e3c4111003817811100f45091f633990e1d890445e62020180c76f886a52738fdf4d3e572b9aca3e3f8fd7eb9ddeea479611714656767ebdd77df3da6aa130200ba176d8c00a00739fdf4d33560c000e5e7e7771800d871b95c5abb766dd2077cbba0c8ebf56ac3860d3d3e302a2c2cd459679d25bfdf6f9d14273fdc666ad3a64dd6494983a2b7de7a4b15151571690100cec21b2300e801060c18a08b2fbe58279d7492faf4e92385dbcd643aa4722c07450a073c1d2128020074168111001c65f9f9f93af7dc732549ededed1dbe1149265575b0633d2892a4bcbcbc946fd1088a00005d4160040047d9e9a79f2e8fc7631d9d91540ff9764191dbed3ea682a28e10140100ba8ac008008ea201030668f0e0c1093dac6522d543be5d50e4f57ad5d8d8985150944e35b6a385a00800d01d088c00e0281a387060caea611d49f5906f1714455456565a4725c80f7f44f5e28b2fd6f4e9d353767f7db410140100ba0b8111001c451db59b4925d5437eaaa0c8300cdb764811918068faf4e93ae9a49324491e8f47858585d6a44715411100a03b111801c03128d5437eaaa028156b4064f711d59e82a00800d0dd088c00e01893ea21bfb341d18001038e89804804450080c384c008008e21a91ef23b1b1445ba0bef0901d129a79ca28b2fbe58175c70814e39e594b869fbf7ef577b7b7b464191d7ebd5d6ad5ba3f95558589874f90000672330028063c4e1088a147e5bd4d9764edd6dcc983192a47efdfa69f8f0e171d32a2a2af4c20b2fa41d14495230188ccbaf3163c6c8ebf5aa5fbf7e2a2c2cecd1bded01008e2c02230038061caea0a827c9cfcf8f0668adadad69072dc982a2acac2c7dfcf1c7711d4de4e7e7cbeff767b47c008033101801400fe784a0c88ecbe5ea307849161429fcb628936f3501009c8dc008007a30270545cdcdcdaaadad55565696140e8cf2f2f2acc9a252054592e476c7dfe20a0b0be5f178a2ff77d46d3900c059088c00a08772525064c7308ca4fbd75150949595a57dfbf6c5e5dd800103a2c1525656166f93000071088c00a007726a50b47fff7eb95c2e656767abb6b6d6f68d4e474191d7eb956118fae0830fe2c60f183040866144ffb75b3600c0b9088c00a087716a50a470cf739f7efaa9b66edd9a51ef730a07445959596a6868d03befbc13f746a8b0b0507dfaf491dfef976c7aab030080c008007a102707450abfc5d9b46953c2db1e25098abc5e6fb47a5c434383b66ddba675ebd6c5e55f7e7ebece38e38c6850949595a5eaea6aaad20100e2101801400f71b482a28a8a0a05020179bd5eeba41ec32e28cacece565959995e7ffd75bdf0c20b5ab76e5d4240959f9fafd34f3f3daed385603098900e000002230038cadc6ef7510b8a2276eedca9c6c646e5e4e4f4b800c92e28f2783c7aebadb7f4c1071f247df313098a0a0b0bd5dede2e49cac9c9d1471f7d94741e008073111801c051545151a1bababaa31a1449d2071f7ca077df7d57e5e5e53a74e8508f0990ec8222490a0402b6f9a5704074ca29a768faf4e91a3a7468b493859c9c1cd5d5d5e9bdf7deb3ce0200805c92625df400007a8cc31514793c1e6ddebc3969603160c0001516166ae0c081eadbb7af0281805c2e97fefdef7f1fd1a0225950a470dba2868686e89b9f969616e5e5e5a9b0b0502e974b1e8f27daa6489272737375e0c001ad5bb7ceb414000062088c00a0073a5c4151c40b2fbc601d952012200d183040f9f9f9dab469d311ab82962a288af07abd72b95c52f89b472e972b5a65ce2c3b3b5b9f7efaa96d2f77000044101801400f733883a2c89b969efce6c42e288a7c9bc8e572250d80cc22d500fd7ebf76eedc49670b00800e111801400f7238832285bbaadeb66d5b8f0d14ec82a2ecec6c6dddba55cdcdcdcacfcfd78001033470e0c084ea720aef9fdfef575353932a2b2b7bec7e02007a1e022300e8210e7750d4d3dbd9240b8aec3aa6c8cfcfd7e73ef7394d983021eefb44fbf6edd37befbd17ed7001008074d12b1d00f400873328cacaca527676b63ef9e49323da79422632098a14fe10ec279f7ca24020101de7f7fbf5cf7ffe93a00800d0290446007094d9054559595972bbddd136359d1d2469dfbe7ddaba75eb11ed3c211399064511797979d17d942497cba5fcfcfcb8340000a48baa74007014d905451e8f471f7df4912a2a2abafc06a9a7bf3d4927282a2c2c546161a1f2f2f24c734abd7bf75630188cfe1fe958c20eed8d00001d21300280a3c42e28f27abddab061438f7cb3d3ddf2f3f3357dfaf4b8e0c61a1449d2c5175facacac2c1946fcedcadaf1824cbdd199793c1ed5d5d5f5d8b65500809e81aa74007014e4e7e76be4c8918e0d8a645315ce2e28cacfcf972bdc3db7dfef8f1bec58d3f8fd7eb5b6b6aa77efde54b30300a44460040047813528705a5024492d2d2daaaeae96c7e391dbed4e088a14ae0a585b5babacac2c793c9e4e0f3535353dbe5a2100e0e8a22a1d001c2593264dd2c081036518468fed18e170cbcfcf575e5e9e5a5a5a92062e916f1775567373b323f316009019022300388af2f3f39306040000e0c8213002000000e078b43102000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e47600474a3b9c5e5aadc5b631a4ab5d89a282d4b5512b79c1a556e586a4d040000806e42600474b35ed991d3ca6b9992b9e812bc79f113000000d0ad088cd0338c3c577317afd12b6f96ebc3dd9637257b6bf4e1ae72bdbbe125fdeeb66b34dc3a2f3a6df186ee78bb05000070ec2330c2d13572866e2fdeac3d6fbca07bae9da62f9cd04fb9b9d644526eef7e1a3a7e8aa65ef50d7dc33a115d92e7555a6fb74e9d7693163db15eefeed8a6d545d6a938b6156ad2ac5bf56071a9ca76774780dcddcb0300e0f02330c2d1336da15e78f151dd32ed4479e457634babda0341198635a164184105dbdbada371045cba78bdca76d7e8efab7fa91f5e7896460ceb6f4d8263d8f54f6c53d99e77f5d2433fd7cc299f579f1c6b8acc74f7f200003852088c70744c5baa4d4ffd449307b5abbe25a0682ce4722b2b275fb97979f26665c9e3f1282f2f4fbdf3f39493e3895f068e8821278cd0e7fab8e56b6d534b6bbb82419bc815c7acc21183757caed4d8ec93afadeb3f3e74f7f200003852088c70145ca09577cfd278a359cd81d85857766f79fd35fae7cb0feaae39dfd7772fe8abe3cff9a6ae9af37ddd78cf237a79c30e3534b59a1784238458e8b32d681dd145ddbd3c00008e0402231c719396dca5ef8df3aad11f1be7ce1ba0fa7fdeafb9e78ed5d7affa991e78e659ad7f5fd2c71bf5f233cfeaf1ffbe51ff79e9991a7fe64c2d372f0c5dd6e29724d3c1b0488c890cbb91000000c73402231c61b374ddd4313ad41c7b1077798f53cb9607f4a3e93fd39f3f8e4b9c8109ba3a49af761fee2ad7a6e71ed32d97165a670a4bf79b41e9a64bcff04b17ea77ebb7a9ccbcbd3bb6e9950766eb546b621b49bf993472866e7fa2347eb9bbcb55f2c4425d3a327e190bce1fa4e1c322c3642d884e99a7d53b42f3de33a59f9ada22ef00826a6bced594c5bee8b2cb8ae745e7cac8c459ba65d54bdab4b5521fee316deb9e4a7db8639b5e593e4f93adf3485d3cd6d69ef86a54b9638de64ad2c4d97af0e5f8e3f1618ae3d11df96f75eaeca55a6d2d137b2a55b679bd562e9891468f8c1374e5cf1fd39f93e4cdbb2f3fa6b9e72bae2ccf1e1b098e150e90c76ba669be9225712b48a28bcb1b3943b7ac7a49259bcb6dcb4249f1525d3dd13a53c7ae7fae322e0f2af7d6e8c3176eb5260b295aa3324bda4dcbceb3a60a1da39737ab6c9765d9bb2b55f6e64b298e53ec9c8a0e91b297693a9b6d2d5912cac745cf6d5359240fd7ff8f79ae34156ad23c9b7218d9c70d6bb4e80acb2c1367e99607929c931d1cbf54e7d12dabd6eb5d535e7cb863b356ffd29cbf1374f503ebf5ee0ed3b1d85dae775f7e38e9faa2c2656ed3d6f8e3f8e1aef294db9becfa71ea4d8fa924baac6dfaddecd83ca75e71ab1e2c5e6f7bad2bdb5caad58bafb1bdc6646af8a5b76ae573a5f1f9b1377cdc3a5acf612d53c0b183c0084756d1b734f5e46c459fb3e591c7bb532ffde24695c4a74cdba93f784c9b7697e8c139f6bddae5f6eea713cfbd5c3ffd7d99de2d5ea829f193a3d2fd6650bae9922bd4d5cb37ebbd276ed6451386aac0bcbd054375e6352b555c5ca840764e872f66ccdf4ccaca918c69bfd49f5f7d54b77c637cfc7273fb69fcc5b7ebdedf2f4dbaff76b25d3205451141b5351f92c2d51f33375c572f2fd5276b97e9e7974dd6890373956bee14cf9babdc7e2335e1cbd334c1345add78ac433df14972e5282fa759c67f3ea6b75f5daaef9d1d7f3c720b86eacc6b56a9b8789eedc36ef7e5ff055af472b9de79e05a4db196096fae0a869fa1cbee7c567f2f7d4c572709ae867fff3195ec2ad1233fffb6be649b37fd35e2fc8b35756c6c9c37fac6d02c36c29bd7276e4a47325f5ea1bef9cb97f4fe3f56e917974dd6b8e1fd12cb42c1508d9b52a47bfe56a1920766db1e87641e786aa31a7b67c56e74ae6ce58c3d57d7c72793245d79fe291a9e1349e99137f7536d7e6a632cc1c4d95a595aa9b7efbf4653ce3a5105bdad199cab821326ebb23b9ed1df37afd1edd3e2274764bbc27fb852f74ad151bafcfc6c459278f38e93fe2dddfde46f35ff2bc7abc01bbe3e796dbaf84c65da42fdf9bd77f5da3d36e550a17d1cf885cb34f98ba671ffbd5e07feb64c3fbb2ac939593054e3a6ced5af5f2dd7efe6d9ff60617b1ebdf8a8eef8d6191a5a104b975b70a2a6fdf4593dffc43c69c46cad2c7d45bfbdfa4c0d8d3b69fb69e839b3754ff19f3437c9b9f2b9794fe9cdd255ba2d7cfd31cbeddd2fb4bdaf95ebcfb75d10372dc27cfde895db24e3876bb4eed7dfd5a9037325b9959ddf5f39e1348bd6d6e8ad477eae9953ceb0bdd6150c1fafa97357eaf9cd4f25ddde0e8d9ca1db9fdba61dbfbf55979d3b3e3e3f142e9bc3c76b4ad1c37a7547a91efcbefd71382c650a38c61018e1889a74e64815b49b3a5bf066cbbf75bdee313d7f6462f8bc355afff0953a3957aa6f8ef46ae796c7eb95d7eb95d7e392610415686b51cba1561dffd5dbf5c8fa640fa747c694254febc1ff1ca3d68616f9fc915ef8c2dbec71a9adfe800aa64cd7a96dad3235c1ea4050c1409ebe74e77c9d3b30a0c676c9e371476f7232826a6fdaaf5ea7dfa0bb979d1b3f6b0a7979b9caf1469712e692372757b9b9b9cacbcbf426395c738bffa695b32648813635f9da14081a32e496db74cc645883b1c375acfd6a6b3a41dffbe5e53ac1d32e5fd02d8f3b7659348ca05aebf76bd0ff77bf1eba296e468baee4ff055abce1ff34ff3ffa6b7f438bdafc41c993abbcfc5ecacbcb535eb64b0ab4cbd750abdc71dfd3ed36c1d5f0796bf4ce8a2b756a6fe960a34f6de1de1d5d9e70de783d920c05dbdbe2e6cbcdcd55f49934caadecdcd0f1cdcdcdb64e4c29d3e54d59f2b49ef8d99735c8f0eb90af4dfe405086cb1dde66af3c6e43861194bfad49edbe7c4db866959e7fda3e48b5b5fa21adddd2aeecc8c3a8e157f6e0333539a1bbf96fe9a20983d5da1e2e775939f26f7e29765d1a394f7f2c5ea22b4ec9d581433eb5b507641886297fdd7219868c409b7c87f62bb7f0ebbae9a977b4384970d4dd0cbf4fed535ed48f4ecdd58166d3f53513e10e71ce3b5e3a7028540e0d4372b93dd1e3e196a1a03fbe0c2927475e5750cdaded323cd9cacd3f2e546ef3729597ed968ca0fcad8d6a730dd15717acd42d291ffe830afaf3f4a5bbe7ebdc614135b61972bb63d71fc308a8a5ae4e232ef9815e7ee46e5d3e3e4f075a82725bceb5606bbd0283bfa9b977cf8ace1b317cde1abd77ff653ac1e35783af4d01c3a5ecbcd0b9d6bb57ae3c0a6faf7f80cebfe359ad4e12cc8504d5d694a7afcdfbba3cfb1bd4166d8c193b02393992afc5a756bf214f769e72f2f2c2ebca53b64732027eb536ee57ee89dfd12dff7b6bfa653bea022dfefd03baf52bc7ebe0a116f9dafc0ac6954d4fb86cfad5d67450ea7b9abef7bfffe860bfbaa94c01c7a0845b1870389dd6bf407e534b7e97dba386aa9daa8c4b95a6910bf5e8ad53e43ed0a8f6f0225dde7c79d4a0dd5bcbb47d6b99b657fad4efb8c8af6086024d07d4fbeceb74c762ebc3e91172de522dfade0435d7f9a2379af86ddead467994176ccb202892a4a002fe911a35cea5b6b6f0b276ec53769fbcb893dcdfd2a811675ea349a671f6b668fd9f9ed5e3bf7b527f2c334cc1914bde1c435b9f59a6a79e78524fae5aae35255b2cf3263769f16a2dbe6890aa1bdaa2fbefceee2d8fd1a07d3bc2c7eca3bac47d3f5cc7da08283060bc461778d45abf2fbafe7ebdb3cc89d4d6d4ae09539354c192ba94ff5396ff5ad79fde4b075a427bedcaedabfaadcfe89e9baed235d75eafdf96ec536eafd0839fe13ba8e3cebc4e372e303dd49cb754abef9c26f78146b5c53255b9f9c7a9be329c375b77abde1754afdcc87ebdad979f7956bf7fe249fdadda1cccb8959d5ba3379e78524f3df1a47ebf72b95e7e33322d954e2cef3b4f69e5dc896a3cd01c3ddeaedc3e5263f8386c2dd3ee5aa9203fd21b6550adf50734e29245ba3721b049e675dd53b245bd7222fb1d94dfdf57a3cfb73c307ffbdb3afbc42c45e3a2ec7c6d2dfd59f8ba54a8db1fb955170df4ab2192c12eaf727a1da7fa8fc2f9bb639fe4cd89eeb7e16f528b2668c6ad4bd338d7ba2ed0deaed3ce9facc6562927af972429cb9dc9a3ec3cad5e3a4be382a60e715c1ee5f42e90af7677f478ecab970a7a2506cbdebc02c9b74fdb4b9ed16f6ffbaeae99f37d5d73ed1d7af4f57dcaca0b072d419f8cbe5fd5a53f4d713e2aa84060a4468df6aa6dff47d1f3ba20cfdc236940bec69375c617b2d5e629081f83ddf279b3653e6b83ad8d1a7cfab774b5699c46deaadf2e9822d51e0a5d475c5ef5caf5e98d477ea1d9d7fea7be7fdb93fa28d85b392e49f2aba92e4b93bf7f57c20f115146bbdafb4fd3b9839ae5cfee256f5696a4a0f272e3dff265f72e906f5f994a8a431d0b5d33e7fbfafe6d8fe8cdeaa0f23ce12b96af5ebdce9da99f26d6de4ce9cac71fd0f59fcfd7fee881732ba74f7ff94ce77ea33cb1b75cc15635361768f2bcfb6daa71c674bd4c01c72e8381e1480d8bd7d718fbab6b8ccabda1615f5dab51b224315d3ac3a58f6f339a0eec8f2eeb93ea16e3e3d265c63747c6a79b72db7a636fe341e39370baca7d878ccaf79e32ae8ca6596a94ecad31f645a657371a951b9626ac2f9d74738bcb8dbadac836d519957b4b8dc5966d6e8cdbe6e6c46d1e39c3b8fff57d465d756d345dc7ebaa312af73518fb76fcc9281a114bf3b9796b8cca43f5b17dffb4dea8dcf592714bc2be251fe2d7b3dfa83eb8d7585d9498aee36196f1bbf76a8cda7db1e3bff760c078f7b98509c74c13af3156163f665c1dfebffb8eb58cc51be2cbe027d53ee3c30d4b8d29e6e53cb0d968ae3b10cbdbaa4346e59b8f19934c69ba27ff6f32febcabc6a8fe34729c0f1995a50fc76d8b34dc58b4b6c6d85f134e53d36c54ae5d189d7ee513f165aab2aad138f0c15f8ddbbf393c2e6fa409c6d5abd6182b679bc759f323b1cc663aa4bbbcdbd7d6180723fbb4b7c6f8e480df282bbec938352edd70e3ea55966351d36c54aefd1f63b8cd32ed074b1eef6b302adf7bcab8d49466d2f2cd46e381f03ac2c7e8fac8f46f3f657cd0506fec8d1ec33aa3b666b3f1a0357fa72d34d67f7cc8a88aac67ef7ea3bae123e3775744d2cc3356ef306dc7a70d46e58e35c6dc84ed4d235dd11ae3a383a672b5b7c6a8ac6a326a77bc6a2c9a756e286f264e33ae9f3dcb263f1287e18bd61bbe8683b1657d7ad038787097b1f207132c69871b97fef225e377ff6d1ab7f825a3e4816b2cc72d329c6bac7cb3c6a8ad0a2fb7bad1a85cdfc175acaad1d8f7cea3a6737bb851545c6ed49bd3ecad35f6d5371b254b2e882d6bda63c6db7575c6a7d13489656fd2b2cd464bb42ced37aa0f551babe7598ee3779e32ca0e1e0c1feffd4655fd6ee377df8e4db75e3f2af7d61a558d3e63d3aa9b8c2913654885c6a459f38cabcf0fa77faed47870b6351fc3c3798f196fd4c6b6795f5dc028596c932ee9b0d078654f8d5115dd96fd464d4b9db1fa26cbfa46ce3656bc5367ec8f1c87bd3546558361bcb2a83096a69bcb1403c3b13af0c60847552018d49061d75847a7e15c7d63dc60b5447ee295471ecf4e3dffb379091d38942cfa4f3df96e7bac6e77b05d9ec25375c1f9f1e90ebf425d307ab07cfec836bbe5f1eed55fefb46cf3c76b74c30325da9be5cde095ae4bd9792ebdb9ea32add8131bfbc9b227b4fec3b6d82ff84650ea55a041b124474eb87d596b64f7bdb90a6e5ba99b2fbd33e198e9fd559a73f90ff4b874988fb5476ecf075a6f69e35672fd5fb4e15020f60b74d0900a0a749a294dbc4ee6ffbcf374c690ece85bb0acec6c6dfdeb7596f676957ae9df7be4f5847f35f7fba5c2d3c2bff6ced365670d567334533df2ba76ebc91f7d55bffab3f53dec563d7ecd0ccd79d432faa8b855679d20b5459a1fb9b265ecffab1ebefc3e6d8b4b57a9c7af59a517aa02b13637fe76e98489fa6e5cba54eed3536f5687aa75295426b24efca2667c3b32fd5cfde0f411f2b587dfd865e5aae1bdbfe881f0d449d3c7e873fe40b40b724f4e6fed2cbe413fb6e6ef6b77ea7bcfbeaf5eb1c2a780ff731a3535d51b92eee295d7b5558fcdf99a6e7bf2f5d09baef75fd3038f3e694d68a350379c7f9a9a7c916f4eb995ddbb4dafde3a45731edb6a495ba9e77e7991fef3e7a6510b2ed294eb57858edbc469baf4dbd7e896c50febc1275e52c9fa7b34b6af37fa264e8621f52a48f116cda5ec5c436fae9e6d3ab72bb5a2e47dd5677963d5e5dcd9f2effeb3ee9fbf2e3aa75ebb43ff28f32bcbdc86274ea1667e7e849ac2c759ee2cb57db84e7f5866398e7fdca25d35ed0abd240fca0816aa30f906cb95dd47fb5f9eaf49d7dca792f725a9429b9e5ca6c73784a62fb874b27efc68281f4f9dfe2d5d3afb562d7ee061fdeeb9526d58789afa068d68d9328c76e5f4c9a0bc2c385b671764475bf1b9b2f3d4f0ea5dbae23ecb71fbf85115ad2851536eac0d91bfad45a33fffbdf87471ba52a6806357facf5d403728df5f2fb7b90d4730a83e0346c4a549cf44f5299082d118c32b7f4599d6d9b655aa54e9bfabe5f1449f4ee5f10c561f5323f423e3620d1e2005a3351eb2e4dffbbe4a5fb32493a43f56a9baa53d8313d42dbf6f97f6fcd13a7e8daa1a2453961f3d6387a8af3fa8700c206f56ae766db20601760ee3b1767915a8f950ef242cab4af5cd92cbdabc2aa94ee6ffa821ea1788e5497b7383be70536b7c8f527b6bf4f2e527ea902f5c708c80d46788464992c668701fd377a6bcd9f26f5da71fdb95a99e64e4080de9e35620badd5ee9a3b7a3c148bc65da5a114a22d9049769787af9466d77b9150a2d830a060a356a7af801f4bcabf4f9d15e859e97ddf2667da2779e59169df7b4fe056a8f66b05b6ed7c72a5fff7a74bad9279bf6e823b9a2e76d30e857dffe49ba37eb46aeec1c35bdf9672d4828c7e9b85823064b01d375a9ede3d7f5b23560482ad2335c8daad73da3552befd7cfae9da599174ed6b809e335aa8f3f769c3bfc81c1ad40fb87aafe8765f4b23dfab0a92d7cfc2497d7abd68a2d7a2e2e5185b6eead8f6b2318cf72fd0db64a43bfa1872ce75ae5de9bf4a5de8a564b0d04db53fc78e791db55a6d20762e52541a4b7cb3d35fafbd38fe9d125b76af655b374e1b9e33566c249eae38fb5df09068d8ccacbf0c221ca0ec4e6f77ab3b4ebbdfb2ca9c2566c51597d5bb4f3202318544ec1604ba298ae9529e0d895ec0a021c162f7e5aaf2c53635ab5b7cb7deaf95a94b241ae1dcb03a1db2d3554596e9431cf1d381817901d9d4f50da6cf3813de1b7225de55230d0229ff5cd4b0f72f5b021f2c7a21bb95dfb54bdcb92c8964dbef5b863ddb9fc9f5b3844ed81f8ed6b6f392497cb153734b606e3fe8f9a3d42a3f3b3636d74dc1e35ecdf199bde537d6db086e778a347c6e572abe1609525514cf5c17ab95c5db85d6d7c426f6e8fbd4d08b4fb34e2f4505bafe1979da6535d0ae5a13b4bedbbdfd49ad5b159470d2950d0546edb5baa54f54c6c7a9c67aa5493d10f1addc3ed76ab6a6ff81545c66cceafb4af4b1768f18657f4f00fced4d002a9adddaf567f50863b4b2eb7577ebf5fb95999e4864b81b6261decf061dca556df41ebc80e58f65392826d09e79acbe552bbccff4bf2d8f70c28974781037bb52bd9f64e5baad723bd5d7a255f5bbbda032e192e97e4f2c8ef0f282bed1f5f127de378739b5db75cdaa7fabd96445199fdd8d3b532051cbb32b962015d56b961a72abd6e53c16b979173ae66fc669e3e1797b2233b55dd204563ac6050ea3344975a52455c3d6c88e9e14652f4b7c723a95ead7e997a4f32a49c54d54a3e5b76d6d79b1eea8332345405c32c896c1d8bc73a3d5b0ed4c7f5ba25974b598657be465f8aa151ad4dad6a95a4f27a7de20f46cf27c308aa4fdf21b1e5f554af56abb2d59ff6768f1a600e4e3ac3d20943a05dded16768e679c3f5fdcf4f94cf1faa8ce4c9eea53d9b1e8a0bbacbabcc6fb983caca1ba221d16a7816b347e84453a01aaf35d473799a0fa69970b95c6a6db27f8bd5b16a3534a57f7e994d5af66bdd707a2fd51e6a53d070c9db3b57fbde7931dc01c337f5b56183f4d3923a5377dc4793653fe5922be0b739bfe28796fdfb75b0a9357e51512e29e053bd75b424e95c3db8709626785bd5d81694e1f22a3fbb59ff7cf941dd75edf735e7ca491a3eec0e95d49bba66cfd08b9fd6cb1b3b701d5c536d02c314ba56a68063574fb85ac1499e09759f6bfe9683d15aaffe5f5fa2179eb829f9c7e712bcaf867a5315a5a05fdec2f1bac0b6479f7375666181fcd15fe6ddf2b7fd5b7b5e8d4cb73c780782d2e011893df62c18a3d3923ef4a4c3f28b5d2020f7f0137491cddbb2e1b74dd469f9595d58d7e194e69dd562d3a7f5ca36bdc9696f6fd384c9ff934640dc9dc7ba67d9f469bdbca63cf1e61ea7b2a726e8e4d1c33b18a6ea3649dab04775cdb100a3f36f608fb08ff7a8aa21a870875ca17653279c6dfb7d21e9268d293455f57279a4862a955b5275a4f2b617f4d7eaf6f0436840729da253a7ced4395f70cbdf2e495e19feb7547a4ffcc3e09603e6b7dc41058d9149db0d4d3a6ba4060463559b3c9e6c5555bc10fe6f95f61c9062b53c0372f71baa51d66375ded93a61903756fdecb0fb40f54da6eb52a40dd6772cc9129cab1f9c39420de10f57b9b27be9c0ab0b74c6853375db836bf4dc33af699ba4d15d0e6abb8b653f5dd9329a36e99e84732b719874f52acbb2d270fe35fa8f715eb5b44b925bd9792d5afbb3427dfdaa9fe981679fd5736bb74a3a25a360c5aab2a24a6d1e4facdd90bf5da34f4ff25d819bc6e8b45e96b7cb55c7c0db65e0082330c211f6baee7972a3da7ae79a7e3835e43fd4a8a1dfb847afee28d5ea076ed5d5dffe96a64e2cd4a48bbfa54bbf3d43d72f7a58bf7b6eb3cade8b7c01fe75addb556daaa6115020708a2eba3bf11b2f5396dca3ab267ad51a69a1eacd5270d7bff4a768b527cb2fb9469bb2877d5d172d307d5162e40cdd3fe34b72b5c5ba99ce5ca8ad44ac7170f86dd9fd968070da422dffc1d90afadabbb0aeee53d5d46aaa7e11943f3848a3bf68ffe1c3941e7b4b1b9b4d1d1ab4b7c8f3c51b54bc6a7642403c7cd2adfadd0b8f85bbdaedce63ddc3acdba9b2a0117da7e56f6dd5d88b1e5451dacdee1ed13b1f48d9b14c95e1fd92beb7fa515d6d6daa30f25cddf2c44b5a393b7e7443abb97a4d4059f99fd769b765fe359588f496f77b6df9c8742e186d720df8aaae2bb6be391eaea2e21f69da0077b4cd872b2b57ad3b366a795cba74c477c210686bd2e08bbeafcfb7fb428dd7b37214fcd7df75bfa5ac6c5abf53955e4ff46619686dd4e86f2d4dfc46d1b4a5facdb746aba935f2e8e99154a6ad7faa88a589fbf8ad5faeac7334f956f3b93441d7df7c9ec619c123f8a3c8b37a69aba9730a05d5de324817ff7aad6effa6f5b84dd0958bd76bf57f2ba1ed9fcb25f95a2def4ea63da6295ff0c63ad938aa9ed53b1fb52a3bf2e901a34ddea15fd3cc259db896a5636c8186b8dda68e151a65cd9e29cbcfd339b99ef86291893fbeafcd4dfe58bba1b616f5f9eaed5a3dcf72dc46ccd31fe77e49464be4fee55256aeb46b538ab65180431118e188ab5c7683ee7cb14a037b9bab38190ab6d44b05e335e5aadbf49b95ffa73facdba2e7ffef71ad5af93b2dfcd12c5d78fe58f5317d4ff4e9e56bf5af366fb48eb6e13fa4dcb145fafd9e726d5a5faa92f5a5dab4b5522f5c73aa9a0ff9a337849ce372b4f9b9bbb529baa455dafaa99415dd1c436d8d2d9afccb1d7a77436839ef95acd27f8e09cad7e93b58c863a55be4ce8bf50c64b41d54c179ffa357776d53c9fa52956cd8a64ffe7093ceeedd1aebc9e9287baee6a0b24c6f3582be067deef2e74279b3619b363d312f2e7d521fff4ccf6ea853efbce84fe60a3436e9c4cb7eab5777c78e59c9e672bdf7979f6beae802456af677dfb1ee6136deade73737a957a42e4db05581fed3b5b074874a8a1fd3838b6fd5d5dfba498b1e78580f2e5fa357de2cd787eb979a1650a1db8a37aab557ec8706c37f48de93bea37b5ead52d99be13cddb04d1f6c7a41777ceb2cf5b1f4da5511d7218aa1f6e6369d75f33ba17c7db35caf2c8e4fdf91f49667b3ddbe3a155c709fde8c9c0beb4bf5ee8e7fea3717f4539d2f7232789595bd4bebff374903f30e3cbd7ca376843b61300241f53be17865058232e452768ea1cd7f8d7cbbc864f5437ae19d43ea152b7c6a0d9eacef1737c5f2f7cd727df2871fe8e460abfc91002eb78f9a5e7f2aeee3d5a57baa95137d6524057c753af9ca57a3cbd9b4b5448bbedc5f878ef0c96f3dbf14f4a929f71cddf07fe52adb1cdec7f59b55b6bb448f5eff150dce51c20f4ac1d666155e7abf4a9e58aa5b7e7cab163fb15edb9ef89646b6fa8f609097da034f6d54556e76f8c1c790bfb945a75ebb56656fbea4df3df0b016fd7886aefef9523d18ee35eedd1ddbb43aed6f6659f8cd3f1004d5ee1baaffefde77f4bbc5b7eafa9f2fd5ef5edea667678dd6c148a72a9d91704d0daaf5a0a1a9f77ca40f23c76dc3367df0c6224dede737f508da4b6ddb9ed6d2ce9d46c0671a81118e820a2dbf7cae16fdfd800617e4c6aad328f4d0d1e66b92afa545fef676f97c3eb5b4b4a8a9c5a7d6e82fb1611b6fd46d7fd8aa5efd7b85bb560d7d5851de7e3a71c2788d9b305e270eccd5c1a6c89b17b7b20b06a8e62f37e8478b4dbfe24afad54b6fcb1bf7162b285fbd4f43c7869633b8b75bedd50775c06dfac27a2754fef26ead78f790fa84be202849325a1ba4de43356ec2788d1b3b540afae50a06d4ea7275695ddde6f92dda2e97a9a58ea1f6c6560d1d3b5ea74e1ca5be49da25db59fed3257af1138f0a724cc191af41ca8d1db371c3fbc9d76a7957d68dc7ba67a9d0afee79465b8d3c459f6d022d0a780769dc946f6be6b5b7e9378fdca51f5e354b332f9fa62f8c1aa61c6b77c42b6ed09dcfefd1e0821c5370d4a276c3a38213c2793a76a87abb826a8ebe4a8b79fccd9d72e56699ca5a40be962c9d3861bc4e1b3752391936d14a7b7976dbed339d0b13c66b6881d410098a5c1ef51a709cb63d72bde674b6d7bd8d77ebd5cd7e459a1a19911e015d596aabfabbd6d90681af6bc17f3da36dca53af58e1535b4b732c7f4fe827f9db621f1fce2990b7e605fdfafffd575ca0f5dcaa8dfac0e38dfec22f49ed4d75d1e59c38c8abb6d606d5d7bbd36e24df2d4ce757f47a1c6c93aff9900a8687f771c2892ac8951a9a23dd7aaf5269796b2ca85750ad0d6e8dbbf05afd6cd12f34fbc2333530bb4d2dbe7007063dc1ea5b74efcbd51ad827523e0db535ee57c1099375e155b3f4c3457fd0d29f5eab9957cdd285e74ed08861fdad4b48dfa31bf56e755bacfd90d1aa66efc9baf0dadbb4f0a7d7eac2b33fa7e0a1962e5fe713afa941b51eaa536ee4b88d1daadeae8022f197cbdb4bf9ae6d7aea173f48a34750c079088c7094acd3af2e9ea2cb17afd56e9f54d02b57d95e777c8f5b612e974b2e8f57d9b979d6492a993f5917ffea157d1cf0aa4f5e8ebc1eb75c0a2ae0f7cbeff72b100cd5a5cecee9a5acdc666d5b758dbe7af9b2c45f85ef9bab9ffca54a830b724d8d590d050341199e3c6505b6ebf11fbfa09a2c4f179bf2afd382effd975eaa30d4bf5796dc91fd3582f2fb030a2857f97907b5feae3f69577e4e17d7d54d365ea7952f7ea281fdf2e3f3c6ef57f4934ce9fa7899bef38df97afc5f75eadf272f7ccc43fb6f3e66eeac6ceb9cdd77ac7b9ad76ed4a4990feaed8352bfdeb9ca0eef97bfcd275f4b937c2d3eb5b4b6aab53d205796e995695485965ff975cd59b545bedc6ce5677bc3e5ca901108e58d3f60481eafb272f3ad334bf7fd9756bcd9a001c765c7ca63385f0346274a60dacb336db7275bbd72b2e571bbe43282a16df6fb1534c2e77ede71f2066af4d75f7d4d53ccdfaec958856e7be96db94cdf73912477769eaadf7c324977e19163f41bfd75b74f034ce53696bf41c9e596273b47797d06a8fe5f8feaa75fbd4ccbad5538375ea79f3cba55bd06f456b6e9cd91110828e0ca566e6e83d62dbc47afe7e4c5aa9c1e2191f3ab26e0d571b9e16321d33efa8392cba3ec9cd8b9f9c00dffa5176bbc2ac889047241f95b5bd4d2d226e5f5d1fe75b7eb9ef25e1907d7874f85965ffe15fdf8990fe5cecb899e2b46a04dad3e9f5a9a0ea9b1d9a7d6d636f90db7b2edce97b4dda71fddb751c1fec785cfe95040dddad2ace636c99bdfa275dd719d8fbba6e62b27db2397cb1577dc0c975b6e6f8ef28e1b205fc52bba6fe6595ad0d91f1780cf3802231c4515faf32f6768d2895334e77f9ed11b3bf6a9bed1674d245fa34ff51f95e98d17efd5af66df90d0b6a064d10c7d71f2355af4fbd7b4bdb22ebeba9bdf275fed6ebdf1f203fae9570a35e5fa47933c285768f9e5976aceb2b5da5e6bda065f9d766f7c580bbef61fbae535c9d5da1eab0fee6f89a533696a8b440b89bfce4ba11bd915a74fd1bcff7b57fbea4debf2fb54bfe3792df9fef9bae2b73e653785db3ea80beb0a0bb78fee305d32cbaffaba2ebfe7f9f8bc91d4525dae5ddbb6c48debd0c78feac75347e9eceb1f51c9d67d32678124f91aebb4effd97f4d4afef384cc7da941f46b2dea64222ed5a92a5ebb6fc7fed67fafad829bae6bf9fd11b1fd5c9673d0d7c3ed55796e98de2dbf493ff77a365a22455e8f1eb27ebe4afccd7aa92b2f872a5c8fc5bf5d7076fd65d2be22749af6bc1d4afebbac73627ccd758f186b6ee881b95864c9617deeee9f3f5d0cba5da5deb4b38a6f595652af9fd5dba6ef229ba62515782a2b0fb9ed40be68feeca2d4fd627dafa42071fae7ced4e5df1c52f69e6c2279296dbddafbfa8df5e3f51e3a75ea7c7ad415158c9fc2bf5bddb9ed6bb9575b1917e9feab7fc51fffdfd7375c56f5d2a686deab0ec3537c7da3bfa5b1a2c533ba764d10c4d9c7c8deefe93fdb1f0d5eed6c6a77ea1fbef0f8ffb7899be73f97c3dfe567c7ef86acbf4e2afbfa5e997ff56276437c69693645fd23d8fa28b696bb44c89e97859955a7ef5993afb1b3fb33f57fcbed0b17c67ad96dff80ddd9c70bea47ffda85c364353af7b5cef9aaf557e9fea77bca02533cf4eb8cea7daaf94a2d7d407f5f2ebbb13efa3be3aeddbfa9afe70d7b7f5e53367e8574982a2c351a680634de8674500001ce126fd79d7adb18f787a73a55d4fea3b93afebb96dd1000047046f8c00008e317cd1c5faeae0ace81b194f562fedf9d7130445000002230080438c98a725dffe820e853e2e23b9b2a583afea39cbb78b0000ce44553a00c067d45295ec9a2e551c9424f51b354e853901b5847be8f2f61ea87f3f354d93e67643db2500c0318f37460080cfae5e83755ab8fbefc159b1a0c895d3574defddaf5f10140100c2088c00009f69b1eebfc35dbaf71a20df47cfe8d7dfbb916fb90000a2088c00009f69e68e9b7db5bbf5c6ffcdd12567ce4cfcce1000c0d1686304000000c0f1786304000000c0f1088c00000000381e811100000000c7233002000000e07804460070c414eaea074a55b6a746957b6b54b975bd164db3a671b0a2352adb1bce9bf050b2c49a080080c383c008008e949b96eb7fe79eaebedef0ff4326e9ea7b1ed3a596644e969f9f2d57f86f6f5e1fcb5400000e1f02230038520a0be46a6e5330f27f7b8b34688cce8a4f0500008e020223003852dedca3bdd95e455e18293b4faad8a297e253010080a380c008008e94d5b7e8ee55efeb803ffcffbe4d7afcceebb4c9920c00001c792e498675240000475cd11a7df4eb0b94d5dc2623dcc668fb63399a32df9a100080eec71b23000000008e476004000000c0f1088c0038dadce2f2b8efe654ee2dd562491a3943b7ac5aaf7777c4a67db863b356ff72868647e79ea0ab1f58af777754c6e6df5dae775f7e58574f34af2562a94a2cdfe9292b9e674d143371966e59f592366dadd487916f1fedad51e59e4a7db8639b5e593e4f93a389932d7b82ae5f55aab2dde1f1ef3da5abe35612d9d79754b2b9dc763d25c54b93ec8f52ac579a72d3637a65b3297ff754aa6cf37a3df88309d685746082ae5efc9236a59dcf268769df4efdc1c37ac5bcccb4f7ad50972e784c7f7ed3b23dbb2b55b6618d16cfee687e00c0e1426004c0f17a65472e855e65e548c6b45feacf2f3eaa3bbe75868616c4d2e5169ca8693f7d56cf3f314f1a315b2b4b5fd16faf3e53430b724d89fa69e839b3754ff19f3477646cb459a4573a57766fcb9488e1ba7a79a93e59bb4c3fbf6cb24e1c98abdc68577692bcb9caed375213be3c4dd6c768f3b2731b97a9a8f839fde68a092ac895e4ca91727394134d5da86ffef225bdff8f55fac56593356e78bfc4f5140cd5b82945bae76f152a7960b629288c17b7defa652a7a7a9bd6fed777f485e1fd4c89725530fc0c7df7a12d7af7e9794997156328f081f4ebf5afe8e1ebced58909f97cb516ff79836e3fcf3c4fc4e1d9b7bca665fafef2cd2a7de87b3ac3bc4c6fae0a869fa5ef3dbc51abe7159ae63619394fbf7bf30d3d75e7e5fad20996edc9cd55c1d869bae6c12d7af7b9859a629a04003832088c00202aa8a03f4f5fba7bbece1d1654639b21b73bf2b951c930026aa9abd3884b7ea0971fb95b978fcfd38196a0dc1e77f4a3a432820ab6d62b30f89b9a7bf7ace8bce91baeb9c57fd3ca5913a4409b9a7c6d0a040d1972cbedf5caebf5caeb714946f46b48f68c5635f57a413ffaea60d536b4c9b0e96667ca92a7f5c4cfbeac41865f877c6df20782325ceed03abc5e79dc860c23287f5b93da7df99a70cd2a3ddf5140e36f56f0ec8ff5cbaf0d53557d6b787991fc316404dad57270bf465c72bf1ef9659200222cd0daa4213faed09ccfe7eb404b402e8f47d1c36104156c3da4b6822fe9ea9b6fb2cc7998f62dd8a243c3ded21d3347abe5509b822e776c7b64c808b4aaf18057936f5aaeebe3e79446ced31ffffa5ffae649b9dadfd0a2b6802157769e72f3f2949797ab5c8f4b86bf55cdf5b51a36f50e3d54dcc1b60000ba1d811100440515088cd4a8d15eb5edff48dbb796697ba54f05791e539a807c8d27eb8c2f64abcd53a0fa8fcab47deb6ef9bcd9ca322fa9b551834fff5662b5b50e4c5abc5a8b2f1aa4ea8650cf6c92e4ceee2d8fd1a07d3bca42dbf4519d0296f9ac8cf676f59f729e0635fb95d5eb384992c76d9aeb3b4f69e5dc896a3cd01c5d962bb78fd4b82fb48ead65da5d2b15e447f63da8d6fa031a71c922dd5b145b8c95110c2a6f486fb9d44b46edeed0b276ec93bcd9ca320511be069f265cfa6b5d193f7b1c231854ff81bd15c8c98aee7b75bb47b9a63b97e16b52ce1917eb76f38c876bdffc010d387db4fa285fcd95e1e5d44bbdcd07de6855f6902feb8205a6712ad42dff7babbe31c8af43ed862497bcbdf3b5eff54774d7b5ffa96baebd434f6dad53414e68c7fc8d751a307d9eee9c665e0600e07023300200334f8e5cff7e5ad74d3b4353a64ed69433ff4337bf7640c745abdb49525046769eb63df2358dffe2644d997aa64efeee1aedc9f32a1a42050352ff213ad53457c766e9bae963d476c81414e5f7d7bed77fadeb269da833ce9f1cdaa62f8ed288afdea497b7d4abd5b20433c32fe5e7efd773b77d435f1b3648c79f73b17ef2c08bda2ae9f639d334b0d9670a1cfaa97eddcff4b5d1a786d63175b2264df8827efcec6ef58f068641f99a7235f9f2ff49f936c395db4f9fbe78a3be38e1ccd0b2ce3f559ffbee63fad09d236f24380ab629eba4a9ba6cb665e6386e65f731b4ee9671d17d3ffddcdf6853b347d9d1202ba0ac3ea76a826939876fdf5cf2e4e668eb235fd3c967869733f64afd7ea74cd5e20c05fc5e0d1a756e6cb6f37ea1cbcfeda5065fe8a8bab28fd381577fa28b2fbd510f3cbb46cf3d7b9f7e3cf50efda922a8506c145020708acebcea5bb16500000e3b0223008872293bd7d09bab67ebcf1f47c6556a45c9fbaacff2c6aacbb9b3e5dffd67dd3f7f5d744ebd7687fe51e65796b9dd48a68abea5a92767ab35524bce9babe0b695baf9d23b4ddb13f6fe2acdb9fc077adc323ac6adecdeed7af527a335e7c175da26491fbfaea797ad52a96ed55927486d910fcdbab265ecffab1ebefcbe50baa84a3d7ecd2abd5015880522fe76e98489fa6e5c3a13778e821fadd6afaf5aa64fcce35fbb513f796e977ae5c4021123d05f83ad8da44c5cd9796a58f71b5db1ac323672cf7fe9c5cd07949515bb7db9148835043a9cfbe6c9917ffb6afdc27cdcb54e3f5ebb45b9d9b1d746c160507dfbc77a74187ef9d91a6f18e140cd2daf67b7de79da923ffa83b654b4ca138e1c8381560d3ec9b6f11400e0302130028028b702ed1faafa1f96d1cbf6e8c3a6b6e8db2097d7abd68a2d7a2e2e5185b6eead97c7dd85cbead821eaeb0f46df1679b372b56bd3752ab1244b8b275b6d657fd1fd2bad13248d1ca1217ddc0a4457e4953e7a5b0f5892852cd3d68a501229d4b647bd0a34c8922ac2e5cd52c3ae8d7ada3a41d2a67f7dac5a8f271a6006830115f44ffe56c4edf6a86af7efada3533b9cfbe6f1aa61cfdbda649db0f7a06ae48a05ce16df38be406dc1c80605d5de32485f7ba429aeb7bbcabd35faf99772d5dc164e170c4afd47645c151300d0795db88303c0678d4b81b6261ddc681d6fe552abefa07564975d3d6c88fcc1c8eb22b7dcae7daade6549942697c7a3d6ea5d890ff192f4b5c11a9ee355644d2e975b0d07ab2c8962aa0fd6cbe5ea86db855f8a467da1ee0a949bdbd79c228ecb25b5fa2baca3533b4afb962c2892a451430a148c1e57490acaef6b91cbe58a1b5ada65fa3fd41d5eac074100c0e1d6f5bb0100a05becacaf97cb157d9f2243435530cc92286d2982b757ab55d9ea8fde000c23a83e7d875812c58c1a607db0efa4d14334c888bd11f3b8bdaadabbca92a88b8ed6bea55053df2a97a9774397cba3f6768f7c8dbee44343835aeb5b53b6210300742f022300e821367d5aaf6c5355bcf6f6364d98fc3ffa5c5caa6ef0f11e553504e589b6adf14b279c9dd8c5b424e9268d299402d19e0c3c524395ca2da9228ca05f7d864dd424eb0415eaf60923d5e68f2cc82db77bbfaa932da8b30ee3be75d6cefdf5f244035eb7b2f29af4e6affae9e4d1c3530f5f9c99a20d1900a0bb111801404ff1d85bdad81c8875fbddde22cf176f50f1aad909bddb0d9f74ab7ef7c2639d6c83f27b6df948b18e228c36b9067c55d715cfb30461c35554fc234d1be056a4e98b2b2b57ad3b366a795c3a137fabbc13bfafbb975c1037fad49beed78fbedc472dedd1f7456aab2fd3d66571c9bac161dcb74e7aee5f1f2b981de9bc23a8f6b6013aeb7b4bf9882b00f430044600d0537cfc333dbba14ebdf3a215c114686cd28997fd56afee2ed7a6f5a52a595faa92cde57aef2f3fd7d4d1059d6c8352a1db8a37aab5576eb46d8ce1ab53c105f7e9cd5ddb42eb585faa7777fc53bfb9a09fea7cd16ef29495bd4bebfff73ed3b2ac0cf90f3569fcb5afeac3cd91edadd4dbbf9aa6c0c1d668353a57ee716a78f319fdca3277d71dce7deba4fb9ed40b1fb645bfbf64f89b943bfe3afd7ec766fdf98987f5e0a29bf4cdd9b76af1030febc1275e52c9e672bdfbf43ceb5200008719811100f420cb7fba442f7ee2897eec533214f03548b9fd74e284f11a3761bcc60def275faba91783ce587183ee7c7e8f0617e498028806a9f7d0d03a268cd7d002a9211238b83cea35e0386d7be47acd79cdbca044aeec1cb99aeb943b3cb2bdb93ad0100b8ae4ed2d4ff5f3baff27ddfeba28e430ee5be73ca95b576c5470c071d18fdc1a6d87a48213f5a50b6769e68feed6634b6ed5ecab6669e6859375ea49c3956bfea63000e088203002809ee4e365face37e6ebf17fd5a97f9f3c657bdda11eca8ca0027ebffc7ebf0241c99d956d9d3343155a7ee5d73567d516f93cd9ea95932d8fdb259711943fbc9ea0e192cbe35576de71f2066af4d75f7d4d53e2bee193c8959dab86276fd36b755ef5f1061508f8e50ff79ded72b99595d7575987ded423ffef322db77e9ba9db1c9e7deb8aca653374fa0d7fd24701af0af273e4f5b8e532026a6bf5c9d7d2a4e6e616f95a5bd5ea37e4ceeedc7b400040d710180170bca6b64875aac85741ed45a61a6d8d962931e92cabc3e57cfca87e3c7594cebefe11956cdda77a5ffc645f639df6bdff929efaf51d09ed613a5c769c0a3d7efd649d3c7dbe1e7ab954bb6b7df29937dbef537d65994a7e7f97ae9b7c8aae58944ee0e0957b58a3befbb59bf5f85bf1dbeeabdfa77faeb95373a77e45b7257933d3dcdc167db3e46f69b04c8d89e573506dcdcd96a9ead67d4b274fcddb9d2cdd27cb66ea8b932fd64f56bea6ed9575f1db23c9d7e853fd47ef6addb21fe9dac3f5360d0090944b715f95000020134b55b27796c685030857766fd597dcacf197f3600f0038b6f0c60800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100a0cbd2e9d21a00809e8ceeba01000000381e6f8c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801c7bca52ad95ba3ca0d4bad137a94b9c5e5aadc5baac5d609e816a1fc2dd7ea22eb94441c0b749b25a569973b20b9d07dacac789e7502704411181d2d4b4a5599ea2250b44665a9a603404796943a2c000a3d5c952cb18ec7e12c0bfdfb1758477d06ccd3ea1ddc8313f5b0732cfc2c653770ecd019044647cbfcc97aaa5c1a79c922db5fda165f759efa346cd4fd972fb34e022c6ed494618334fcfc1bad13e020cb2f1fa5e1c346e98a15b171730b8798937cf6158dd0d8fe03ac63e1c4b2d0656334b88f751c7ae239d6bfff00ed7a7a90860f8b1fc6f3fc844e20303a8a163cb151078de334f92a4b15a825a5fac9e481daf5d20c2d8f9f02006933ac233eeb0cc96f1d07c98965a1db90737138c7f01947607434ad98a13fbc7550fdcebec1f45a7aa94aae1ca34f76fd494fcf8f255dbcc1fa9a38b14ac4e20d35aadcb146732de323af9ae3d6b1b74665c53f54517179d2e5259813aade67de0ef3ebf48eb7d16ebd35a1fae973ec96619d3fccfaea7cc71ac5bf74b35b4f6c591d6f670a367990f8ba3ef5fa1384ab4d96dc6bddb6c83ca12a1d1defaf753b64c967f3323bdec674f2c9dc56c59a3e59550b433f8cdf1fd3f18f67d96fdb7d8f95fba2485bab1469659727e9b6cdb2963b9b7d8c6e8ba99c98d3747add69cc1bdf6e2894170f7fbdbfa4cf6b66781e6b1949fb5858f73d216f3b2e4f66b16db5ae3fd93c1d9785c51b6a642cbf50de03fb75da3c239a26e17a6865734ec71fd78ed7ad8cca612cafacf96a3d3e2189ebb796bb08eb3918daff74ca82659b332807dadca6a0355d5289fb92983f1d9f47f132cd4f9b7cb294bb50f99ca5d324f5fbfa32db3489ac7968dae6c8353e611fc2f9612aa7995c5333491b653d867669edee493bd6e8850ecfb1c4e39bb06cc926afcab57a8ea1f6befdad09bb5717f6bdc3eb083e530c86a3392c354af6d618953bd6187325a3a8b8dc6869358c922589d38b4cf32dde506354ee2d3756cfb18c0b2f276e1d4b4a8d665f306199dbcaeb8cca0d4b6db62971985b5c6e188679bb64a8688db13af2ff9252cbb2e619ab7758b727b4deda46c3282b9e1797aea9698351b2a12661bc757f42dbd16cdaef70babda5c662cb7a6cf72fadedb41f6cf360ce1aa3d6302ccb4cb17ebba1688df1d1c17ae340bbdd712f354a76d4248eb7595f2cef94245f64cc2d5e13fe3fd536a65fe6e616971bf50776196571db182ac7d6bcb24f6bbf9d9ab3c6284bd84ffbb48b37d41875db3f32ca6cca80f5b886f6a1e37489c352a3c4b2dea2e272a33dd060ac2e8a5f7ee2b67475dde9cd3bb7b83c216f8a6cc645d2a67b2cba7cced90ca1f57f6894ed2837e59fdd72332b0b9ab3c6a888bbd6a51e6ccf69f3752d8375db1ffbc4e39434af96941aed01f3b5d134bf259d612449673d678b63eb4d561622fb685e5e5171b911b0397fad7955545c6e18ad878cea837be3ce03dba1cb79996ce8447e5af3c9e6da16bbaefed0669d96a128310fb5a4349657456b8c4adb729978ffb13f3733b9a6daa755783f0da3297e3fedca53d11a634f4383b1bda2c5927fa9ceb134cbaa5d3998b3c63868048cda5a9bf57534243cdfd80fddb2ef0c4e191246301ce1616e71b9d1d2d8669414af3176b704e32e18890f449121f1829a696064bf5c9ba1688d511348bcc876382c29357cadfb4d374cbb8784d045f1e386f6c4f1d6f9936dc79c35c6a776c164bafb675d8fdd50b4c6a86ab7de6463f3b7d90535e9aebf688df151636be203e59252a3b12990303ef1013872038f6d5b621aeb907c1b332973738bcb8dfa437edb7cb12e2769da25a586cf67cebfd87acc0f2fa121f1e6bb78438d51df94582ee616971b8d2d35b1e3baa4d40806f65b1e7ec2c7afa3e36f3b24e67bb26de9d2bad39cd7ee98db8d8b8c4feb581ca6732eedf5675816923f80da0cc9f62d3a64b6ee64c73ea11c26cdabc4f32b724db7aedf7aad4f96ceba1d49d769bdf658c7a7b8fe2dde50633434761418754f5eda0f19e667423afbb476e777b2c13e6f4d43d27299b8dea4e786cdf66792564b4a0d2349792f2a2e375ada0fc6dd6b3f6a6849bc2787a7d9ed4bb232185f5653948325a586afa9dd765f520e09cf37364377ed3b832306aad2f500cb2fff8bfed150afd3a64c57efc001953e116944bf54678d921a4a9fd402cb3cd232addf522ff519a251d649e92a7fdb66b989e64e9fa8d6aa4d7ac754b52f2ddbab5465f4d7e0b196f1d57be2db4eaddca37f371e54c396d7e2c7efa8528d69fec876bc6ddd8e956bb56177ad469f65a99694e6fe25dd4e93b9d327aabd66935eb46bcc39ff6d95d6d46a48a1a5da46baeb97e476bbd550b5337ee48e2ad5795cdaf54e7ca70acb2baad4bfff588db0d63f899aa7a9a715a4b7fe84349997398f67bfb6ac4dcc9705efec54fffe63e2b6d336ed8e2ad504fdb1fc2b9aa6f34f0cb5b133f5231076a3de29973478445cd58643f589e573794595bcae81d1e3baf8ac31dabbebef5ab7323e9de6bfadd2fd419d36ddbeda4d721fa8ba41ea33644cdc58bb6de9cababb326f2ae91c8bc376cea5b9fece94857475785debc4baed8ebdb51c4625e4d532eda996e9fc0a9f8b5bd626ac7fc1db3bd5ffc4299a5a644ef75a42ba0e154dd3f9270ed0aeb7ad1db72cd3ba2df5d2a8b3b5b883ebdf827776caebcdb28e8ed74d799952baf999c1b52d5dcb2baa3474c0249d65ad96d549b6e74626d7549bb48bcf4aaca21fb162edfb3a1028882ba36eaf37f19e9c549a6535553998ffb6dea83f681d9b167f4b7dac6a9fb97ade11d9777cd61018f50837eae9d27a65793d6a7df78958af52e1de5faa2a122f7a4aeb0139b58407715be187ec862a955b27d930d7730e3c74a17ab5b45993a4b9de10978ce8dfa38614282ffb0bfaaea58e70e5debb34d9a6f7a054eb49673bcd460d4995073b6d1f9053addfcaedf6d81e67977544548a5afd45d374dec8be69ad3f214d27cadcc183e5da9370978b887f20b44dbb628fca0f9a6e886387a89f51adea1de64431e555360f3076c76647956aa2e5679e460c96b2075dac3b12cacf2c8db6cc9a545c1df5bbf4f54179d61436dbd295757765ded4d23916dd79ce59a5b3fe4e9585b4a4715debccbaed9617570e63ecf2aabcaa3ef64fd1088dcacfd6e08b226d5c4cc3cc313ab07f7f28dd92b335b9ffc0a4e76c4a6387e8b8e6439af823eb43658dee981ceb823bf5f52f0ddd959729a4939f995edbd236ff493dbbbb56a3af0ce55d42bb950cd99e1b51695c53a3226943d791841f252356ecd1ce03f13fee25bb27d94ab7ac9e7452ca72d059debc026d59e6b2f44a17e9a1f330ef3b3e73088c7a88e56bdf57436e6ec2db811e23d945252cd408b44633f564f4c2e4f9d1cb6ac9ebe097c40cb5d4bea2bb2c5d72468734baab3e52db79b4b95c3de5c25edbed37c14c5803cbb66d0f25969b74ba760d37c8adbc527a2a3acf1d7aa5a6c59a32a94eafbb8bf3765557cfb91ead83eb5a77b196c37479738fd39687ad0f7c9121d6357b50fb3a7d9e79f39af5da8f93ad63b2cddb15245aa62bc60ed2f0614f6a97a42fcd33d2e8aca1b332b9a66692b66bd22aabd94dd6d9801e87c0a80749b879aed8a31d07f62756d10a9b5b3844070eec88ffb5c8faab5b9785ab23a4acaeb254574e2e5043e99df10f4a093bd435915f153bff2b79e7b7d3f617cda8d0f72eec7eb13c2a3a2837297530af5d99ebdb7794edafaca1b43b53fc9a99c48e2ad5b90627563d0aebdcafd7e994e3e422df15bb2bee41318d82237571dd5d99b7ebba7ece75d161290b4a2f5f0fdbbad314391747d89f8b513baa54e71a9a743b538acc3bce3a215eaaebdfdcc2210a0603d6d1f18e765eaa73d7b6cc85be2997fbe33fc928f80fcd34f71c190c245db75526d7d4f4d27650de8b46684c67df3a2ab3b2ba5f49ca41d1088deadbd73ab61b1ce67dc7670e81518f16aa7bdd67f22c9b5f9e12db919457d56b80cd45b2a8708802810e6e5c292c7867a7868dbe4c5726ab1e503442e36daa28144d9fa8fe5d58afd5f2b5efcb336092be91a40bd60e75613b97af7d5f598392ac7bc9d93a77488e6d3defa32355b9e948aa7913cb9c240502fd6cdab9a45155299915af85daaf5c94d88dafb93d45a6bff42f7867a7869e9ca21c2715ab8a11f7cc34679a2615dad427b3d1f975776d5e49ea67734d485797cfb9aeea4459701be93d8076785debc4babb57aa73d124e576c64b280b69cebbbca24ac306d9b5a1099de7edfe14557bd5d17a8e445eaa83fcb4bfb6498955a4d3b272ad36551c883d8cafd8a35d070fda2ccbfe23b2995c53d34d9baabc174d9f28e340fa6dba12cfb154796b12aeb696d03631bc0dfd3ab80f775677ee3b3efb088c7ab805e73fa95d1aa39909dfec58a8c97d76ea29d39b8fe597ff45ff38e88eff60ec92522dffd6f16a6aebe0c695cafcc9bab7b4565fb9a921fedb164b4a4375a957ec51d981fdf137bd25a55a3e6358d7d66bb562869e78b356a77cfb219bef8ca4516da12bdbb96286ee78ee438db3ae7bce1a1dbc699276adf959ac6d580f90bcdc749c4fc9e74d2c7392146c6d519fc90be3f22594b65ea5f776e623c5cb74c5bd1bd5d0e73cdd11f7ad9e795abd639646376cd4fd9da93e36ff493dfb61adcebda1def28d96a52a49f99d8ad02f8e03be789569bea52a59789e8e6b698f4f9a4ca7d7ddb57997af7d5fcd39497ea14d4757cfb92ecbb02cac784d1b3fb67b00b5d1d1752dd3751f060b9ed8a8069b73514b4a4ddfe849b19d1b62e5c3be2c2cd3152fedd4f1a32fb3cc1baa761c3de6f327ebde376a75fe4df16570f186859a9e7b50fe0e1f25526ce311ca4b657c6d8b750a9118ccc58bcb2b499a335d534f317fa43dd48e78c8e4ef99f22fb4efe764e598660cc9e49a9a76da14e57df9b74fd6aea7d3ac3699e41c4bafacdea8294fefd4e7cebb21fe1b534b4a75c769d2c77197d3f0b78e3ab8c6a5a5bbf61d8ed0d1d50c4750c3817003c538376acab03b55aaf3e21a5fcf1c6cadd6134e7be746358c9a156bf8785195e6def79efc2d0d712933b5e0fc419afb4cb5262f3435aabc7248b8fe7278bd7d4cdb785195e65ef78a6abbb85e6b9e2c387f907ef8cc87d146aea161a14edb62d7d39055d7b673f9e5a3e4ba6f53fcba179ea77fdee7ea723b0feb7e46241b7fe080a951b1ad64e5269d3738c9e6b52b735253db56fd61d89392295f668edaa9a7868dd215d69ed4d2b57286c60f7b52bbcc6579ef424dae7e52c3c7a61f6cc5e75fa81dc0d2d2b6f872bc7796147d80b1b7e0fc3bf5fc6ec334dfffa7ea3befd0abb5e9b631eafcbabb34ef8a19ba6d4dec7c49f6c1cb54ba76ce75838cca42f8013c92b68387aad4d7b54cd79d5cb2f3b8432bc2eb375fb3f686dabac5f510976c3b656a4395ac2ccc9f2ccf757f8abf6fecadd1eda7bd1fd78bd782f30769c9c6f832f88daa3bd47f4db55a1b1b63099349b68d19e665d764766d5b70be39ef53ff1060bd2f6cbdcfa529a6fc5b7ef9282d2d0d9af26fa106bf7887feb2bfd5bc1829c36b6a26699395f73f16c56fab5296d924e758ba6575fe64b9eedba43e9317c6d25c54a5bbc6fe45d5be43a6f5a4ef40d26d8de99e7d8713b8c2fd760340c6e61697ebf6c9557acae6a1020090994caea999a405901ede1801000000703c0223000000008e476004000000c0f1686304000000c0f1786304000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111821a6688dcaf6d6a8648975828d4cd26664a94af6d6a8ac789e75420f10dab6ca0d4bad1370842cde50a3cabda55a6c9de068f3b47a471ae5327cce76e9dc9a135a46e5de1a55ee58a3b9d6e9c728ca15d293d9b9d6fdf7472435db90169559c72657b84e5a644897dc6c9d02872330ea11420fdc3de122daa7ff00eba8a432497bac995b5cfe997af03bd690ff3d50d11ad5aeb84c2abd53c3870dd2f0b133b4dc9aa6a75b524a00e408a100a64b3f0274d167f9fef8d9f54828583ac73a1e4e4260d413148dd0582ea23dcaa82105d651926ed494618334fcfc1bad13d0cdecf35f5a70fe200d1f36590bac13d0b11533347ed8208dbf7c99754a7ac60e51efd66a6d59dbc9f97b80b98543aca324cad567d0180dee631d87cfb4475dd26de3ad6393abb840bacd253d7f6f6c5ce189529639119c88c0a8273024bf751c7a04c33a024714f9dfb304756c1f946378d3d1291c716480e20202a3a36ff1861a19cb2f94f7c07e9d36cf88afbb1fa9a77c6fa40ebcb55e7fb8be73a4ce7f787a91790529ea44cf2d2e57e5de72ad8e9f41d97b22554e4ccbb599df5eb81d4e7428d7ea39d634a6fd49b2fcbe8796a5bf0dd674a9aa257694369ce7ff6f82a47e17e98eb83489ed9f427958aac5faa1e55824abae63973f89cb4d2679be657e9c13f262c71a15dd5b7a78d25a92c4b55589e4435147f91fde7fbb2a76d6755a8fabe2ebfd171597a74e9b32afd397b08c84721139f63f4cd807fbf29078ce97dc6ba83a77a03561229b760f91fc2cb296cbb863169a66ccfbbc0e1cc8d2571f0a5da7e2f22c93fcb7b99e45b7c3522ea27960597ec2b23bccebd03e3cfcf5fe923eaf9996e51fc972954ceaed0fc9fc7a9328613d9dba8698caadf55c4e38df33491b664d677b3ec4961bcbf752bd505caecabdb3749aa47e5f5f669b3fd6e364b7cf5d3ad7c2d2ba97a6382f4212b7233edfc2d313ca6f9236b1d6eb40425e275ed33bccaf0ef6217999ebc8cdd2cd8674f33aeb84d8b4d98f84fe9d6d936e78b81d5174a8930ac3d3226d8c22d5e6661bd20d53a5764933c3e9adcb8363180c477998b3c6a8f0058d922596f1456b8c3d0d0dc6f68a16a3ac785ec23c657b6b8cca0d4b4de3e719ab77d418957b4b8dc5d67171e942c3dce272a3b1799fb1ba287e7ddb3e6a8c4f3f678d516d18f1e38ad61895d66d0e6f93795b8b8acb8d806198d285b767c71aa328ba2d4b8d92e8b2971a257b6b8c6d1fd4c6a759526ab4b51b09f9b078438d61184dc6ea39a6ed58526a1846d7d3c66f636cdbcc69e716971bf5073e34ca7694c7f2d1f63824396673d618078d80515b6b738ce3868ef22d83e31c1e67c41d97d0b1325a0f19d507f776316db3298f6df2229ce7e6e5cd2d2e8d5b8e7dfec7c6cfb58c4bebb826399f8a8acb8df660266534cd6149a9fdf919b7fde1f25e5e179f7649a9d11eb096cb50da84edda5b631cacb59cb37683cd39bb78438d51b7fd23a32caeacc6d663ce672d29359a7d55f1f9dc0df91f59c6fefd6d71eb2c2a2e37da7d7ea3644369dc3e1715971bed8186b8f2925e5e87e64d382f8f58b94a36d81dd7f036ed2d8f5b7f46d79b84a1a3729dc93524fe3a6d2dcf76e3d24b6b7fbdd19c3546adf51e94ecdc314d2b2bfea1657c245f3b2aef76c724b3732d937ba95df989a44fb867d81cefb976e5ba688df171636bc2f8b8b4e95e8b3bcaafa4fbd051994b63b8a4ced03dcd860a2de30bd719fab561e89cf0ffb30d4337af8b4d3fa7ccd06f4cd325439794c59653b8ced03d96e9c36dc63138714818c170a4079b0796c8f88f1a5a126e1cf6179bc810be6875e666675a5fc27297941a6ded07e3d2c66f73b2f558c617ad316a5a8346c9bd96e54787f0f65b2ff2760f3a4b4a0d2360ffe051545c6eb498b73793b4491e9462375b4b6074c89f78435b526af87c1d3d6c9bd236b5272ec33c74986fc9f2dffe3857d904990aef7743a329d8c9306d8d5d1ecf59637cda1a1b9f2ce8b12e3b31ff6dc667725c939e4f9673a6c3bceec2b0a4d4f0b5ee4f78c04ca7bc273ea08487396b8c8aa656db631f37249cb3a165d63725e6dfdce272a3b1a52621f868f6258eeb7afe47cad2a796a02b9407875af65bc6279e87b643425e2779803c52e52ac990f4b8da9481f4af37364387e53a836b48d2721b2a8f9fb49aaf1919a44d71bd09dd83ccfb9862b9c9cac892522318b096a7f0b24d6525e931c9e05ccbe45e6a5f7e52dc33ac65ab28fe1aabf0316bfddbdf8c971be3c72fde109bafc36b719af995741f3a2c73690c9100e6929be3c7cf360c2d2a8bffdf1c1859ffb70e768191dd3806c70d54a5ebe1dc5eaf1ab6bc16dffb53d1349d7fe240ed7a69865698c74b926ed43be592068f48ac169286c8fa12963bff6d95d6b4ebb4e9d6ea0c6145d374fe8903b4eb6d6bc704cbb46e4bbd34eaec505586157bb475ff7e8d3ebb8357e9e56f5b1a422fd39e6a497d86685478cce2b3c6e8935d7fd2d3f3e3124a9256ac7d5f0702051a3c36f47f266933e5f1ec4f6c90bea34a3541bf861486f32b923f76c76cfedb7aa3fea0756cbc74f32d0d73a74f547bcd26bd68d3087fc13b3be5f5c65a9f669ab6b56a93deb6e6f1cab5dab0bb56a3cf0a6d7b7955bd068c3c4f17d854b1cc54a6c7d5f67cd24e553798ce996ecceb04dbab5465f44f2c6b1d96f7a53a6b94d450fa646207012b5fd3a68a06ebd8b41daadfa4772cf9b7bca24a5ed7c0c4edb4e89efc0f6968f8b7f6ac348f09e541fdc77fd7fab8f1a1e3d567c818f3c844c9f23a0dddb35f9672652bc571d532addf521f77cd53bad71b3b87a35c2794db50797c7d776de2f149236daaeb4de81e549bb88f76cb4d62f15963b477d7dfb52eae3c8597bd3f18bebfa53826199c6b99dc4b6dcb4f26f7f915afc55d63a5799a7a5a81defcd35754db28539e85f66dd73ba1fb7447d7e2f4f22bc4761fbaa3cc55bc24554b1a7d9169e423d24992de5a651a67517b501afc2569b87502901a81510fe7767b545561b9498c1da27e46b5aa77c48f8e28af4abc99a6cb767d260937bb88b143745cf3214dfc51b89d9469b863b2b987b11bf57469bd346a56cabac60d553bada342fb15354f23064baade63fb90a5157bb4f340e4269a49dacc1d3c58ae3dd63bd78a3d2a3f680a76c60e513fc3654e91a1f4f22d1dc97a7cb39369dabcec2fe8bb96e35fb9f72e4d36f510b5fcf2bfe81f75d2650f1949dba0a527f3e36a5fbec3414854f7e5b52cf5eb030f5da85e2d6dd6241d97f770cf9589dbde0d1aaa546e1db7a34a3532ac632dba2bffc3ecb62343e9e475c7ba6bbface5ca4607c775794595faf71fab11a6361f695d6f6c756fb95692721b650908d3493b6a48418a72601f10a75c6e9cd071cd1e7471b4ed626c98a5d191641d1c9374d9978918f37ed8a6cde83e1f2e6b913c2f9aa6af8cf6ead36669f1df0eaacf69d342e3979cadc903dcd165a6be16a7995f61b6fbd02d65ee5e69e37669c8a458fba0732649d93ee99fa61ee5ac9e7f566acf937e1c6e5b4480843411182123a96e42debc66bdf66357e81b270943ac2bdce5978fd2f06183f454b9a217cc4c1a291fbbf625bdc9a5a35bf32de9c3878d0cd2b6d4bea2bb128e7d788876731eeaf63cfb477f52830af4cdff356c1a0e1f5ddd91d7a106eb359aa927a379e0f9d1cb6ac93b36fa83ed4a187fa41deb797da47447b94e5bb2c0d24e2669bba86ddb4389d7a6f0d0e9aeec3b21d5bdb43316bcb353834ffcb2a616491a7eb2da779568fd4ae9fdbd65d1006a6ee11055effebbd64703eb8eafc55dcdaf6e29736f6d92da72a52f843fc63a619c54b549aab02634bb36d41df783eb25f595aea73305a487c0e858b4a34a75aec149ab88d8feea96b23a474c3018b07f7352344263fa0fb4f945286c4795ea5c4335789c754272a16f87dca9d20669f495e9f7aa1462f985cc2a6e7b33497b98eca8d27e0db53f66452334aa6f5febd8a452e65bb27d3449f546716ee110058381e8ff9d496bfd2531a995a1efeae43eb44903475ea61b127a9deac8e13fae29f33aa5a5ba7272811a4aef8cffee5567a38d157bb4e3c07efb73f3a87db3e5f0e77f7aba39af8fe47ea53caea173ecc0811d896f88ba2865b94eb6df36ac6f6f4242e5d1fae09f4eda54d71b6bdacc75705c23521e93f4cfb54edf4b2332bdcf87abb71ddf47bae5c289b16a6df3dfd62e8dd1594b7ea873cf3b39b1ba9b925d8bd3ccaf34a52c731dba56fa77a43a5db81addae97ac89ec5586bf57f4cc7669f854e992707005244160d443b88d2417513b91fac417d975751aae1f1dbdf859db2ac48c1a52a0603018372ee8f7abcf69d312965b347da2fa7bea93bff148b94da984da20f51d3021aeba483a16bcb353c3465fa62b6d7e7d2a9a3e51c68158db894cd246d9e459a785abdfc4ea80c7144d9fa87e815880911e6bbea57f9c97575469d8a0493a2b212f42f5d2dbfd9d4cbbf67d79064cd237320d70e6bfad37ea6cda24d8ec8b55a78e6bc6ac799d86a2111a6f531da768fa44f5cff8582b568dc8e6dcd492b3f5a53ec759c71e114726ff3b90615ef7eb3baac3e378e4f62bd456a4cfe459360f8aa1732c93363499b196ebf4af21b109e1b6a3664bced6e441360ffe69a45dbef67d650d4a720d5972b6ce1d9293d8be2a05eb3565c13b3b35f464fbe31ad33de75aa7efa51129efa9d6fbbca2dbfd85afbeaeaf9d566bcaa750193b29fff31a5ca0c4e36266b916a7975f99b096b90c6cdd2e0dff9274c92449dbe33fcc9a8eb736494d9206a6f1ebed508227272330ea0956bca68d1f1f4cb88827b74c57dcbb510d7dced31d717576e769f58e591addb051f79b5e712f7862a37287c4df6c8a8acbf593b3b3e4b37e5936d8a6ece197c52f7749a9967ffb64ed7eee565d91f497cb65bae2a59d3a7eb465de703597e8abf3a2352ab36cf305a715e8e09b8fa5587612f327ebded25a7de5a686f8bad1e1edddf5b4e94bf699a48d3c180d1aa3119d6eff6275a3a63cbd539f3bef86f8ef712c29d51da7491fb79bd3da4823dfd23ecef327ebde376a75fe4df57179b178c3424dcf3d28bff9b29049da1533f4c49bb53ae5db0f59aa4accd3ea1db15f08176fb07c2763c9d9facaf1f92a7d22f66b7fdaf99fe1714d4b87799dfc7b2f512bf6a8ecc0fef8879a25a55a3e63989ada6c1e303b143ae7b34fb19c5f73d6a8ecca21da5dd199657683c391ff99ca20af97af7d5fcd39c97f858f3a82fbb5e0fc27b54b6334d3f24d9fc51b166a729f9d7acafc16ac2b3a2cd7195c43c2b27327c56ff79c35aabd6992aadfb85f532c81635a6957ccd01dcf7da871d66bc89c353a78d324ed5af3b334ef13b1ce09e29ebfe73fa9673facd5b937c45fcfa4a52a895621eba673add3f7d288cceef30a77d6113ce70b3ae5c0ceb8b78ce555f5ea3feb6a9d5a171fd077782d4e2bbf52e8a8cc59bfa994ca5b9ba4a63ce99493a57f6fb24e4d34dbf4cd2285db25e5b64b6baf358db48874f4904ef084cf2c02a31e217c018c3450345d701a0eecb7a40d5b3943e3873da95d9179f6d6a872ef424dae7e52c3c7ceb0f40c334303efdfa43e931746d3de31e42f9afb975ab535379b53aab9b94ddb96bbf40799967be518fded3e57427de2846d9b3f599eebfe14db8ff070fb69efc7f7ee64b7cd9dbcf92f387f90e63e53adc90b4d0d43af1ca23f16b9126ecc99a40d05048aa64debc2dd91f993e5ba2ffe38545e54a5bbc6fe45d5be43d6d4893acab70c8ef382f30769c9c6b6b8bcf846d51dea7f77957a65c7b7cbc834ed0f9ff950a3af34e5f1de853a6d8bb987a7024dfea5f518f48a7f50c820ff3339ae0965369994791daa4e13e9d9c9de8d9a7267f8a1c674ace75ef78a6a5bd2ebd52ac1ca191a5c6439bf160ed18bc3eed5fbae266b6a5b69ef7f92b4070e983b4009392cf99f910cf27ac50cddb626563e133f1a1a73e4f6eb464d1976a74a65dafebd359a3978a3ee32b5cdec1629cb7566d710496af9a34b776d9918dbee85e7a9fa991fd95ecfd34dbbfcf25172ddb729fe1ab2f03cfdd3e61e94ca82f39fd4ae689988fc30b34c578c1da4a5a5f1d7b3cabdb3a4974cf7cd6e38d7ba742f8dc8e43e1f0efc3f696e4e78cbb87cedfbaa387428617cc7d7e234f32bd53ed86d7be4988f1da23eda99e6dbd77075ba826c696b8ae026aaaf34d7f471d74b8e979666c7b74b4af841f25e69f57ae9a46bf8c0abc325f4e1cdc0c0700487a235c6271d7d83e4080dc9bef362376492f633352c2975e67e3330448724df09b21d3249cbe0a4c1fc4d2506869e32f0c60838cabab7cd425764d2a62193b49f2d730b873872bf01a0fb84ba034ffde61d38f2088c802364f1069b2a6187a1cd42c796aa245ab524c6be4d4326699d61d490822ef48c05000855494ea3130ae00873855f1d0138dc9694aaf24a6b071bf52abd7394aeb07e59fc305bbca14633475946366cd45d6313bfb29e495a004eb054257b676948e99d09ed6512659216008e2e0223000000008e47553a000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc0080090da2575d2a232eb5800003e53088c00e0b3e0923a69519d54689d10f188b4c8902eb9d93ae1e83ba72cb46dd661f623d694dd289c1fe758c703009c8ac008003e2bb2b2ac637ab848b026e93657fcb07cbd3571f72a3c513ad6b20b007058111801008e8247a445d748ff5e25dd36de3a51aab8407af45aebd8ee63584700009c8ec00800bac3f0758955c12e991f9fa6309c26a1fad6cdd2cd8674f3bad82873dad9e1e599a777a74bea32acc21679d3333f71bfd3ddc6d9d748da9e59f0d3d17646db42cd0fe56734ada57dd46c43ba61aad42e69a6dd765be7b73966b3c3f398f7df9a0600704c21300280aebaa44eba69aaf4bca92ad8c3eba5f3ef4d7c78cfa4fa9647d20586547b736899f75e604dd175b30de99c4f4dd5d85649275d935e8033ea5ee90a7335b85552bfa969ccfb887492a4b75659272497ee76e60f936ebe5dfa6324ddcd52ddb8f8e0e8519774fffad0b1782a9c2e9ab78f488bee95ea56c5d6f5fc76e9fb36edb3dace95ae3b3e96eeadf8c90080630b8111007445e13ae9bcbed2df6f8e7f30aebc40fae376e9f3d774ed4d42db7ae9f925d6b1c9655245ec9c32699c4f7ad85c95edda50203064528a8e1cc2fa6fb7046bd78602c22153138308b348fb9e7df75aa7d8cb643bbd05d2ae5f491591114ba48ddba55ee3e28f83cbf4b7d9ec6ba4baf5f16fb2de1a2f6d9634fa22734ae9c46ce9799b6a800080631281110074c517ce905ab7db072f6f6d920e491a9a224848c52d69d74bd6b1c9b97b493fb654018b0ed7483996f413c649fb36499596f16f6d92da72a52f74b0ddffde641d2355be2455491a38ce3a25e6f8e32535499f5a272491c976b6344bffb41c8b4f3f95dad2390ee13759bb5eb44e90b6da0461cddb794b04009f21044600d01503fb4a75c99ef0b74b751d04091d49f7ad8a24059ba4072dbdbb99ab9eb59a13df2cf59374d254fb202a1db5dbad6362fa9d681d132fbb9774bc75a49d0cb7b3fd63d3dba2b08adda1f6441d293c31547df1cbf726aeeb9271529b2f3e7dd2e30e003816111801c06749b22a62c96c36b5a5b10ecf67109459d5edb68e8949fb0d8ec9e1da4e2bb7a4d536ebb8cd25ddd62f31e802007c661018014057d41e94fa257bf5312ef4b6c3fa66259380e0b0b937f436aba3373ba9d8be094bb2cf66152f49d5366d766c75c376a62bf266a9471c1f00c091466004005df1cf77a59c71895d734bd23993a49c36e99fe1371a9107ef8480221c4c1c695bb74b23a776be7388932659c784f6f9b88eaa00de2bad5e2f1d3fd53edfacbaba9da9c40541d74aff96748e4d153d00c0671e8111007445c505d2c683d2d7ef8d7f701fbe4eba629cb4f1e7a6ea57d74a6f1d94c6cd928647c6cd976ebee6e804466fad923e9674b9cfb43d0a754260ed06db4efeb8f874c3d749df1927fd6b55c79d12447aed3be75efb759d5316ebeabcabdb6927f2d6ca1aa4ae5d1f0a54adcb3da72c754f7b11916f2d1d8e200e00705811180140573ddf4f7a7cbb7489a9b1fe7553436d55acbdd53ddf4fda9e2b5d17497bafb4f1e6d09b0aab743a0c306bcf74867ba57b5dd2f61cd3f6843b35d898c637931e7749bbce88dfe70d37a7ffd1d6b7c687be33249b8e152e31072c5ddc4e5be1b756275d135a562410aab820f63da6b8ed51f7b6650200f438ae0cbf7a010070bc474241c95b3f215800007c66f0c60800000080e3111801000000703c0223000000008e471b23000000008ec71b23000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008e476004000000c0f1088c00000000381e811100000000c7233002000000e0780446000000001c8fc00800000080e3111801000000703c0223000000008ef7ff0322b34e652f5f51150000000049454e44ae426082);
-INSERT INTO `companies_details` (`id`, `user_id`, `company_name`, `sector`, `website`, `phone_number`, `street`, `postal_code`, `city`, `booth_contact_name`, `booth_contact_email`, `invoice_contact_name`, `invoice_contact_email`, `po_number`, `vat_number`, `logo`) VALUES
-(4, 16, 'PaulkoppensINC', 'Hardware & embedded systemen', 'www.youtube.com', '68745765447', 'leuvense steenweg', '10867', 'geenstad', 'paul koppens', 'pualkoppens@mail.com', 'pual koppens ', 'pualkoppens@mail.com', NULL, 'BE76574890', NULL);
+INSERT INTO `companies_details` (`id`, `user_id`, `company_name`, `sector`, `website`, `phone_number`, `street`, `postal_code`, `city`, `booth_contact_name`, `booth_contact_email`, `invoice_contact_name`, `invoice_contact_email`, `po_number`, `vat_number`, `logo`, `zoek_jobstudent`, `zoek_stage`, `zoek_connecties`, `zoek_job`, `domein_data`, `domein_netwerking`, `domein_ai`, `domein_software`, `about`) VALUES
+(1, 3, 'TechCorp', 'IT Consultancy', 'https://techcorp.be', '+32012345678', 'Main Street 5', '1000', 'Brussel', 'Bob Tech', 'bob@techcorp.be', 'Finance TechCorp', 'factuur@techcorp.be', 'PO1234', 'BE0123456789', NULL, 0, 0, 0, 0, 0, 0, 0, 0, NULL),
+(2, 4, 'SmartSolutions', 'Softwareontwikkeling', 'https://smartsolutions.be', '+32098765432', 'Innovationlaan 3', '2000', 'Antwerpen', 'Eva Manager', 'eva@smartsolutions.be', 'Boekhouding Smart', 'boekhouding@smartsolutions.be', 'PO5678', 'BE9876543210', NULL, 0, 0, 0, 0, 0, 0, 0, 0, NULL),
+(3, 12, 'qwerty', 'Dienstverlening & consultancy', 'qwerty', '12345789', 'qwerty', '1234', 'qwerty', 'qwerty', 'qwerty@qwerty', 'qwerty', 'qwerty@qwerty', NULL, '102589648', NULL, 1, 1, 0, 0, 0, 0, 1, 0, 'qwerty is beter dan azerty');
+
+--
+-- Triggers `companies_details`
+--
+DELIMITER $$
+CREATE TRIGGER `tr_company_added_generate_speeddates` AFTER INSERT ON `companies_details` FOR EACH ROW BEGIN
+    -- Genereer speeddates voor het nieuwe bedrijf
+    CALL GenereerSpeeddatesVoorBedrijf(NEW.id);
+    
+    -- Log de actie in audit log
+    INSERT INTO speeddates_audit_log (actie, student_id, aantal_speeddates_vrijgegeven, uitgevoerd_op, extra_info)
+    VALUES (
+        'COMPANY_ADDED', 
+        NULL, 
+        NULL, 
+        NOW(), 
+        CONCAT('Nieuw bedrijf toegevoegd: ID ', NEW.id, ', Naam: ', NEW.company_name)
+    );
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `tr_company_deleted_speeddates_cleanup` AFTER DELETE ON `companies_details` FOR EACH ROW BEGIN
+    DECLARE aantal_speeddates INT DEFAULT 0;
+    DECLARE aantal_gereserveerde_speeddates INT DEFAULT 0;
+    
+    -- Tel hoeveel speeddates er zijn voor dit bedrijf (voor audit log)
+    SELECT COUNT(*) INTO aantal_speeddates
+    FROM speeddates 
+    WHERE company_id = OLD.id;
+    
+    -- Tel aantal gereserveerde speeddates
+    SELECT COUNT(*) INTO aantal_gereserveerde_speeddates
+    FROM speeddates 
+    WHERE company_id = OLD.id AND bezet = 1;
+    
+    -- Verwijder alle speeddates van dit bedrijf
+    DELETE FROM speeddates WHERE company_id = OLD.id;
+    
+    -- Log de actie in audit log
+    INSERT INTO speeddates_audit_log (actie, student_id, aantal_speeddates_vrijgegeven, uitgevoerd_op, extra_info)
+    VALUES (
+        'COMPANY_DELETED', 
+        NULL, 
+        aantal_speeddates, 
+        NOW(), 
+        CONCAT('Bedrijf ID: ', OLD.id, ', Bedrijfsnaam: ', OLD.company_name, ', Gereserveerde speeddates: ', aantal_gereserveerde_speeddates)
+    );
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -68,8 +399,19 @@ CREATE TABLE `favorites` (
   `id` int(11) NOT NULL,
   `student_id` int(11) NOT NULL,
   `company_id` int(11) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `bedrijf_liked_student` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `favorites`
+--
+
+INSERT INTO `favorites` (`id`, `student_id`, `company_id`, `created_at`, `bedrijf_liked_student`) VALUES
+(1, 1, 1, '2025-06-05 09:06:39', 0),
+(2, 2, 2, '2025-06-05 09:06:39', 0),
+(36, 13, 2, '2025-06-19 15:16:03', 0),
+(38, 13, 12, '2025-06-19 15:36:03', 1);
 
 -- --------------------------------------------------------
 
@@ -86,6 +428,14 @@ CREATE TABLE `feedback` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `feedback`
+--
+
+INSERT INTO `feedback` (`id`, `company_id`, `student_id`, `score`, `comment`, `created_at`) VALUES
+(1, 1, 1, 5, 'Zeer gemotiveerd en goed voorbereid.', '2025-06-05 09:06:51'),
+(2, 2, 2, 4, 'Sterke technische kennis, iets meer communicatie gewenst.', '2025-06-05 09:06:51');
+
 -- --------------------------------------------------------
 
 --
@@ -97,6 +447,155 @@ CREATE TABLE `likes` (
   `ID_target` int(11) NOT NULL,
   `target_type` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `speeddates`
+--
+
+CREATE TABLE `speeddates` (
+  `date_id` int(11) NOT NULL,
+  `company_id` int(11) NOT NULL COMMENT 'ID van companies_details tabel',
+  `begin_tijd` time NOT NULL COMMENT 'Starttijd van de speeddate',
+  `eind_tijd` time NOT NULL COMMENT 'Eindtijd van de speeddate',
+  `student_id` int(11) DEFAULT NULL COMMENT 'ID van students_details tabel (NULL als niet gereserveerd)',
+  `status` enum('available','booked','cancelled_by_admin') NOT NULL DEFAULT 'available' COMMENT 'Status van het tijdslot',
+  `cancellation_reason` varchar(255) DEFAULT NULL COMMENT 'Reden van annulering door admin',
+  `aangemaakt_op` timestamp NOT NULL DEFAULT current_timestamp(),
+  `gereserveerd_op` timestamp NULL DEFAULT NULL COMMENT 'Wanneer de speeddate gereserveerd werd'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `speeddates`
+--
+
+INSERT INTO `speeddates` (`date_id`, `company_id`, `begin_tijd`, `eind_tijd`, `student_id`, `status`, `cancellation_reason`, `aangemaakt_op`, `gereserveerd_op`) VALUES
+(449, 2, '14:20:00', '14:25:00', 7, 'cancelled_by_admin', 'De beschikbare tijden voor speeddates zijn gewijzigd door de organisatie.', '2025-06-21 13:03:20', '2025-06-21 16:41:29'),
+(755, 1, '13:00:00', '13:05:00', 7, 'booked', NULL, '2025-06-21 16:59:21', '2025-06-21 17:12:17'),
+(1180, 1, '12:00:00', '12:05:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1181, 1, '12:05:00', '12:10:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1182, 1, '12:10:00', '12:15:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1183, 1, '12:15:00', '12:20:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1184, 1, '12:20:00', '12:25:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1185, 1, '12:25:00', '12:30:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1186, 1, '12:30:00', '12:35:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1187, 1, '12:35:00', '12:40:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1188, 1, '12:40:00', '12:45:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1189, 1, '12:45:00', '12:50:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1190, 1, '12:50:00', '12:55:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1191, 1, '12:55:00', '13:00:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1192, 1, '13:05:00', '13:10:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1193, 1, '13:10:00', '13:15:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1194, 1, '13:15:00', '13:20:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1195, 1, '13:20:00', '13:25:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1196, 1, '13:25:00', '13:30:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1197, 1, '13:30:00', '13:35:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1198, 1, '13:35:00', '13:40:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1199, 1, '13:40:00', '13:45:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1200, 1, '13:45:00', '13:50:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1201, 1, '13:50:00', '13:55:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1202, 1, '13:55:00', '14:00:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1203, 2, '12:00:00', '12:05:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1204, 2, '12:05:00', '12:10:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1205, 2, '12:10:00', '12:15:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1206, 2, '12:15:00', '12:20:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1207, 2, '12:20:00', '12:25:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1208, 2, '12:25:00', '12:30:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1209, 2, '12:30:00', '12:35:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1210, 2, '12:35:00', '12:40:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1211, 2, '12:40:00', '12:45:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1212, 2, '12:45:00', '12:50:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1213, 2, '12:50:00', '12:55:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1214, 2, '12:55:00', '13:00:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1215, 2, '13:00:00', '13:05:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1216, 2, '13:05:00', '13:10:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1217, 2, '13:10:00', '13:15:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1218, 2, '13:15:00', '13:20:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1219, 2, '13:20:00', '13:25:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1220, 2, '13:25:00', '13:30:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1221, 2, '13:30:00', '13:35:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1222, 2, '13:35:00', '13:40:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1223, 2, '13:40:00', '13:45:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1224, 2, '13:45:00', '13:50:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1225, 2, '13:50:00', '13:55:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1226, 2, '13:55:00', '14:00:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1227, 3, '12:00:00', '12:05:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1228, 3, '12:05:00', '12:10:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1229, 3, '12:10:00', '12:15:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1230, 3, '12:15:00', '12:20:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1231, 3, '12:20:00', '12:25:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1232, 3, '12:25:00', '12:30:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1233, 3, '12:30:00', '12:35:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1234, 3, '12:35:00', '12:40:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1235, 3, '12:40:00', '12:45:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1236, 3, '12:45:00', '12:50:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1237, 3, '12:50:00', '12:55:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1238, 3, '12:55:00', '13:00:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1239, 3, '13:00:00', '13:05:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1240, 3, '13:05:00', '13:10:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1241, 3, '13:10:00', '13:15:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1242, 3, '13:15:00', '13:20:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1243, 3, '13:20:00', '13:25:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1244, 3, '13:25:00', '13:30:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1245, 3, '13:30:00', '13:35:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1246, 3, '13:35:00', '13:40:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1247, 3, '13:40:00', '13:45:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1248, 3, '13:45:00', '13:50:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1249, 3, '13:50:00', '13:55:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL),
+(1250, 3, '13:55:00', '14:00:00', NULL, 'available', NULL, '2025-06-21 17:44:12', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `speeddates_audit_log`
+--
+
+CREATE TABLE `speeddates_audit_log` (
+  `id` int(11) NOT NULL,
+  `actie` varchar(50) NOT NULL COMMENT 'Type actie (STUDENT_DELETED, CONFIG_CHANGED, etc.)',
+  `student_id` int(11) DEFAULT NULL COMMENT 'ID van de student (indien van toepassing)',
+  `aantal_speeddates_vrijgegeven` int(11) DEFAULT NULL COMMENT 'Aantal speeddates dat is vrijgegeven',
+  `uitgevoerd_op` timestamp NOT NULL DEFAULT current_timestamp(),
+  `extra_info` text DEFAULT NULL COMMENT 'Extra informatie over de actie'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `speeddates_config`
+--
+
+CREATE TABLE `speeddates_config` (
+  `id` int(11) NOT NULL,
+  `start_uur` time NOT NULL COMMENT 'Startuur voor speeddates (bijv. 09:00)',
+  `eind_uur` time NOT NULL COMMENT 'Einduur voor speeddates (bijv. 17:00)',
+  `sessie_duur_minuten` int(11) NOT NULL DEFAULT 5 COMMENT 'Duur van elke speeddate sessie in minuten',
+  `actief` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Of deze configuratie actief is',
+  `aangemaakt_op` timestamp NOT NULL DEFAULT current_timestamp(),
+  `aangepast_op` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `speeddates_config`
+--
+
+INSERT INTO `speeddates_config` (`id`, `start_uur`, `eind_uur`, `sessie_duur_minuten`, `actief`, `aangemaakt_op`, `aangepast_op`) VALUES
+(1, '12:00:00', '14:00:00', 5, 1, '2025-06-21 13:03:18', '2025-06-21 18:16:08');
+
+--
+-- Triggers `speeddates_config`
+--
+DELIMITER $$
+CREATE TRIGGER `tr_speeddates_config_update` AFTER UPDATE ON `speeddates_config` FOR EACH ROW BEGIN
+    -- Alleen uitvoeren als de tijden of sessie duur zijn gewijzigd
+    IF OLD.start_uur != NEW.start_uur OR OLD.eind_uur != NEW.eind_uur OR OLD.sessie_duur_minuten != NEW.sessie_duur_minuten THEN
+        -- Roep de synchronisatie procedure aan
+        CALL SynchroniseerSpeeddatesMetConfig();
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -149,7 +648,31 @@ CREATE TABLE `students_details` (
 --
 
 INSERT INTO `students_details` (`id`, `user_id`, `school`, `education`, `year`, `about`, `linkedin_url`, `interest_jobstudent`, `interest_stage`, `interest_job`, `interest_connect`, `domain_data`, `domain_networking`, `domain_ai`, `domain_software`) VALUES
-(5, 15, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+(1, 1, 'Hogeschool Gent', 'Toegepaste Informatica', 'derde', 'Passie voor software development.', 'https://linkedin.com/in/alice', 1, 1, 1, 0, 0, 0, 1, 1),
+(2, 2, 'Hogeschool Gent', 'Toegepaste Informatica', 'tweede', 'Grote interesse in AI en data.', 'https://linkedin.com/in/thomas', 0, 1, 1, 1, 1, 0, 1, 0),
+(4, 8, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(6, 11, 'ErasmusHogeschool', 'TI', '', 'Ik ben Bilal', 'https://www.linkedin.com/in/bilal-belkasem-0ba8552b6/', 1, 0, 0, 0, 0, 0, 1, 0),
+(7, 13, 'Erasmus Hogeschool Brussel', 'toegepaste informatica', 'eerste', ':sfhlghse', NULL, 0, 0, 0, 1, 0, 1, 0, 0),
+(8, 14, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+--
+-- Triggers `students_details`
+--
+DELIMITER $$
+CREATE TRIGGER `tr_student_deleted_speeddates_free` AFTER DELETE ON `students_details` FOR EACH ROW BEGIN
+    -- Maak alle speeddates van de verwijderde student weer beschikbaar
+    UPDATE speeddates 
+    SET student_id = NULL,
+        bezet = 0,
+        gereserveerd_op = NULL
+    WHERE student_id = OLD.id;
+    
+    -- Log de actie (optioneel - voor audit trail)
+    INSERT INTO speeddates_audit_log (actie, student_id, aantal_speeddates_vrijgegeven, uitgevoerd_op)
+    VALUES ('STUDENT_DELETED', OLD.id, ROW_COUNT(), NOW());
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -173,14 +696,176 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `password_hash`, `role`, `organization`, `profile_slug`, `created_at`) VALUES
+(1, 'Alice Student', 'alice@student.com', '$2b$10$mstei6sypy6fdgdUHNHDIeo/aXAiE9LL/BKAPv0H5OK82U73ZfTn2', 'student', 'Hogeschool Gent', 'alice-student', '2025-06-05 09:01:00'),
+(2, 'Thomas Student', 'thomas@student.com', 'hashed_pw2', 'student', 'Hogeschool Gent', 'thomas-student', '2025-06-05 09:01:00'),
 (3, 'Bob Company', 'bob@bedrijf.com', 'hashed_pw3', 'bedrijf', 'TechCorp', 'bob-techcorp', '2025-06-05 09:01:00'),
 (4, 'Eva Enterprise', 'eva@bedrijf.com', 'hashed_pw4', 'bedrijf', 'SmartSolutions', 'eva-smartsolutions', '2025-06-05 09:01:00'),
-(5, 'Admin Beheer', 'admin@careerlaunch.be', 'hashed_admin', 'admin', NULL, 'admin-launch', '2025-06-05 09:01:00'),
-(6, 'jelle schroeven', 'yolofangamer@gmail.com', '$2b$10$/3Wp205mwwnWCziLwc28c.HqzBYctApmqcjBKHkkn4ko2xA4HP91S', 'student', 'Hogeschool Gent', 'jelle-schroeven', '2025-06-10 13:14:12'),
-(14, 'jelle schroef', 'fjkgkhgfq@mail.com', '$2b$10$bz.ACurXX0yvb7dX8Xz3R.JIoH4HnRX.ozTJhbnPALWZOe/nxWYYG', 'bedrijf', 'jelleINC', 'jelle-schroef', '2025-06-12 13:53:34'),
-(15, 'pual koppens', 'paulkoppens@mail.com', '$2b$10$uEH/ki.LynFdlK7zrXN/HepARtjVslVp/N14iJDcLtGlaJLeu2eFu', 'student', 'Hogeschool Gent', 'pual-koppens', '2025-06-12 14:15:43'),
-(16, 'paul koppens', 'paulkoppensINC@mail.com', '$2b$10$d/L.zMWlgGS6sFenqKpg9.XP8VavUsw0KGGZExKpVS6.e6ikyvgQK', 'bedrijf', NULL, 'paul-koppens', '2025-06-13 07:09:11'),
-(18, 'Steve Koppens', 'stevekoppens@mail.com', '$2b$10$4zuHK4N.KcbENQDdbIV54Oo8V0ZWEIrZtgnAgCU1A/IPU3NI4vS1u', 'bedrijf', NULL, 'steve-koppens', '2025-06-13 07:42:17');
+(5, 'Admin Beheer', 'admin@careerlaunch.be', '$2b$10$yd6ZQbXM3QBC.uNfz2apBulLeqIiEb78ss.C7wIbxTzC4xLa5pd2S', 'admin', NULL, 'admin-launch', '2025-06-05 09:01:00'),
+(8, 'Digay kengoum', 'Digay.kengoum@student.ehb.be', '$2b$10$OSWeRWMn6mJSlZP//.BdOOXGBdP5h.tUxHQ9W7bUzw86JXpx5jVHG', 'student', 'Hogeschool Gent', 'digay-kengoum', '2025-06-13 13:22:59'),
+(10, 'âzerty', 'azerty@azerty', '$2b$10$INqhpWp9K8hGxIDmzeH5tOXWrGavD85GVPKwLnFRamoA7Oy1sT9ra', 'bedrijf', NULL, 'âzerty', '2025-06-16 07:52:30'),
+(11, 'Bilal Belkasem', 'bilal.belkasem@student.ehb.be', '$2b$10$1Vt9y9nSEVWMOe98nDCoxOCc3/EQx/JHIY3HRmj9MGDEq05H4Zod6', 'student', 'Hogeschool Gent', 'bilal-belkasem', '2025-06-17 07:49:01'),
+(12, 'qwerty', 'qwerty@qwerty', '$2b$10$9dPSkl6VbWAdFgSWJ0eXHeaYs.HXMhRFhNhuIcugyFHW7caemhgGK', 'bedrijf', NULL, 'qwerty', '2025-06-17 08:22:02'),
+(13, 'jelle schroeven2', 'jelle.schroeven@student.ehb.be', '$2b$10$akFfsQZpQNEk2aO88uSIf.y7UPqGn6Ys7u7/fLnxGoxG0Q6wS3Lxq', 'student', NULL, 'jelle-schroeven2', '2025-06-18 08:05:22'),
+(14, 'hildegard laporte', 'mama@mail', '$2b$10$lE84PYbSppX6px69dfQ/zuJK.wv.CMzmsVbTUytl0S9XX2bsdiIIK', 'student', 'Hogeschool Gent', 'hildegard-laporte', '2025-06-21 18:37:38');
+
+--
+-- Triggers `users`
+--
+DELIMITER $$
+CREATE TRIGGER `tr_company_user_deleted_speeddates_cleanup` AFTER DELETE ON `users` FOR EACH ROW BEGIN
+    DECLARE company_details_id INT;
+    DECLARE aantal_speeddates INT DEFAULT 0;
+    DECLARE aantal_gereserveerde_speeddates INT DEFAULT 0;
+    
+    -- Als een user wordt verwijderd, controleer of het een bedrijf was
+    IF OLD.role = 'bedrijf' THEN
+        -- Zoek de bijbehorende company_details record
+        SELECT id INTO company_details_id 
+        FROM companies_details 
+        WHERE user_id = OLD.id;
+        
+        -- Als er een company_details record bestaat, verwijder speeddates
+        IF company_details_id IS NOT NULL THEN
+            -- Tel totaal aantal speeddates
+            SELECT COUNT(*) INTO aantal_speeddates
+            FROM speeddates 
+            WHERE company_id = company_details_id;
+            
+            -- Tel aantal gereserveerde speeddates
+            SELECT COUNT(*) INTO aantal_gereserveerde_speeddates
+            FROM speeddates 
+            WHERE company_id = company_details_id AND bezet = 1;
+            
+            -- Verwijder alle speeddates van dit bedrijf
+            DELETE FROM speeddates WHERE company_id = company_details_id;
+            
+            -- Log de actie in audit log
+            INSERT INTO speeddates_audit_log (actie, student_id, aantal_speeddates_vrijgegeven, uitgevoerd_op, extra_info)
+            VALUES (
+                'COMPANY_USER_DELETED', 
+                NULL, 
+                aantal_speeddates, 
+                NOW(), 
+                CONCAT('Bedrijf User ID: ', OLD.id, ', Company Details ID: ', company_details_id, ', Gereserveerde speeddates: ', aantal_gereserveerde_speeddates)
+            );
+        END IF;
+    END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `tr_user_deleted_speeddates_free` AFTER DELETE ON `users` FOR EACH ROW BEGIN
+    DECLARE student_details_id INT;
+    
+    -- Als een user wordt verwijderd, controleer of het een student was
+    IF OLD.role = 'student' THEN
+        -- Zoek de bijbehorende student_details record
+        SELECT id INTO student_details_id 
+        FROM students_details 
+        WHERE user_id = OLD.id;
+        
+        -- Als er een student_details record bestaat, maak speeddates vrij
+        IF student_details_id IS NOT NULL THEN
+            UPDATE speeddates 
+            SET student_id = NULL,
+                bezet = 0,
+                gereserveerd_op = NULL
+            WHERE student_id = student_details_id;
+        END IF;
+    END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `v_beschikbare_speeddates`
+-- (See below for the actual view)
+--
+CREATE TABLE `v_beschikbare_speeddates` (
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `v_speeddates_kalender`
+-- (See below for the actual view)
+--
+CREATE TABLE `v_speeddates_kalender` (
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `v_speeddates_stats_per_bedrijf`
+-- (See below for the actual view)
+--
+CREATE TABLE `v_speeddates_stats_per_bedrijf` (
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `v_student_reservaties`
+-- (See below for the actual view)
+--
+CREATE TABLE `v_student_reservaties` (
+);
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `v_student_speeddates`
+-- (See below for the actual view)
+--
+CREATE TABLE `v_student_speeddates` (
+);
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `v_beschikbare_speeddates`
+--
+DROP TABLE IF EXISTS `v_beschikbare_speeddates`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_beschikbare_speeddates`  AS SELECT `s`.`date_id` AS `date_id`, `s`.`company_id` AS `company_id`, `cd`.`company_name` AS `company_name`, `s`.`begin_tijd` AS `begin_tijd`, `s`.`eind_tijd` AS `eind_tijd`, `s`.`bezet` AS `bezet` FROM (`speeddates` `s` join `companies_details` `cd` on(`s`.`company_id` = `cd`.`id`)) WHERE `s`.`bezet` = 0 ORDER BY `cd`.`company_name` ASC, `s`.`begin_tijd` ASC ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `v_speeddates_kalender`
+--
+DROP TABLE IF EXISTS `v_speeddates_kalender`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_speeddates_kalender`  AS SELECT `s`.`date_id` AS `date_id`, `cd`.`company_name` AS `company_name`, `s`.`begin_tijd` AS `begin_tijd`, `s`.`eind_tijd` AS `eind_tijd`, CASE WHEN `s`.`bezet` = 0 THEN 'Beschikbaar' WHEN `s`.`bezet` = 1 THEN concat('Gereserveerd door: ',`u`.`name`) END AS `status`, `s`.`gereserveerd_op` AS `gereserveerd_op` FROM (((`speeddates` `s` join `companies_details` `cd` on(`s`.`company_id` = `cd`.`id`)) left join `students_details` `sd` on(`s`.`student_id` = `sd`.`id`)) left join `users` `u` on(`sd`.`user_id` = `u`.`id`)) ORDER BY `s`.`begin_tijd` ASC, `cd`.`company_name` ASC ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `v_speeddates_stats_per_bedrijf`
+--
+DROP TABLE IF EXISTS `v_speeddates_stats_per_bedrijf`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_speeddates_stats_per_bedrijf`  AS SELECT `cd`.`id` AS `company_id`, `cd`.`company_name` AS `company_name`, count(`s`.`date_id`) AS `totaal_slots`, sum(case when `s`.`bezet` = 0 then 1 else 0 end) AS `beschikbare_slots`, sum(case when `s`.`bezet` = 1 then 1 else 0 end) AS `gereserveerde_slots`, round(sum(case when `s`.`bezet` = 1 then 1 else 0 end) / count(`s`.`date_id`) * 100,2) AS `bezettingsgraad_percentage` FROM (`companies_details` `cd` left join `speeddates` `s` on(`cd`.`id` = `s`.`company_id`)) GROUP BY `cd`.`id`, `cd`.`company_name` ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `v_student_reservaties`
+--
+DROP TABLE IF EXISTS `v_student_reservaties`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_student_reservaties`  AS SELECT `s`.`date_id` AS `date_id`, `s`.`company_id` AS `company_id`, `cd`.`company_name` AS `company_name`, `s`.`begin_tijd` AS `begin_tijd`, `s`.`eind_tijd` AS `eind_tijd`, `s`.`student_id` AS `student_id`, `sd`.`user_id` AS `student_user_id`, `u`.`name` AS `student_name`, `s`.`gereserveerd_op` AS `gereserveerd_op` FROM (((`speeddates` `s` join `companies_details` `cd` on(`s`.`company_id` = `cd`.`id`)) join `students_details` `sd` on(`s`.`student_id` = `sd`.`id`)) join `users` `u` on(`sd`.`user_id` = `u`.`id`)) WHERE `s`.`bezet` = 1 ORDER BY `s`.`begin_tijd` ASC ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `v_student_speeddates`
+--
+DROP TABLE IF EXISTS `v_student_speeddates`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_student_speeddates`  AS SELECT `s`.`date_id` AS `date_id`, `cd`.`company_name` AS `company_name`, `s`.`begin_tijd` AS `begin_tijd`, `s`.`eind_tijd` AS `eind_tijd`, `s`.`gereserveerd_op` AS `gereserveerd_op`, `u`.`name` AS `student_naam`, `u`.`email` AS `student_email` FROM (((`speeddates` `s` join `companies_details` `cd` on(`s`.`company_id` = `cd`.`id`)) join `students_details` `sd` on(`s`.`student_id` = `sd`.`id`)) join `users` `u` on(`sd`.`user_id` = `u`.`id`)) WHERE `s`.`bezet` = 1 ORDER BY `s`.`begin_tijd` ASC ;
 
 --
 -- Indexes for dumped tables
@@ -198,6 +883,7 @@ ALTER TABLE `companies_details`
 --
 ALTER TABLE `favorites`
   ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_like` (`student_id`,`company_id`,`bedrijf_liked_student`),
   ADD KEY `student_id` (`student_id`),
   ADD KEY `company_id` (`company_id`);
 
@@ -214,6 +900,30 @@ ALTER TABLE `feedback`
 --
 ALTER TABLE `likes`
   ADD PRIMARY KEY (`User_ID`,`ID_target`,`target_type`);
+
+--
+-- Indexes for table `speeddates`
+--
+ALTER TABLE `speeddates`
+  ADD PRIMARY KEY (`date_id`),
+  ADD KEY `company_id` (`company_id`),
+  ADD KEY `student_id` (`student_id`),
+  ADD KEY `begin_tijd` (`begin_tijd`);
+
+--
+-- Indexes for table `speeddates_audit_log`
+--
+ALTER TABLE `speeddates_audit_log`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `actie` (`actie`),
+  ADD KEY `student_id` (`student_id`),
+  ADD KEY `uitgevoerd_op` (`uitgevoerd_op`);
+
+--
+-- Indexes for table `speeddates_config`
+--
+ALTER TABLE `speeddates_config`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `stands`
@@ -245,19 +955,37 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `companies_details`
 --
 ALTER TABLE `companies_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `favorites`
 --
 ALTER TABLE `favorites`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `feedback`
 --
 ALTER TABLE `feedback`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `speeddates`
+--
+ALTER TABLE `speeddates`
+  MODIFY `date_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1251;
+
+--
+-- AUTO_INCREMENT for table `speeddates_audit_log`
+--
+ALTER TABLE `speeddates_audit_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `speeddates_config`
+--
+ALTER TABLE `speeddates_config`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `stands`
@@ -269,13 +997,13 @@ ALTER TABLE `stands`
 -- AUTO_INCREMENT for table `students_details`
 --
 ALTER TABLE `students_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- Constraints for dumped tables
@@ -291,8 +1019,7 @@ ALTER TABLE `companies_details`
 -- Constraints for table `favorites`
 --
 ALTER TABLE `favorites`
-  ADD CONSTRAINT `favorites_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `favorites_ibfk_2` FOREIGN KEY (`company_id`) REFERENCES `companies_details` (`id`);
+  ADD CONSTRAINT `favorites_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `feedback`
@@ -300,6 +1027,13 @@ ALTER TABLE `favorites`
 ALTER TABLE `feedback`
   ADD CONSTRAINT `feedback_ibfk_1` FOREIGN KEY (`company_id`) REFERENCES `companies_details` (`id`),
   ADD CONSTRAINT `feedback_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `speeddates`
+--
+ALTER TABLE `speeddates`
+  ADD CONSTRAINT `fk_speeddates_company` FOREIGN KEY (`company_id`) REFERENCES `companies_details` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_speeddates_student` FOREIGN KEY (`student_id`) REFERENCES `students_details` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `stands`
