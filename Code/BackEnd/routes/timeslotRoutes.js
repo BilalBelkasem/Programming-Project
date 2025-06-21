@@ -91,7 +91,7 @@ router.post('/', authenticateToken, isCompany, async (req, res) => {
             }
 
             await conn.commit();
-            res.status(201).json({ 
+            res.status(201).json({
                 message: `${slots.length} timeslots created`,
                 slots: slots
             });
@@ -152,6 +152,27 @@ router.delete('/:id', authenticateToken, isCompany, async (req, res) => {
         }
     } catch (err) {
         console.error('Error deleting slot:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+router.get('/companies/:companyId/timeslots', async (req, res) => {
+    try {
+        const [slots] = await db.query(`
+      SELECT 
+        id,
+        DATE(start_time) as date,
+        TIME_FORMAT(start_time, '%H:%i') as start_time,
+        TIME_FORMAT(end_time, '%H:%i') as end_time,
+        available
+      FROM timeslots
+      WHERE company_id = ?
+      ORDER BY start_time
+    `, [req.params.companyId]);
+
+        res.json(slots);
+    } catch (err) {
+        console.error('Error fetching public slots:', err);
         res.status(500).json({ error: 'Server error' });
     }
 });

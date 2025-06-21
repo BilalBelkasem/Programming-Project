@@ -7,27 +7,56 @@ import '../Css/Speeddates.css';
 const Speeddates = () => {
   const [companies, setCompanies] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState(null);
-  const [timeSlots, setTimeSlots] = useState([]);
   const [myReservations, setMyReservations] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [availableSlots, setAvailableSlots] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-  // In your Speeddates.jsx component
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchInitialData = async () => {
       try {
-        const res = await axios.get('/api/reservations/me');
-        console.log('Response:', res.data); // Log response
-        setMyReservations(res.data);
+        setIsLoading(true);
+        const token = localStorage.getItem('token');
+
+        // Get available slots from backend API
+        const slotsRes = await axios.get(`${API_BASE_URL}/speeddates`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        // Extract companies from slots data
+        const companies = slotsRes.data.reduce((acc, slot) => {
+          if (!acc.some(c => c.id === slot.company_id)) {
+            acc.push({
+              id: slot.company_id,
+              name: slot.company_name,
+              description: slot.sector,
+              industry: slot.sector,
+              location: ''
+            });
+          }
+          return acc;
+        }, []);
+
+        setCompanies(companies);
+        setAvailableSlots(slotsRes.data);
+
+        // Get user's reservations
+        const reservationsRes = await axios.get(`${API_BASE_URL}/reservations/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setMyReservations(reservationsRes.data);
+
       } catch (err) {
-        console.error('Full error:', err);
-        console.error('Error response:', err.response); // Log detailed error
+        console.error('Initial load error:', err);
         if (err.response?.status === 401) navigate('/login');
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchData();
+    fetchInitialData();
   }, [navigate]);
 
   const handleNewReservationClick = (company) => {
@@ -39,7 +68,7 @@ const Speeddates = () => {
     }
 
     setSelectedCompany(company);
-    axios.get(`/api/companies/${companyId}/slots`)
+    axios.get('/timeslots')
       .then(res => {
         const available = res.data.filter(slot => {
           const isAvailable = !myReservations.some(r =>
@@ -60,21 +89,20 @@ const Speeddates = () => {
   const handleReservation = async (slot) => {
     try {
       const res = await axios.post('/api/reservations', {
-        slotId: slot.id
+        slotId: slot.id,
+        companyId: selectedCompany.id // Add company ID
       });
 
       setMyReservations(prev => [...prev, {
         id: res.data.id,
-        slot_id: slot.id,
-        start_time: res.data.slot.start_time,
-        end_time: res.data.slot.end_time,
-        company: {
-          id: res.data.companyId,
-          name: res.data.slot.company_name
-        }
+        slot: {  // Changed from slot_id to match your formatDateTime usage
+          id: slot.id,
+          datetime: slot.datetime,
+          start_time: slot.start_time,
+          end_time: slot.end_time
+        },
+        company: selectedCompany // Use the full company object
       }]);
-
-      setAvailableSlots(prev => prev.filter(s => s.id !== slot.id));
     } catch (err) {
       console.error('Error creating reservation:', err);
       alert(err.response?.data?.error || 'Reservation failed');
@@ -85,9 +113,12 @@ const Speeddates = () => {
     try {
       await axios.delete(`/api/reservations/${id}`);
       setMyReservations(prev => prev.filter(r => r.id !== id));
+
+      // Refresh slots if modal is open
       if (selectedCompany) {
-        // Refresh available slots
-        handleNewReservationClick(selectedCompany);
+        const companyId = selectedCompany.id;
+        const res = await axios.get(`/api/companies/${companyId}/speeddates`)
+        setAvailableSlots(res.data);
       }
     } catch (err) {
       console.error('Error cancelling reservation:', err);

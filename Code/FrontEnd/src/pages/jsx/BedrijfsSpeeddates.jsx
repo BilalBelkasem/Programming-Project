@@ -36,7 +36,7 @@ const fetchCompanySlots = async () => {
   
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.get('http://localhost:5001/api/company/speeddates', {
+    const response = await axios.get('http://localhost:5000/api/company/speeddates', {
       headers: { 
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
@@ -70,7 +70,7 @@ const fetchCompanySlots = async () => {
     setIsGenerating(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5001/api/company/speeddates', 
+      await axios.post('http://localhost:5000/api/company/speeddates', 
         { startTime, endTime },
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
@@ -88,7 +88,7 @@ const fetchCompanySlots = async () => {
     
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5001/api/company/speeddates/${slotId}`, {
+      await axios.delete(`http://localhost:5000/api/company/speeddates/${slotId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       await fetchCompanySlots();
