@@ -15,7 +15,7 @@ const studentRoutes        = require('./students');
 const badgeRoutes          = require('./badge');
 const mijnProfielRoutes    = require('./Controller/mijnprofiel');
 const studentDetailsRoutes = require('./Controller/studentDetails');
-const reservationsRoutes   = require('./controller/reservations');
+const reservationsRoutes   = require('./Controller/reservations');
 
 const app = express();
 

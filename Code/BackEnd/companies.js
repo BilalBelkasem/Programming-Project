@@ -48,11 +48,11 @@ router.get('/:companyId/slots', async (req, res) => {
                 date_id as _id,
                 TIME_FORMAT(begin_tijd, '%H:%i') as time
             FROM speeddates 
-            WHERE company_id = ? AND bezet = 0
+            WHERE company_id = ? AND status = 'available'
             ORDER BY begin_tijd
         `, [companyId]);
         
-        // All slots returned are available, so no need to check 'bezet' status
+        // All slots returned are available
         res.json(slots);
     } catch (err) {
         console.error('Error fetching time slots:', err);

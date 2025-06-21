@@ -44,13 +44,14 @@ CREATE TABLE `speeddates` (
   `begin_tijd` time NOT NULL COMMENT 'Starttijd van de speeddate',
   `eind_tijd` time NOT NULL COMMENT 'Eindtijd van de speeddate',
   `student_id` int(11) DEFAULT NULL COMMENT 'ID van students_details tabel (NULL als niet gereserveerd)',
-  `bezet` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Of de speeddate gereserveerd is',
+  `status` enum('available','booked','cancelled_by_admin') NOT NULL DEFAULT 'available' COMMENT 'Status van het tijdslot',
+  `cancellation_reason` varchar(255) DEFAULT NULL COMMENT 'Reden van annulering door admin',
   `aangemaakt_op` timestamp NOT NULL DEFAULT current_timestamp(),
   `gereserveerd_op` timestamp NULL DEFAULT NULL COMMENT 'Wanneer de speeddate gereserveerd werd',
   PRIMARY KEY (`date_id`),
   KEY `company_id` (`company_id`),
   KEY `student_id` (`student_id`),
-  KEY `bezet` (`bezet`),
+  KEY `status` (`status`),
   KEY `begin_tijd` (`begin_tijd`),
   CONSTRAINT `fk_speeddates_company` FOREIGN KEY (`company_id`) REFERENCES `companies_details` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_speeddates_student` FOREIGN KEY (`student_id`) REFERENCES `students_details` (`id`) ON DELETE SET NULL
@@ -91,7 +92,8 @@ BEGIN
     -- Maak alle speeddates van de verwijderde student weer beschikbaar
     UPDATE speeddates 
     SET student_id = NULL,
-        bezet = 0,
+        status = 'available',
+        cancellation_reason = NULL,
         gereserveerd_op = NULL
     WHERE student_id = OLD.id;
     
@@ -126,7 +128,8 @@ BEGIN
         IF student_details_id IS NOT NULL THEN
             UPDATE speeddates 
             SET student_id = NULL,
-                bezet = 0,
+                status = 'available',
+                cancellation_reason = NULL,
                 gereserveerd_op = NULL
             WHERE student_id = student_details_id;
         END IF;
@@ -157,7 +160,7 @@ BEGIN
     -- Tel aantal gereserveerde speeddates
     SELECT COUNT(*) INTO aantal_gereserveerde_speeddates
     FROM speeddates 
-    WHERE company_id = OLD.id AND bezet = 1;
+    WHERE company_id = OLD.id AND status = 'booked';
     
     -- Verwijder alle speeddates van dit bedrijf
     DELETE FROM speeddates WHERE company_id = OLD.id;
@@ -207,7 +210,7 @@ BEGIN
             -- Tel aantal gereserveerde speeddates
             SELECT COUNT(*) INTO aantal_gereserveerde_speeddates
             FROM speeddates 
-            WHERE company_id = company_details_id AND bezet = 1;
+            WHERE company_id = company_details_id AND status = 'booked';
             
             -- Verwijder alle speeddates van dit bedrijf
             DELETE FROM speeddates WHERE company_id = company_details_id;
@@ -299,12 +302,12 @@ BEGIN
                 AND begin_tijd = current_time_slot
             ) THEN
                 -- Voeg nieuwe speeddate toe als deze nog niet bestaat
-                INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, bezet)
+                INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, status)
                 VALUES (
                     company_id_var,
                     current_time_slot,
                     ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60)),
-                    0
+                    'available'
                 );
             END IF;
             
@@ -363,12 +366,12 @@ BEGIN
         SET current_time_slot = start_time;
         
         WHILE current_time_slot < end_time DO
-            INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, bezet)
+            INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, status)
             VALUES (
                 company_id_var,
                 current_time_slot,
                 ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60)),
-                0
+                'available'
             );
             
             -- Ga naar volgende tijdsslot
@@ -412,12 +415,12 @@ BEGIN
     SET current_time_slot = start_time;
     
     WHILE current_time_slot < end_time DO
-        INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, bezet)
+        INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, status)
         VALUES (
             company_id_param,
             current_time_slot,
             ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60)),
-            0
+            'available'
         );
         
         -- Ga naar volgende tijdsslot
@@ -484,7 +487,7 @@ BEGIN
     DECLARE current_company_id INT;
     
     -- Controleer of de speeddate beschikbaar is
-    SELECT bezet = 0, company_id INTO is_available, current_company_id
+    SELECT status = 'available', company_id INTO is_available, current_company_id
     FROM speeddates 
     WHERE date_id = speeddate_id_param;
     
@@ -492,7 +495,7 @@ BEGIN
         -- Reserveer de speeddate
         UPDATE speeddates 
         SET student_id = student_id_param, 
-            bezet = 1, 
+            status = 'booked', 
             gereserveerd_op = NOW()
         WHERE date_id = speeddate_id_param;
         
@@ -517,7 +520,7 @@ BEGIN
     DECLARE is_reserved BOOLEAN DEFAULT FALSE;
     
     -- Controleer of de speeddate gereserveerd is
-    SELECT bezet = 1 INTO is_reserved
+    SELECT status = 'booked' INTO is_reserved
     FROM speeddates 
     WHERE date_id = speeddate_id_param;
     
@@ -525,7 +528,8 @@ BEGIN
         -- Annuleer de reservering
         UPDATE speeddates 
         SET student_id = NULL, 
-            bezet = 0, 
+            status = 'cancelled_by_admin',
+            cancellation_reason = 'Student heeft de reservering geannuleerd',
             gereserveerd_op = NULL
         WHERE date_id = speeddate_id_param;
         
@@ -551,10 +555,10 @@ SELECT
     cd.company_name,
     s.begin_tijd,
     s.eind_tijd,
-    s.bezet
+    s.status
 FROM speeddates s
 JOIN companies_details cd ON s.company_id = cd.id
-WHERE s.bezet = 0
+WHERE s.status = 'available'
 ORDER BY cd.company_name, s.begin_tijd;
 
 -- View: Gereserveerde Speeddates per student
@@ -573,7 +577,7 @@ FROM speeddates s
 JOIN companies_details cd ON s.company_id = cd.id
 JOIN students_details sd ON s.student_id = sd.id
 JOIN users u ON sd.user_id = u.id
-WHERE s.bezet = 1
+WHERE s.status = 'booked'
 ORDER BY s.begin_tijd;
 
 -- View: Speeddates statistieken per bedrijf
@@ -582,9 +586,9 @@ SELECT
     cd.id as company_id,
     cd.company_name,
     COUNT(s.date_id) as totaal_slots,
-    SUM(CASE WHEN s.bezet = 0 THEN 1 ELSE 0 END) as beschikbare_slots,
-    SUM(CASE WHEN s.bezet = 1 THEN 1 ELSE 0 END) as gereserveerde_slots,
-    ROUND((SUM(CASE WHEN s.bezet = 1 THEN 1 ELSE 0 END) / COUNT(s.date_id)) * 100, 2) as bezettingsgraad_percentage
+    SUM(CASE WHEN s.status = 'available' THEN 1 ELSE 0 END) as beschikbare_slots,
+    SUM(CASE WHEN s.status = 'booked' THEN 1 ELSE 0 END) as gereserveerde_slots,
+    ROUND((SUM(CASE WHEN s.status = 'booked' THEN 1 ELSE 0 END) / COUNT(s.date_id)) * 100, 2) as bezettingsgraad_percentage
 FROM companies_details cd
 LEFT JOIN speeddates s ON cd.id = s.company_id
 GROUP BY cd.id, cd.company_name;
@@ -661,9 +665,9 @@ BEGIN
     SELECT 
         cd.company_name,
         COUNT(s.date_id) as totaal_slots,
-        SUM(CASE WHEN s.bezet = 0 THEN 1 ELSE 0 END) as beschikbaar,
-        SUM(CASE WHEN s.bezet = 1 THEN 1 ELSE 0 END) as gereserveerd,
-        ROUND((SUM(CASE WHEN s.bezet = 1 THEN 1 ELSE 0 END) / COUNT(s.date_id)) * 100, 2) as bezettingsgraad_percentage
+        SUM(CASE WHEN s.status = 'available' THEN 1 ELSE 0 END) as beschikbaar,
+        SUM(CASE WHEN s.status = 'booked' THEN 1 ELSE 0 END) as gereserveerd,
+        ROUND((SUM(CASE WHEN s.status = 'booked' THEN 1 ELSE 0 END) / COUNT(s.date_id)) * 100, 2) as bezettingsgraad_percentage
     FROM companies_details cd
     LEFT JOIN speeddates s ON cd.id = s.company_id
     GROUP BY cd.id, cd.company_name
@@ -686,10 +690,10 @@ BEGIN
         cd.company_name,
         s.begin_tijd,
         s.eind_tijd,
-        s.bezet
+        s.status
     FROM speeddates s
     JOIN companies_details cd ON s.company_id = cd.id
-    WHERE s.bezet = 0 
+    WHERE s.status = 'available' 
     AND s.begin_tijd >= zoek_tijd
     ORDER BY s.begin_tijd
     LIMIT 20;
@@ -708,7 +712,8 @@ CREATE PROCEDURE `ResetAlleSpeeddates`()
 BEGIN
     UPDATE speeddates 
     SET student_id = NULL,
-        bezet = 0,
+        status = 'available',
+        cancellation_reason = NULL,
         gereserveerd_op = NULL;
     
     SELECT 'SUCCESS' as status, 'Alle speeddates zijn gereset naar beschikbaar' as message;
@@ -750,8 +755,8 @@ SELECT
     s.begin_tijd,
     s.eind_tijd,
     CASE 
-        WHEN s.bezet = 0 THEN 'Beschikbaar'
-        WHEN s.bezet = 1 THEN CONCAT('Gereserveerd door: ', u.name)
+        WHEN s.status = 'available' THEN 'Beschikbaar'
+        WHEN s.status = 'booked' THEN CONCAT('Gereserveerd door: ', u.name)
     END as status,
     s.gereserveerd_op
 FROM speeddates s
@@ -780,7 +785,7 @@ FROM speeddates s
 JOIN companies_details cd ON s.company_id = cd.id
 JOIN students_details sd ON s.student_id = sd.id
 JOIN users u ON sd.user_id = u.id
-WHERE s.bezet = 1
+WHERE s.status = 'booked'
 ORDER BY s.begin_tijd;
 
 -- --------------------------------------------------------

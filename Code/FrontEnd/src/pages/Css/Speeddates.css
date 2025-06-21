@@ -391,6 +391,44 @@
   background: #dc2626;
 }
 
+.reservation-card.cancelled {
+  background-color: #fff0f1;
+  border-left: 5px solid #e74c3c;
+}
+
+.cancellation-info {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #ffeae8;
+  border-radius: 4px;
+}
+
+.status-text {
+  font-weight: bold;
+  color: #c0392b;
+  margin: 0 0 5px 0;
+}
+
+.reason-text {
+  font-size: 0.9em;
+  color: #7f8c8d;
+  margin: 0;
+}
+
+.reservation-card button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.reservation-card button.confirm-cancellation {
+  background-color: #27ae60;
+}
+
 @media (max-width: 768px) {
   .header {
     flex-direction: column;

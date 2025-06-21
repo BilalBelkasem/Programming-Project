@@ -118,9 +118,7 @@ const Speeddates = () => {
       }
     }).then(res => {
       setMyReservations(prev => [...prev, res.data]);
-      setTimeSlots(prev => prev.map(s => 
-        s._id === selectedSlot._id ? { ...s, available: false } : s
-      ));
+      setTimeSlots(prev => prev.filter(s => s._id !== selectedSlot._id));
       setSelectedCompany(null);
       setSelectedSlot(null);
       setReservationError('');
@@ -269,10 +267,21 @@ const Speeddates = () => {
         ) : (
           <div className="reservations-list">
             {myReservations.map(r => (
-              <div key={r._id} className="reservation-card">
+              <div key={r._id} className={`reservation-card ${r.status === 'cancelled_by_admin' ? 'cancelled' : ''}`}>
                 <h4>{r.company.name}</h4>
                 <p>Tijd: {r.time}</p>
-                <button onClick={() => handleCancelReservation(r._id)}>Annuleren</button>
+                {r.status === 'cancelled_by_admin' && (
+                  <div className="cancellation-info">
+                    <p className="status-text">Geannuleerd door organisatie</p>
+                    <p className="reason-text">{r.cancellationReason}</p>
+                  </div>
+                )}
+                <button 
+                  onClick={() => handleCancelReservation(r._id)}
+                  className={r.status === 'cancelled_by_admin' ? 'confirm-cancellation' : ''}
+                >
+                  {r.status === 'cancelled_by_admin' ? 'Ok, verwijder' : 'Annuleren'}
+                </button>
               </div>
             ))}
           </div>
