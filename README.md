@@ -3,12 +3,12 @@
 Een full-stack webapplicatie ontwikkeld door studenten van Erasmus Hogeschool Brussel voor het event Career Launch 2026. Studenten en bedrijven kunnen zich registreren, profielen beheren, speeddates boeken en elkaar snel terugvinden via QR-codes. Admins kunnen bedrijven en studenten beheren en badges printen voor gebruik op de beursvloer.
 
 ## 👥 Team
-- **Marwân Amakran** 
-- **Bilal Belkasem** 
-- **Digay Kengoum** 
-- **Denis Bujorean** 
-- **Ayman Bounaânaâ** 
-- **Jelle Schroeven** 
+- **Marwân Amakran** - Frontend design
+- **Bilal Belkasem** - Backend & Database
+- **Digay Kengoum** - Backend
+- **Denis Bujorean** - Frontend design
+- **Ayman Bounaânaâ** - Frontend
+- **Jelle Schroeven** - Backend & Database
 
 ## ⚙️ Tech Stack
 
@@ -23,7 +23,6 @@ Een full-stack webapplicatie ontwikkeld door studenten van Erasmus Hogeschool Br
 
 ### Overige Tools
 - **QRCode** - QR code generation
-- **Multer** - File upload handling
 - **Puppeteer** - PDF generation
 
 ## 📦 Installatie
@@ -38,25 +37,31 @@ cd Programming-Project
 ```bash
 cd Code/BackEnd
 npm install
-npm install multer ( If there is a problem about module, go pacckage.json in depedencies you will see type = module delete this and it will work.)
-npm install pupeteer
-npm install qrcode
 ```
 
 ### 3. Frontend installeren
 ```bash
 cd ../FrontEnd
 npm install
-npm install react-router-dom
-npm install axios (for requests)
-npm install lucide-react
 npm run dev
 ```
 
 ### 4. Database opzetten
-Make sure MySQL is running (e.g. through XAMPP)
+Open phpMyAdmin en importeer het bestand career_launch_2026.sql in een nieuwe database met de naam career_launch_2026.
 
-Open phpMyAdmin and import career_launch_2026.sql into a new database named career_launch_2026
+Omgeving:
+
+Maak een `.env`-bestand aan in de map `Code/BackEnd/` met de volgende inhoud:
+
+```env
+DB_HOST=localhost
+DB_USER=je_mysql_gebruiker
+DB_PASSWORD=je_mysql_wachtwoord
+DB_NAME=career_launch_2026
+DB_PORT=3306
+PORT=5000
+JWT_SECRET=je_geheime_sleutel
+```
 
 ## 🗄️ Database Design
 
