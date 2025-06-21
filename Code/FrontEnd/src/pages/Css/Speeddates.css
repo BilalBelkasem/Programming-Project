@@ -84,6 +84,24 @@
   margin-bottom: 3rem;
 }
 
+/* No companies message */
+.no-companies-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 2rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border: 2px dashed #d1d5db;
+}
+
+.no-companies-message p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0;
+  font-weight: 500;
+}
+
 /* Kaarten */
 .company-card {
   background: #ffffff;
@@ -204,6 +222,89 @@
   cursor: not-allowed;
 }
 
+.slot-button.selected {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.reservation-error {
+  background-color: #e74c3c;
+  color: black;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.company-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.schedule-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+}
+
+.schedule-time-block {
+  text-align: center;
+}
+
+.schedule-student-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.schedule-time {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #343a40;
+}
+
+.schedule-student-name {
+  font-size: 1em;
+  color: #495057;
+}
+
+.schedule-student-major {
+  font-size: 0.9em;
+  color: #6c757d;
+}
+
+.confirm-btn {
+  display: block;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin-top: 1.5rem;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: center;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background-color: #4338ca;
+}
+
+.confirm-btn:disabled {
+  background-color: #a5b4fc;
+  cursor: not-allowed;
+}
+
 /* Mijn Reservaties */
 .reservations-section {
   margin-top: 3rem;
@@ -288,6 +389,44 @@
 
 .reservation-card button:hover {
   background: #dc2626;
+}
+
+.reservation-card.cancelled {
+  background-color: #fff0f1;
+  border-left: 5px solid #e74c3c;
+}
+
+.cancellation-info {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #ffeae8;
+  border-radius: 4px;
+}
+
+.status-text {
+  font-weight: bold;
+  color: #c0392b;
+  margin: 0 0 5px 0;
+}
+
+.reason-text {
+  font-size: 0.9em;
+  color: #7f8c8d;
+  margin: 0;
+}
+
+.reservation-card button {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.reservation-card button.confirm-cancellation {
+  background-color: #27ae60;
 }
 
 @media (max-width: 768px) {

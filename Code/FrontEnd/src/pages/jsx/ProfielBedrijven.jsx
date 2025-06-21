@@ -120,10 +120,12 @@ export default function ProfielBedrijven() {
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
-          <Link to="/dashboard" className="navLink">Info</Link>
-          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/favorieten" className="navLink">studenten</Link>
-          <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
+          <Link to="/dashboard" className="nav-btn">Info</Link>
+          <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
+          <Link to="/speeddates" className="nav-btn">Speeddates</Link>
+          <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
+          <Link to="/favorieten" className="nav-btn">Favorieten</Link>
+          <Link to="/mijn-profiel" className="nav-btn active">Mijn Profiel</Link>
         </nav>
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>

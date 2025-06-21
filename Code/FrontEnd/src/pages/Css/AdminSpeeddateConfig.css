@@ -1,0 +1,344 @@
+.admin-speeddate-container {
+  background-color: #fff5f5; /* lichte roodtint achtergrond */
+  min-height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.admin-header {
+  background-color: #e30613; /* Erasmus rood */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.admin-logo-block {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.admin-logo {
+  width: 45px;
+  border-radius: 8px;
+}
+
+.admin-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-size: 16px;
+}
+
+.back-btn:hover {
+  background: white;
+  color: #e30613;
+  transform: translateY(-2px);
+}
+
+.config-main {
+  padding: 40px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.config-card {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.config-card h2 {
+  color: #e30613;
+  margin-bottom: 30px;
+  font-size: 28px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.current-config {
+  background: #fce6e6;
+  border-radius: 15px;
+  padding: 25px;
+  margin-bottom: 30px;
+  border-left: 5px solid #e30613;
+}
+
+.current-config h3 {
+  color: #e30613;
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.current-config p {
+  margin: 8px 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.current-config strong {
+  color: #e30613;
+  font-weight: 600;
+}
+
+.config-form h3 {
+  color: #e30613;
+  margin-bottom: 25px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.time-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+.time-input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.time-input-group label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.time-input-group select {
+  padding: 12px;
+  border: 2px solid #e1e5e9;
+  border-radius: 10px;
+  font-size: 16px;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.time-input-group select:focus {
+  outline: none;
+  border-color: #e30613;
+}
+
+.password-input {
+  margin-bottom: 25px;
+}
+
+.password-input label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.password-input input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e1e5e9;
+  border-radius: 10px;
+  font-size: 16px;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.password-input input:focus {
+  outline: none;
+  border-color: #e30613;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border-left: 4px solid #c33;
+  font-weight: 500;
+}
+
+.action-buttons {
+  text-align: center;
+}
+
+.preview-btn {
+  background-color: #e30613;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+
+.preview-btn:hover:not(:disabled) {
+  background-color: #c00510;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(227, 6, 19, 0.3);
+}
+
+.preview-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirmation-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirmation-content {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.confirmation-content h3 {
+  color: #e30613;
+  margin-bottom: 25px;
+  font-size: 24px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.changes-summary {
+  margin-bottom: 30px;
+}
+
+.changes-summary h4 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.changes-summary p {
+  margin: 8px 0;
+  color: #666;
+  font-size: 16px;
+}
+
+.warning-box {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 15px;
+}
+
+.warning-box p {
+  color: #856404;
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.confirm-btn {
+  background: #e30613;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+  font-size: 16px;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background: #c00510;
+  transform: translateY(-2px);
+}
+
+.confirm-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+  font-size: 16px;
+}
+
+.cancel-btn:hover:not(:disabled) {
+  background: #5a6268;
+  transform: translateY(-2px);
+}
+
+.cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .time-inputs {
+    grid-template-columns: 1fr;
+  }
+  
+  .confirmation-buttons {
+    flex-direction: column;
+  }
+  
+  .config-main {
+    padding: 20px;
+  }
+  
+  .config-card {
+    padding: 25px;
+  }
+  
+  .admin-header {
+    padding: 15px 20px;
+  }
+  
+  .back-btn {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+} 

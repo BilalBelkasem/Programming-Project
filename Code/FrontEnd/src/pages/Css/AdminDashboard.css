@@ -78,11 +78,17 @@
 }
 
 .bedrijf {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+.badge {
   grid-column: 1 / 2;
   grid-row: 2 / 3;
 }
 
-.badge {
+.speeddate-config {
   grid-column: 2 / 3;
-  grid-row: 1 / 3;
+  grid-row: 2 / 3;
+  font-size: 35px;
 }
