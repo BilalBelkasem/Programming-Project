@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-exports.getAllStudents = (req, res) => {
+exports.getAllStudents = async (req, res) => {
   const sql = `
     SELECT 
       users.id, 
@@ -11,67 +11,47 @@ exports.getAllStudents = (req, res) => {
     WHERE users.role = 'student'
   `;
 
-  db.query(sql, (err, result) => {
-    if (err) {
-      console.error('Fout bij ophalen studenten:', err);
-      return res.status(500).json({ error: err.message });
-    }
+  try {
+    const [result] = await db.query(sql);
     res.json(result);
-  });
+  } catch (err) {
+    console.error('Fout bij ophalen studenten:', err);
+    return res.status(500).json({ error: 'Fout bij het ophalen van studenten' });
+  }
 };
 
-exports.deleteStudent = (req, res) => {
+exports.deleteStudent = async (req, res) => {
   const studentId = req.params.id;
   console.log(`DELETE request ontvangen voor student id: ${studentId}`);
+  let connection;
 
-  db.beginTransaction(err => {
-    if (err) {
-      console.error('Fout bij starten transaction:', err);
-      return res.status(500).json({ error: 'Fout bij starten database transaction' });
+  try {
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    // Step 1: Delete from favorites
+    await connection.query('DELETE FROM favorites WHERE student_id = ?', [studentId]);
+
+    // Step 2: Delete from students_details
+    await connection.query('DELETE FROM students_details WHERE user_id = ?', [studentId]);
+
+    // Step 3: Delete from users
+    await connection.query('DELETE FROM users WHERE id = ?', [studentId]);
+
+    await connection.commit();
+    
+    console.log(`User met id ${studentId} succesvol verwijderd.`);
+    res.json({ message: 'Student succesvol verwijderd' });
+
+  } catch (err) {
+    console.error(`Fout bij verwijderen student ${studentId}:`, err);
+    if (connection) {
+      await connection.rollback();
     }
-
-    // ✅ Step 1: Delete from favorites first to respect foreign key constraint
-    db.query('DELETE FROM favorites WHERE student_id = ?', [studentId], (err) => {
-      if (err) {
-        console.error('Fout bij verwijderen uit favorites:', err);
-        return db.rollback(() => {
-          res.status(500).json({ error: 'Fout bij verwijderen uit favorites: ' + err.message });
-        });
-      }
-
-      // ✅ Step 2: Then delete from students_details
-      const deleteDetailsSql = 'DELETE FROM students_details WHERE user_id = ?';
-      db.query(deleteDetailsSql, [studentId], (err) => {
-        if (err) {
-          console.error('Fout bij verwijderen student details:', err);
-          return db.rollback(() => {
-            res.status(500).json({ error: 'Fout bij verwijderen student details: ' + err.message });
-          });
-        }
-
-        // ✅ Step 3: Then delete from users
-        const deleteUserSql = 'DELETE FROM users WHERE id = ?';
-        db.query(deleteUserSql, [studentId], (err2) => {
-          if (err2) {
-            console.error('Fout bij verwijderen student:', err2);
-            return db.rollback(() => {
-              res.status(500).json({ error: 'Fout bij verwijderen student: ' + err2.message });
-            });
-          }
-
-          db.commit(commitErr => {
-            if (commitErr) {
-              console.error('Fout bij commit van transaction:', commitErr);
-              return db.rollback(() => {
-                res.status(500).json({ error: 'Fout bij commit van transaction' });
-              });
-            }
-
-            console.log(`User met id ${studentId} succesvol verwijderd.`);
-            res.json({ message: 'Student succesvol verwijderd' });
-          });
-        });
-      });
-    });
-  });
+    res.status(500).json({ error: 'Fout bij verwijderen van de student' });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
 };
