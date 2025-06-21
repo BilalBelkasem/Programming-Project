@@ -10,6 +10,7 @@ export default function IngelogdHeader({ onLogout }) {
       <nav className="nav spaced">
         <Link to="/dashboard" className="nav-link">Info</Link>
         <Link to="/bedrijven" className="nav-link">Bedrijven</Link>
+        <Link to="/speeddates" className="nav-link">Speeddates</Link>
         <Link to="/plattegrond" className="nav-link">Plattegrond</Link>
         <Link to="/favorieten" className="nav-link">Favorieten</Link>
         <Link to="/profiel-bedrijf" className="nav-link">Mijn profiel</Link>

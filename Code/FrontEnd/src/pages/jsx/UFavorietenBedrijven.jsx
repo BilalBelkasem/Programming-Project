@@ -61,23 +61,16 @@ export default function UFavorietenBedrijven({ onLogout }) {
     <div className="pageWrapper">
       {/* Nieuwe headerstructuur zoals GBedrijven */}
       <header className="header">
-        <div className="header-section left">
-          <img src={logo} alt="Erasmus Logo" className="logo" />
-        </div>
-
-        <div className="header-section center">
-          <nav className="nav-center">
-            <Link to="/dashboard" className="nav-btn">Info</Link>
-            <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
-            <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
-            <Link to="/favorieten" className="nav-btn active">Favorieten</Link>
-            <Link to="/mijn-profiel" className="nav-btn">Mijn profiel</Link>
-          </nav>
-        </div>
-
-        <div className="header-section right">
-          <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
-        </div>
+        <img src={logo} alt="Erasmus Logo" className="logo" />
+        <nav className="nav">
+          <Link to="/dashboard" className="nav-btn">Info</Link>
+          <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
+          <Link to="/speeddates" className="nav-btn">Speeddates</Link>
+          <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
+          <Link to="/favorieten" className="nav-btn active">Favorieten</Link>
+          <Link to="/mijn-profiel" className="nav-btn">Mijn Profiel</Link>
+        </nav>
+        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
       <main className="main">
