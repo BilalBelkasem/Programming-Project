@@ -39,4 +39,25 @@ router.get('/sectors', (req, res) => {
     res.json(allSectors);
 });
 
+// GET available time slots for a specific company
+router.get('/:companyId/slots', async (req, res) => {
+    try {
+        const { companyId } = req.params;
+        const [slots] = await db.query(`
+            SELECT 
+                date_id as _id,
+                TIME_FORMAT(begin_tijd, '%H:%i') as time
+            FROM speeddates 
+            WHERE company_id = ? AND bezet = 0
+            ORDER BY begin_tijd
+        `, [companyId]);
+        
+        // All slots returned are available, so no need to check 'bezet' status
+        res.json(slots);
+    } catch (err) {
+        console.error('Error fetching time slots:', err);
+        res.status(500).json({ error: 'Failed to fetch time slots' });
+    }
+});
+
 module.exports = router;

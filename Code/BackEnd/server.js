@@ -15,6 +15,7 @@ const studentRoutes        = require('./students');
 const badgeRoutes          = require('./badge');
 const mijnProfielRoutes    = require('./Controller/mijnprofiel');
 const studentDetailsRoutes = require('./Controller/studentDetails');
+const reservationsRoutes   = require('./Controller/reservations');
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/mijnprofiel', authMiddleware.authenticateToken, mijnProfielRoutes);
 app.use('/api/student_details', studentDetailsRoutes);
+app.use('/api/reservations', reservationsRoutes);
 
 // Extra routes
 app.get('/api/users', async (req, res) => {

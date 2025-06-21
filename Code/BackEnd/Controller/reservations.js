@@ -6,22 +6,30 @@ const { authenticateToken } = require('../middleware/authMiddleware');
 // GET all reservations for the logged-in user
 router.get('/user/me', authenticateToken, async (req, res) => {
     try {
+        // Get student details ID from user ID
+        const [studentDetails] = await db.query('SELECT id FROM students_details WHERE user_id = ?', [req.user.id]);
+        
+        if (studentDetails.length === 0) {
+            return res.status(404).json({ error: 'Student details not found' });
+        }
+        
+        const studentId = studentDetails[0].id;
+        
         const [reservations] = await db.query(`
             SELECT 
                 s.date_id as _id,
-                s.begin_tijd as datetime,
-                cd.id as company_id,
-                cd.company_name as company_name
+                TIME_FORMAT(s.begin_tijd, '%H:%i') as time,
+                cd.company_name
             FROM speeddates s
             JOIN companies_details cd ON s.company_id = cd.id
             WHERE s.student_id = ?
             ORDER BY s.begin_tijd
-        `, [req.user.id]);
+        `, [studentId]);
 
         const formattedReservations = reservations.map(r => ({
             _id: r._id,
-            slot: { datetime: r.datetime },
-            company: { _id: r.company_id, name: r.company_name }
+            time: r.time,
+            company: { name: r.company_name }
         }));
 
         res.json(formattedReservations);
@@ -33,10 +41,28 @@ router.get('/user/me', authenticateToken, async (req, res) => {
 
 // POST a new reservation
 router.post('/', authenticateToken, async (req, res) => {
-    const { slotId } = req.body;
-    const studentId = req.user.id; 
-
+    const { slotId, companyId } = req.body;
+    
     try {
+        // Get student details ID from user ID
+        const [studentDetails] = await db.query('SELECT id FROM students_details WHERE user_id = ?', [req.user.id]);
+        
+        if (studentDetails.length === 0) {
+            return res.status(404).json({ error: 'Student details not found' });
+        }
+        
+        const studentId = studentDetails[0].id;
+
+        // Correctly check if the student already has a reservation with this company
+        const [existingReservation] = await db.query(
+            'SELECT date_id FROM speeddates WHERE company_id = ? AND student_id = ?',
+            [companyId, studentId]
+        );
+
+        if (existingReservation.length > 0) {
+            return res.status(409).json({ error: 'Je hebt al een reservatie met dit bedrijf.' });
+        }
+        
         const [slots] = await db.query('SELECT * FROM speeddates WHERE date_id = ? AND bezet = 0', [slotId]);
         if (slots.length === 0) {
             return res.status(409).json({ error: 'This time slot is no longer available.' });
@@ -51,9 +77,8 @@ router.post('/', authenticateToken, async (req, res) => {
         const [newReservation] = await db.query(`
             SELECT 
                 s.date_id as _id,
-                s.begin_tijd as datetime,
-                cd.id as company_id,
-                cd.company_name as company_name
+                TIME_FORMAT(s.begin_tijd, '%H:%i') as time,
+                cd.company_name
             FROM speeddates s
             JOIN companies_details cd ON s.company_id = cd.id
             WHERE s.date_id = ?
@@ -61,8 +86,8 @@ router.post('/', authenticateToken, async (req, res) => {
 
         const formattedReservation = {
             _id: newReservation[0]._id,
-            slot: { datetime: newReservation[0].datetime },
-            company: { _id: newReservation[0].company_id, name: newReservation[0].company_name }
+            time: newReservation[0].time,
+            company: { name: newReservation[0].company_name }
         };
 
         res.status(201).json(formattedReservation);
@@ -75,9 +100,17 @@ router.post('/', authenticateToken, async (req, res) => {
 // DELETE a reservation
 router.delete('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
-    const studentId = req.user.id;
-
+    
     try {
+        // Get student details ID from user ID
+        const [studentDetails] = await db.query('SELECT id FROM students_details WHERE user_id = ?', [req.user.id]);
+        
+        if (studentDetails.length === 0) {
+            return res.status(404).json({ error: 'Student details not found' });
+        }
+        
+        const studentId = studentDetails[0].id;
+
         const [result] = await db.query(`
             UPDATE speeddates 
             SET student_id = NULL, bezet = 0, gereserveerd_op = NULL

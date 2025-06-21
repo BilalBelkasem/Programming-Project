@@ -222,6 +222,46 @@
   cursor: not-allowed;
 }
 
+.slot-button.selected {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.reservation-error {
+  background-color: #e74c3c;
+  color: black;
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.confirm-btn {
+  display: block;
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin-top: 1.5rem;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: center;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background-color: #4338ca;
+}
+
+.confirm-btn:disabled {
+  background-color: #a5b4fc;
+  cursor: not-allowed;
+}
+
 /* Mijn Reservaties */
 .reservations-section {
   margin-top: 3rem;
