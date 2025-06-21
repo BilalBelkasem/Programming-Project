@@ -11,6 +11,7 @@ import CompanyRegistrationForm from './pages/jsx/CompanyRegistrationForm.jsx';
 import AdminStudent from './pages/jsx/AdminStudent.jsx';
 import AdminBedrijf from './pages/jsx/AdminBedrijf.jsx';
 import AdminBadge from './pages/jsx/AdminBadge.jsx';
+import AdminSpeeddateConfig from './pages/jsx/AdminSpeeddateConfig.jsx';
 import ClientRegistration from './pages/jsx/ClientRegistration.jsx';
 import ProfielBedrijven from './pages/jsx/ProfielBedrijven.jsx';
 import ProfielStudent from './pages/jsx/ProfielStudent.jsx';
@@ -107,6 +108,10 @@ export default function App() {
       <Route
         path="/admin/badges"
         element={isLoggedIn && user?.role === 'admin' ? <AdminBadge /> : <Navigate to="/login" replace />}
+      />
+      <Route
+        path="/admin/speeddate-config"
+        element={isLoggedIn && user?.role === 'admin' ? <AdminSpeeddateConfig /> : <Navigate to="/login" replace />}
       />
 
       {/* Studentprofiel met idParam beveiliging */}

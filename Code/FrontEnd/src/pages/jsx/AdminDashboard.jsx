@@ -46,6 +46,12 @@ export default function AdminDashboard() {
         >
           badge
         </div>
+        <div
+          className="admin-tile speeddate-config"
+          onClick={() => navigate('/admin/speeddate-config')}
+        >
+          speeddate configuratie
+        </div>
       </main>
     </div>
   );
