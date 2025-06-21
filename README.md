@@ -47,7 +47,7 @@ npm run dev
 ```
 
 ### 4. Database opzetten
-Open phpMyAdmin en importeer het bestand career_launch_2026.sql in een nieuwe database met de naam career_launch_2026.
+Open phpMyAdmin en importeer het bestand career_launch_2026.sql in een nieuwe database met de naam career_launch_2026. Dan importeer het tweede sql bestand speeddates_database
 
 Omgeving:
 
