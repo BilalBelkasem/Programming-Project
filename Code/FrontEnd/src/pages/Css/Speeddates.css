@@ -237,6 +237,49 @@
   text-align: center;
 }
 
+.company-schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.schedule-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+}
+
+.schedule-time-block {
+  text-align: center;
+}
+
+.schedule-student-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.schedule-time {
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #343a40;
+}
+
+.schedule-student-name {
+  font-size: 1em;
+  color: #495057;
+}
+
+.schedule-student-major {
+  font-size: 0.9em;
+  color: #6c757d;
+}
+
 .confirm-btn {
   display: block;
   width: 100%;
