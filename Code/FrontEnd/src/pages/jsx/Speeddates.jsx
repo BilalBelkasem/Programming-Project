@@ -1,31 +1,69 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
-import logo from '../../assets/logoerasmus.png';
+import { useNavigate } from 'react-router-dom';
+import SharedHeaderIngelogd from '../../components/SharedHeaderIngelogd';
 import '../Css/Speeddates.css';
 
 const Speeddates = () => {
-  const [companies, setCompanies] = useState([]);
+  const [allCompanies, setAllCompanies] = useState([]);
+  const [filteredCompanies, setFilteredCompanies] = useState([]);
+  const [sectors, setSectors] = useState([]);
+  const [selectedSectors, setSelectedSectors] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showFilter, setShowFilter] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [timeSlots, setTimeSlots] = useState([]);
   const [myReservations, setMyReservations] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-
   const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('/api/companies')
-      .then(res => setCompanies(res.data))
-      .catch(err => console.error(err));
+      .then(res => {
+        setAllCompanies(res.data);
+        setFilteredCompanies(res.data);
+      })
+      .catch(err => console.error('Error fetching companies:', err));
+
+    axios.get('/api/companies/sectors')
+      .then(res => setSectors(res.data))
+      .catch(err => console.error('Error fetching sectors:', err));
 
     axios.get('/api/reservations/user/me')
       .then(res => setMyReservations(res.data))
-      .catch(err => console.error(err));
+      .catch(err => console.error('Error fetching reservations:', err));
   }, []);
+
+  useEffect(() => {
+    // Apply search query filter whenever it changes
+    const searchFiltered = allCompanies.filter(company => {
+      const sectorMatch = selectedSectors.length === 0 || selectedSectors.includes(company.industry);
+      const searchMatch = [company.name, company.description, company.industry, company.location].some(field =>
+        field && typeof field === 'string' && field.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      return sectorMatch && searchMatch;
+    });
+    setFilteredCompanies(searchFiltered);
+  }, [searchQuery, allCompanies, selectedSectors]);
+
+  const handleSectorChange = (sector) => {
+    setSelectedSectors(prev =>
+      prev.includes(sector)
+        ? prev.filter(s => s !== sector)
+        : [...prev, sector]
+    );
+  };
+
+  const applySectorFilter = () => {
+    const sectorFiltered = allCompanies.filter(company =>
+      selectedSectors.length === 0 || selectedSectors.includes(company.industry)
+    );
+    setFilteredCompanies(sectorFiltered);
+    setShowFilter(false);
+  };
 
   const handleCompanyClick = (company) => {
     setSelectedCompany(company);
-    axios.get(`/api/companies/${company._id}/slots`)
+    axios.get(`/api/companies/${company.id}/slots`)
       .then(res => setTimeSlots(res.data))
       .catch(err => console.error(err));
   };
@@ -33,7 +71,7 @@ const Speeddates = () => {
   const handleReservation = (slot) => {
     axios.post('/api/reservations', {
       slotId: slot._id,
-      companyId: selectedCompany._id,
+      companyId: selectedCompany.id,
     }).then(res => {
       setMyReservations(prev => [...prev, res.data]);
       setTimeSlots(prev => prev.map(s => s._id === slot._id ? { ...s, available: false } : s));
@@ -42,7 +80,15 @@ const Speeddates = () => {
 
   const handleCancelReservation = (id) => {
     axios.delete(`/api/reservations/${id}`)
-      .then(() => setMyReservations(prev => prev.filter(r => r._id !== id)));
+      .then(() => {
+        setMyReservations(prev => prev.filter(r => r._id !== id));
+        if (selectedCompany) {
+          const canceledReservation = myReservations.find(r => r._id === id);
+          if (canceledReservation && canceledReservation.company._id === selectedCompany.id) {
+            handleCompanyClick(selectedCompany);
+          }
+        }
+      });
   };
 
   const handleLogout = () => {
@@ -50,17 +96,10 @@ const Speeddates = () => {
     navigate("/login");
   };
 
-  const filteredCompanies = companies.filter(c =>
-    [c.name, c.description, c.industry, c.location].some(field =>
-      field?.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
   const formatDateTime = (datetime) => {
     const d = new Date(datetime);
     return {
-      date: d.toLocaleDateString('nl-NL', {
-        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
-      }),
+      date: d.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }),
       time: d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' }),
     };
   };
@@ -76,49 +115,70 @@ const Speeddates = () => {
 
   return (
     <div className="speeddates-container">
+      <SharedHeaderIngelogd onLogout={handleLogout} />
 
-      {/* HEADER */}
-      <header className="header">
-        <img src={logo} alt="Erasmus Logo" className="logo" />
-        <nav className="nav">
-          <Link to="/dashboard" className="nav-btn">Info</Link>
-          <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
-          <Link to="/speeddates" className="nav-btn active">Speeddates</Link>
-          <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
-          <Link to="/favorieten" className="nav-btn">Favorieten</Link>
-          <Link to="/mijn-profiel" className="nav-btn">Mijn Profiel</Link>
-        </nav>
-        <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
-      </header>
-
-      {/* TITEL + SEARCH */}
       <h1 className="speeddates-title">Speeddate Reservaties</h1>
       <p className="speeddates-subtitle">Reserveer je speeddate met innovatieve bedrijven</p>
-      <input
-        className="speeddates-search"
-        type="text"
-        value={searchQuery}
-        placeholder="Zoek bedrijf, locatie, of industrie..."
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-
-      {/* BEDRIJVEN GRID */}
-      <div className="speeddates-grid">
-        {filteredCompanies.map(c => (
-          <div key={c._id} className="company-card" onClick={() => handleCompanyClick(c)}>
-            <h3 className="company-name">{c.name}</h3>
-            <p className="company-description">{c.description}</p>
-            <div className="company-meta">
-              <span>{c.industry}</span>
-              <span>{c.location}</span>
-              <span>{c.contact}</span>
-            </div>
-            <span className="session-badge">5 min sessies</span>
-          </div>
-        ))}
+      
+      <div className="search-and-filter-container">
+        <input
+          className="speeddates-search"
+          type="text"
+          value={searchQuery}
+          placeholder="Zoek bedrijf, locatie, of industrie..."
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button className="filter-btn" onClick={() => setShowFilter(!showFilter)}>Filter</button>
       </div>
 
-      {/* SLOT MODAL */}
+      {showFilter && (
+        <div className="filter-modal">
+            <div className="filter-modal-content">
+                <h3>Filter op Sector</h3>
+                <div className="sector-list">
+                    {sectors.map(sector => (
+                        <div key={sector} className="sector-checkbox">
+                            <input
+                                type="checkbox"
+                                id={sector}
+                                value={sector}
+                                checked={selectedSectors.includes(sector)}
+                                onChange={() => handleSectorChange(sector)}
+                            />
+                            <label htmlFor={sector}>{sector}</label>
+                        </div>
+                    ))}
+                </div>
+                <button onClick={applySectorFilter}>Toepassen</button>
+                <button onClick={() => setShowFilter(false)}>Sluiten</button>
+            </div>
+        </div>
+      )}
+
+      <div className="speeddates-grid">
+        {filteredCompanies.length === 0 ? (
+          <div className="no-companies-message">
+            {selectedSectors.length > 0 ? (
+              <p>Geen bedrijven gevonden voor {selectedSectors.length === 1 ? selectedSectors[0] : selectedSectors.join(', ')}</p>
+            ) : (
+              <p>Geen bedrijven gevonden die overeenkomen met je zoekopdracht.</p>
+            )}
+          </div>
+        ) : (
+          filteredCompanies.map(c => (
+            <div key={c.id} className="company-card" onClick={() => handleCompanyClick(c)}>
+              <h3 className="company-name">{c.name || 'Bedrijfsnaam niet beschikbaar'}</h3>
+              <p className="company-description">{c.description || 'Geen beschrijving beschikbaar'}</p>
+              <div className="company-meta">
+                <span>{c.industry || 'Sector niet beschikbaar'}</span>
+                <span>{c.location || 'Locatie niet beschikbaar'}</span>
+              </div>
+              <span className="session-badge">5 min sessies</span>
+            </div>
+          ))
+        )}
+      </div>
+
       {selectedCompany && (
         <div className="slot-modal">
           <div className="slot-modal-content">
@@ -148,7 +208,6 @@ const Speeddates = () => {
         </div>
       )}
 
-      {/* RESERVATIES */}
       <div className="reservations-section">
         <div className="reservations-header">
           <h2 className="reservations-title">📅 Mijn Reservaties</h2>
