@@ -11,118 +11,101 @@ const Speeddates = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [availableSlots, setAvailableSlots] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        setIsLoading(true);
-        const token = localStorage.getItem('token');
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      const token = localStorage.getItem('token');
 
-        // Get available slots from backend API
-        const slotsRes = await axios.get(`${API_BASE_URL}/speeddates`, {
+      try {
+        // Fetch companies data
+        const companiesRes = await axios.get(`${API_BASE_URL}/bedrijven`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
+        setCompanies(companiesRes.data);
 
-        // Extract companies from slots data
-        const companies = slotsRes.data.reduce((acc, slot) => {
-          if (!acc.some(c => c.id === slot.company_id)) {
-            acc.push({
-              id: slot.company_id,
-              name: slot.company_name,
-              description: slot.sector,
-              industry: slot.sector,
-              location: ''
-            });
-          }
-          return acc;
-        }, []);
-
-        setCompanies(companies);
-        setAvailableSlots(slotsRes.data);
-
-        // Get user's reservations
+        // Fetch user's reservations
         const reservationsRes = await axios.get(`${API_BASE_URL}/reservations/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         setMyReservations(reservationsRes.data);
 
       } catch (err) {
-        console.error('Initial load error:', err);
+        console.error('Error:', err);
+        setError(err.response?.data?.message || 'Failed to load data');
         if (err.response?.status === 401) navigate('/login');
       } finally {
         setIsLoading(false);
       }
     };
-    fetchInitialData();
-  }, [navigate]);
 
-  const handleNewReservationClick = (company) => {
-    const companyId = company.id || company._id || company.user_id;
-    if (!companyId) {
-      console.error('Invalid company object:', company);
-      alert('Cannot load slots - missing company ID');
-      return;
+    fetchData();
+  }, [navigate, API_BASE_URL]);
+
+  const fetchAvailableSlots = async (companyId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(
+        `${API_BASE_URL}/company/speeddates/companies/${companyId}`,
+        {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }
+      );
+      // Filter only available slots
+      const available = response.data.filter(slot => slot.available);
+      setAvailableSlots(available);
+    } catch (err) {
+      console.error('Error fetching available slots:', err);
+      setAvailableSlots([]);
+      setError('Failed to load available time slots');
     }
+  };
 
+  const handleNewReservationClick = async (company) => {
     setSelectedCompany(company);
-    axios.get('/timeslots')
-      .then(res => {
-        const available = res.data.filter(slot => {
-          const isAvailable = !myReservations.some(r =>
-            (r.slot?.id === slot.id) || (r.slot?._id === slot._id)
-          );
-          const slotDate = new Date(slot.datetime).toISOString().split('T')[0];
-          return isAvailable && slotDate === '2026-03-13';
-        });
-        setAvailableSlots(available);
-      })
-      .catch(err => {
-        console.error('Error fetching slots:', err);
-        alert('Error loading available time slots');
-      });
+    await fetchAvailableSlots(company.id);
   };
 
-  // For creating reservations
   const handleReservation = async (slot) => {
-    try {
-      const res = await axios.post('/api/reservations', {
-        slotId: slot.id,
-        companyId: selectedCompany.id // Add company ID
-      });
+    if (!selectedCompany) return;
 
-      setMyReservations(prev => [...prev, {
-        id: res.data.id,
-        slot: {  // Changed from slot_id to match your formatDateTime usage
-          id: slot.id,
-          datetime: slot.datetime,
-          start_time: slot.start_time,
-          end_time: slot.end_time
-        },
-        company: selectedCompany // Use the full company object
-      }]);
+    const token = localStorage.getItem('token');
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/reservations`,
+        { slot_id: slot.id },
+        {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }
+      );
+
+      // Update local state
+      setMyReservations(prev => [...prev, response.data]);
+      setAvailableSlots(prev => prev.filter(s => s.id !== slot.id));
+      setSelectedCompany(null);
     } catch (err) {
-      console.error('Error creating reservation:', err);
-      alert(err.response?.data?.error || 'Reservation failed');
+      console.error('Error making reservation:', err);
+      setError(err.response?.data?.message || 'Failed to make reservation');
     }
   };
 
-  const handleCancelReservation = async (id) => {
+  const handleCancelReservation = async (reservationId) => {
+    const token = localStorage.getItem('token');
     try {
-      await axios.delete(`/api/reservations/${id}`);
-      setMyReservations(prev => prev.filter(r => r.id !== id));
-
-      // Refresh slots if modal is open
-      if (selectedCompany) {
-        const companyId = selectedCompany.id;
-        const res = await axios.get(`/api/companies/${companyId}/speeddates`)
-        setAvailableSlots(res.data);
-      }
+      await axios.delete(`${API_BASE_URL}/reservations/${reservationId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      // Update local state
+      setMyReservations(prev => prev.filter(r => r.id !== reservationId));
     } catch (err) {
-      console.error('Error cancelling reservation:', err);
-      alert('Annuleren mislukt');
+      console.error('Error canceling reservation:', err);
+      setError(err.response?.data?.message || 'Failed to cancel reservation');
     }
   };
 
@@ -131,39 +114,18 @@ const Speeddates = () => {
     navigate("/login");
   };
 
-  const formatDateTime = (datetime) => {
-    // If datetime is already in "HH:mm" format (from backend)
-    if (typeof datetime === 'string' && datetime.match(/^\d{2}:\d{2}$/)) {
-      return {
-        time: datetime,
-        date: '13 maart 2026' // Hardcoded date
-      };
-    }
-
-    // If it's a Date object
-    const d = new Date(datetime);
-    const hours = d.getHours().toString().padStart(2, '0');
-    const minutes = d.getMinutes().toString().padStart(2, '0');
-
-    return {
-      date: '13 maart 2026', // Hardcoded date
-      time: `${hours}:${minutes}`
-    };
-  };
-  const groupSlotsByDate = (slots) => {
-    return slots.reduce((acc, slot) => {
-      const key = new Date(slot.datetime).toDateString();
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(slot);
-      return acc;
-    }, {});
+  const formatTimeDisplay = (time) => {
+    return time; // Already in HH:mm format
   };
 
-  // Filter companies based on search query
   const filteredCompanies = companies.filter(c =>
-    [c.name, c.description, c.industry, c.location].some(field =>
+    [c.company_name, c.description, c.sector, c.city].some(field =>
       field?.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  if (isLoading) {
+    return <div className="loading">Loading...</div>;
+  }
 
   return (
     <div className="speeddates-container">
@@ -181,9 +143,12 @@ const Speeddates = () => {
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
-      {/* Title and search */}
+      {/* Main content */}
       <h1 className="speeddates-title">Speeddate Reservaties</h1>
       <p className="speeddates-subtitle">Reserveer je speeddate met innovatieve bedrijven</p>
+
+      {error && <div className="error-message">{error}</div>}
+
       <input
         className="speeddates-search"
         type="text"
@@ -198,13 +163,10 @@ const Speeddates = () => {
           <div key={c.id} className="company-card">
             <div className="company-card-header">
               <div className='company-header'>
-                <h3 className="company-name">{c.name}</h3>
+                <h3 className="company-name">{c.company_name}</h3>
                 <button
                   className="new-reservation-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleNewReservationClick(c);
-                  }}
+                  onClick={() => handleNewReservationClick(c)}
                 >
                   +
                 </button>
@@ -212,42 +174,33 @@ const Speeddates = () => {
             </div>
             <p className="company-description">{c.description}</p>
             <div className="company-meta">
-              <span>{c.industry}</span>
-              <span>{c.location}</span>
-              <span>{c.contact}</span>
+              <span>{c.sector}</span>
+              <span>{c.city}</span>
             </div>
             <span className="session-badge">5 min sessies</span>
           </div>
         ))}
       </div>
 
-      {/* Timeslot modal for new reservation */}
+      {/* Timeslot modal */}
       {selectedCompany && (
         <div className="slot-modal">
           <div className="slot-modal-content">
             <button className="close-btn" onClick={() => setSelectedCompany(null)}>×</button>
-            <h2>Reserveer bij {selectedCompany.name}</h2>
+            <h2>Reserveer bij {selectedCompany.company_name}</h2>
 
             {availableSlots.length > 0 ? (
-              Object.entries(groupSlotsByDate(availableSlots)).map(([date, slots]) => (
-                <div key={date} className="slot-group">
-                  <h4 className="slot-date">{formatDateTime(slots[0].datetime).date}</h4>
-                  <div className="slot-list">
-                    {slots.map(slot => {
-                      const { time } = formatDateTime(slot.datetime);
-                      return (
-                        <button
-                          key={slot._id}
-                          className="slot-button"
-                          onClick={() => handleReservation(slot)}
-                        >
-                          {time}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))
+              <div className="slot-list">
+                {availableSlots.map(slot => (
+                  <button
+                    key={slot.id}
+                    className="slot-button"
+                    onClick={() => handleReservation(slot)}
+                  >
+                    {formatTimeDisplay(slot.start_time)} - {formatTimeDisplay(slot.end_time)}
+                  </button>
+                ))}
+              </div>
             ) : (
               <p className="no-slots">Geen beschikbare slots voor dit bedrijf</p>
             )}
@@ -259,23 +212,27 @@ const Speeddates = () => {
       <div className="reservations-section">
         <div className="reservations-header">
           <h2 className="reservations-title">📅 Mijn Reservaties</h2>
-          <button className="mini-refresh-btn" onClick={() => window.location.reload()}>↻</button>
+          <button
+            className="mini-refresh-btn"
+            onClick={() => window.location.reload()}
+          >
+            ↻
+          </button>
         </div>
 
         {myReservations.length === 0 ? (
           <p className="no-reservations">Je hebt nog geen reservaties gemaakt.</p>
         ) : (
           <div className="reservations-list">
-            {myReservations.map(r => {
-              const { date, time } = formatDateTime(r.slot.datetime);
-              return (
-                <div key={r._id} className="reservation-card">
-                  <h4>{r.company.name}</h4>
-                  <p>{date} om {time}</p>
-                  <button onClick={() => handleCancelReservation(r._id)}>Annuleren</button>
-                </div>
-              );
-            })}
+            {myReservations.map(r => (
+              <div key={r.id} className="reservation-card">
+                <h4>{r.company_name || r.company?.company_name}</h4>
+                <p>13 maart 2026 om {formatTimeDisplay(r.start_time || r.slot?.start_time)}</p>
+                <button onClick={() => handleCancelReservation(r.id)}>
+                  Annuleren
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>

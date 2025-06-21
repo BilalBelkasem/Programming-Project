@@ -156,25 +156,26 @@ router.delete('/:id', authenticateToken, isCompany, async (req, res) => {
     }
 });
 
-router.get('/companies/:companyId/timeslots', async (req, res) => {
-    try {
-        const [slots] = await db.query(`
+
+router.get('/companies/:companyId', async (req, res) => {
+  try {
+    const [slots] = await db.query(`
       SELECT 
         id,
-        DATE(start_time) as date,
-        TIME_FORMAT(start_time, '%H:%i') as start_time,
-        TIME_FORMAT(end_time, '%H:%i') as end_time,
+        DATE_FORMAT(start_time, '%H:%i') as start_time,
+        DATE_FORMAT(end_time, '%H:%i') as end_time,
         available
       FROM timeslots
       WHERE company_id = ?
+      AND date = '2026-03-13'
       ORDER BY start_time
     `, [req.params.companyId]);
 
-        res.json(slots);
-    } catch (err) {
-        console.error('Error fetching public slots:', err);
-        res.status(500).json({ error: 'Server error' });
-    }
+    res.json(slots);
+  } catch (err) {
+    console.error('Error fetching slots:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 module.exports = router;

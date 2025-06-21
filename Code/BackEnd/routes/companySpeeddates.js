@@ -8,37 +8,35 @@ const { authenticateToken, isCompany } = require('../middleware/authMiddleware')
 
 // GET /api/company/speeddates - Fetch timeslots for the company
 router.get('/', authenticateToken, isCompany, async (req, res) => {
-    console.log('Fetching slots for company ID:', req.user.id); // Debug log
-    try {
-        console.log('User from token:', req.user); // Debug log
-        await db.query('SELECT 1');
-        console.log('Database connection OK');
-        const [company] = await db.query(
-            `SELECT id FROM companies_details WHERE user_id = ?`,
-            [req.user.id]
-        );
+  try {
+    // Get company ID from user_id
+    const [company] = await db.query(
+      `SELECT id FROM companies_details WHERE user_id = ?`,
+      [req.user.id]
+    );
 
-        if (!company.length) {
-            console.log('No company found for user_id:', req.user.id);
-            return res.status(403).json({ error: 'Company not found' });
-        }
-
-    console.log('Company found:', company); // Debug log
-
-        const [slots] = await db.query(
-            `SELECT id, start_time, end_time, date, available 
-                FROM timeslots 
-                WHERE company_id = ? 
-                ORDER BY date, start_time`,
-            [company[0].id]
-        );
-
-        console.log('Slots found:', slots.length); // Debug log
-        res.json(slots);
-    } catch (err) {
-        console.error('Error fetching slots:', err);
-        res.status(500).json({ error: 'Server error' });
+    if (!company.length) {
+      return res.status(404).json({ error: 'Company not found' });
     }
+
+    // Get slots for this company
+    const [slots] = await db.query(`
+      SELECT 
+        id,
+        DATE_FORMAT(start_time, '%H:%i') as start_time,
+        DATE_FORMAT(end_time, '%H:%i') as end_time,
+        available
+      FROM timeslots
+      WHERE company_id = ?
+      AND date = '2026-03-13'
+      ORDER BY start_time
+    `, [company[0].id]);
+
+    res.json(slots);
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 // POST /api/company/speeddates - Create new timeslots

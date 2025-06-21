@@ -33,72 +33,45 @@ router.get('/me', authenticateToken, async (req, res) => {
 });
 
 // Create new reservation
+// routes/reservationsRoutes.js
 router.post('/', authenticateToken, async (req, res) => {
-  const { slotId } = req.body;
-  const studentId = req.user.id;
-
-  if (!slotId) {
-    return res.status(400).json({ error: 'Slot ID is required' });
-  }
+  const { slot_id } = req.body; // Match your DB column name
+  const student_id = req.user.id;
 
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
-
-    // 1. Check slot availability
-    const [slot] = await conn.query(`
-      SELECT t.*, c.id as company_id 
-      FROM timeslots t
-      JOIN companies_details c ON t.company_id = c.id
-      WHERE t.id = ? AND t.available = 1
-      FOR UPDATE
-    `, [slotId]);
     
-    if (slot.length === 0) {
+    // Check slot availability
+    const [slot] = await conn.query(
+      `SELECT * FROM timeslots WHERE id = ? AND available = 1 FOR UPDATE`,
+      [slot_id]
+    );
+    
+    if (!slot.length) {
       return res.status(400).json({ error: 'Slot not available' });
     }
 
-    // 2. Check if student already has reservation at this time
-    const [existing] = await conn.query(`
-      SELECT r.id 
-      FROM reservations r
-      JOIN timeslots t ON r.slot_id = t.id
-      WHERE r.student_id = ? AND t.datetime = ?
-    `, [studentId, slot[0].datetime]);
-
-    if (existing.length > 0) {
-      return res.status(400).json({ error: 'You already have a reservation at this time' });
-    }
-
-    // 3. Create reservation
+    // Create reservation
     const [result] = await conn.query(
-      `INSERT INTO reservations (slot_id, student_id) 
-       VALUES (?, ?)`,
-      [slotId, studentId]
+      `INSERT INTO reservations (slot_id, student_id) VALUES (?, ?)`,
+      [slot_id, student_id]
     );
 
-    // 4. Mark slot as unavailable
+    // Update slot availability
     await conn.query(
-      `UPDATE timeslots SET available = 0 
-       WHERE id = ?`,
-      [slotId]
+      `UPDATE timeslots SET available = 0 WHERE id = ?`,
+      [slot_id]
     );
 
     await conn.commit();
-    
     res.status(201).json({ 
       id: result.insertId,
-      message: 'Reservation created successfully',
-      companyId: slot[0].company_id,
-      slot: slot[0]
+      message: 'Reservation created'
     });
   } catch (err) {
     await conn.rollback();
-    console.error('Error creating reservation:', err);
-    
-    if (err.code === 'ER_DUP_ENTRY') {
-      return res.status(400).json({ error: 'Already reserved this slot' });
-    }
+    console.error('Error:', err);
     res.status(500).json({ error: 'Server error' });
   } finally {
     conn.release();

@@ -170,21 +170,50 @@ app.post(
   }
 );
 
+// Get all companies
+app.get('/api/companies', async (req, res) => {
+  try {
+    const [companies] = await db.query(`
+      SELECT 
+        cd.id,
+        cd.company_name as name,
+        cd.sector as description,
+        cd.city as location,
+        u.email
+      FROM companies_details cd
+      JOIN users u ON cd.user_id = u.id
+    `);
+    res.json(companies);
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
-const PORT = process.env.PORT || 5001;
+// Get timeslots for a company
+app.get('/api/timeslots/company/:companyId', async (req, res) => {
+  try {
+    const [slots] = await db.query(`
+      SELECT 
+        id,
+        DATE_FORMAT(start_time, '%H:%i') as start_time,
+        DATE_FORMAT(end_time, '%H:%i') as end_time,
+        available
+      FROM timeslots
+      WHERE company_id = ?
+      AND date = '2026-03-13'
+      AND available = 1
+      ORDER BY start_time
+    `, [req.params.companyId]);
+    
+    res.json(slots);
+  } catch (err) {
+    console.error('Error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
-});
-// Tijdelijk test endpoint - verwijderen na testen
-// Vervang je test endpoint hiermee
-app.get('/api/test', (req, res) => {
-  console.log('Test endpoint reached');
-  res.json({ 
-    message: 'Test successful',
-    routes: [
-      '/api/company/speeddates',
-      '/api/companies',
-      '/api/students'
-    ]
-  });
 });
