@@ -17,7 +17,6 @@ export default function GInfoPagina() {
           <nav className="nav-center">
             <Link to="/" className="nav-btn active">info</Link>
             <Link to="/GBedrijven" className="nav-btn">bedrijven</Link>
-            <Link to="/speeddates" className="nav-btn">speeddates</Link>
             <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
             <Link to="/login" className="nav-btn">login/registeren</Link>
           </nav>
