@@ -134,7 +134,6 @@ router.delete('/:id', authenticateToken, isStudent, async (req, res) => {
     const { id } = req.params;
     
     try {
-        console.log(`DELETE request for reservation ID: ${id}`);
         const [studentDetails] = await db.query('SELECT id FROM students_details WHERE user_id = ?', [req.user.id]);
         if (studentDetails.length === 0) return res.status(404).json({ error: 'Student details not found' });
         const studentId = studentDetails[0].id;
@@ -142,26 +141,22 @@ router.delete('/:id', authenticateToken, isStudent, async (req, res) => {
         const [reservation] = await db.query('SELECT status FROM speeddates WHERE date_id = ? AND student_id = ?', [id, studentId]);
 
         if (reservation.length === 0) {
-            console.log(`Reservation not found for ID: ${id}, student: ${studentId}`);
             return res.status(404).json({ error: 'Reservation not found or you do not have permission to cancel it.' });
         }
 
         const currentStatus = reservation[0].status;
-        console.log(`Reservation status: ${currentStatus}`);
 
         if (currentStatus === 'cancelled_by_admin') {
-            console.log(`Deleting cancelled reservation ID: ${id}`);
-            const result = await db.query('DELETE FROM speeddates WHERE date_id = ?', [id]);
-            console.log(`Delete result:`, result);
+            // If cancelled by admin, the user's action deletes it permanently from the database
+            await db.query('DELETE FROM speeddates WHERE date_id = ?', [id]);
         } else if (currentStatus === 'booked') {
-            console.log(`Making booked reservation available again ID: ${id}`);
+            // If it was a normal booking, just make it available again
             await db.query(`
                 UPDATE speeddates 
                 SET student_id = NULL, status = 'available', gereserveerd_op = NULL, cancellation_reason = NULL
                 WHERE date_id = ?
             `, [id]);
         } else {
-            console.log(`Invalid status: ${currentStatus}`);
             return res.status(400).json({ error: 'Invalid reservation state for cancellation.' });
         }
 
