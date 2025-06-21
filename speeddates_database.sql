@@ -113,11 +113,11 @@ CREATE TRIGGER `tr_user_deleted_speeddates_free`
 AFTER DELETE ON `users`
 FOR EACH ROW
 BEGIN
+    DECLARE student_details_id INT;
+    
     -- Als een user wordt verwijderd, controleer of het een student was
     IF OLD.role = 'student' THEN
         -- Zoek de bijbehorende student_details record
-        DECLARE student_details_id INT;
-        
         SELECT id INTO student_details_id 
         FROM students_details 
         WHERE user_id = OLD.id;
@@ -146,11 +146,10 @@ CREATE TRIGGER `tr_company_deleted_speeddates_cleanup`
 AFTER DELETE ON `companies_details`
 FOR EACH ROW
 BEGIN
-    -- Tel hoeveel speeddates er zijn voor dit bedrijf (voor audit log)
     DECLARE aantal_speeddates INT DEFAULT 0;
     DECLARE aantal_gereserveerde_speeddates INT DEFAULT 0;
     
-    -- Tel totaal aantal speeddates
+    -- Tel hoeveel speeddates er zijn voor dit bedrijf (voor audit log)
     SELECT COUNT(*) INTO aantal_speeddates
     FROM speeddates 
     WHERE company_id = OLD.id;
@@ -187,13 +186,13 @@ CREATE TRIGGER `tr_company_user_deleted_speeddates_cleanup`
 AFTER DELETE ON `users`
 FOR EACH ROW
 BEGIN
+    DECLARE company_details_id INT;
+    DECLARE aantal_speeddates INT DEFAULT 0;
+    DECLARE aantal_gereserveerde_speeddates INT DEFAULT 0;
+    
     -- Als een user wordt verwijderd, controleer of het een bedrijf was
     IF OLD.role = 'bedrijf' THEN
         -- Zoek de bijbehorende company_details record
-        DECLARE company_details_id INT;
-        DECLARE aantal_speeddates INT DEFAULT 0;
-        DECLARE aantal_gereserveerde_speeddates INT DEFAULT 0;
-        
         SELECT id INTO company_details_id 
         FROM companies_details 
         WHERE user_id = OLD.id;
@@ -264,9 +263,8 @@ BEGIN
     DECLARE start_time TIME;
     DECLARE end_time TIME;
     DECLARE session_duration INT;
-    DECLARE current_time TIME;
-    DECLARE company_cursor CURSOR FOR 
-        SELECT id FROM companies_details;
+    DECLARE current_time_slot TIME;
+    DECLARE company_cursor CURSOR FOR SELECT id FROM companies_details;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
     
     -- Haal de actieve configuratie op
@@ -291,27 +289,27 @@ BEGIN
         END IF;
         
         -- Controleer of er al speeddates bestaan voor dit bedrijf binnen de nieuwe tijdsrange
-        SET current_time = start_time;
+        SET current_time_slot = start_time;
         
-        WHILE current_time < end_time DO
+        WHILE current_time_slot < end_time DO
             -- Controleer of er al een speeddate bestaat voor deze tijd
             IF NOT EXISTS (
                 SELECT 1 FROM speeddates 
                 WHERE company_id = company_id_var 
-                AND begin_tijd = current_time
+                AND begin_tijd = current_time_slot
             ) THEN
                 -- Voeg nieuwe speeddate toe als deze nog niet bestaat
                 INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, bezet)
                 VALUES (
                     company_id_var,
-                    current_time,
-                    ADDTIME(current_time, SEC_TO_TIME(session_duration * 60)),
+                    current_time_slot,
+                    ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60)),
                     0
                 );
             END IF;
             
             -- Ga naar volgende tijdsslot
-            SET current_time = ADDTIME(current_time, SEC_TO_TIME(session_duration * 60));
+            SET current_time_slot = ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60));
         END WHILE;
         
     END LOOP;
@@ -338,9 +336,8 @@ BEGIN
     DECLARE start_time TIME;
     DECLARE end_time TIME;
     DECLARE session_duration INT;
-    DECLARE current_time TIME;
-    DECLARE company_cursor CURSOR FOR 
-        SELECT id FROM companies_details;
+    DECLARE current_time_slot TIME;
+    DECLARE company_cursor CURSOR FOR SELECT id FROM companies_details;
     DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
     
     -- Haal de actieve configuratie op
@@ -363,19 +360,19 @@ BEGIN
         END IF;
         
         -- Genereer speeddate slots voor dit bedrijf
-        SET current_time = start_time;
+        SET current_time_slot = start_time;
         
-        WHILE current_time < end_time DO
+        WHILE current_time_slot < end_time DO
             INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, bezet)
             VALUES (
                 company_id_var,
-                current_time,
-                ADDTIME(current_time, SEC_TO_TIME(session_duration * 60)),
+                current_time_slot,
+                ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60)),
                 0
             );
             
             -- Ga naar volgende tijdsslot
-            SET current_time = ADDTIME(current_time, SEC_TO_TIME(session_duration * 60));
+            SET current_time_slot = ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60));
         END WHILE;
         
     END LOOP;
@@ -399,7 +396,7 @@ BEGIN
     DECLARE start_time TIME;
     DECLARE end_time TIME;
     DECLARE session_duration INT;
-    DECLARE current_time TIME;
+    DECLARE current_time_slot TIME;
     
     -- Haal de actieve configuratie op
     SELECT start_uur, eind_uur, sessie_duur_minuten 
@@ -412,19 +409,19 @@ BEGIN
     DELETE FROM speeddates WHERE company_id = company_id_param;
     
     -- Genereer nieuwe speeddate slots
-    SET current_time = start_time;
+    SET current_time_slot = start_time;
     
-    WHILE current_time < end_time DO
+    WHILE current_time_slot < end_time DO
         INSERT INTO speeddates (company_id, begin_tijd, eind_tijd, bezet)
         VALUES (
             company_id_param,
-            current_time,
-            ADDTIME(current_time, SEC_TO_TIME(session_duration * 60)),
+            current_time_slot,
+            ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60)),
             0
         );
         
         -- Ga naar volgende tijdsslot
-        SET current_time = ADDTIME(current_time, SEC_TO_TIME(session_duration * 60));
+        SET current_time_slot = ADDTIME(current_time_slot, SEC_TO_TIME(session_duration * 60));
     END WHILE;
     
     SELECT 'SUCCESS' as status, CONCAT('Speeddates succesvol gegenereerd voor bedrijf ID: ', company_id_param) as message;
@@ -600,6 +597,200 @@ GROUP BY cd.id, cd.company_name;
 --
 
 -- CALL GenereerSpeeddatesVoorAlleBedrijven();
+
+-- --------------------------------------------------------
+
+--
+-- Trigger: Automatisch speeddates genereren wanneer nieuw bedrijf wordt toegevoegd
+-- Deze trigger zorgt ervoor dat er automatisch speeddates worden gegenereerd voor nieuwe bedrijven
+--
+
+DELIMITER $$
+CREATE TRIGGER `tr_company_added_generate_speeddates` 
+AFTER INSERT ON `companies_details`
+FOR EACH ROW
+BEGIN
+    -- Genereer speeddates voor het nieuwe bedrijf
+    CALL GenereerSpeeddatesVoorBedrijf(NEW.id);
+    
+    -- Log de actie in audit log
+    INSERT INTO speeddates_audit_log (actie, student_id, aantal_speeddates_vrijgegeven, uitgevoerd_op, extra_info)
+    VALUES (
+        'COMPANY_ADDED', 
+        NULL, 
+        NULL, 
+        NOW(), 
+        CONCAT('Nieuw bedrijf toegevoegd: ID ', NEW.id, ', Naam: ', NEW.company_name)
+    );
+END$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Automatisch speeddates genereren voor bestaande bedrijven
+-- Voer dit uit om speeddates te maken voor bedrijven die al in de database staan
+--
+
+CALL GenereerSpeeddatesVoorAlleBedrijven();
+
+-- --------------------------------------------------------
+
+--
+-- Indexes voor de nieuwe tabellen
+--
+
+ALTER TABLE `speeddates_config`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `speeddates`
+  MODIFY `date_id` int(11) NOT NULL AUTO_INCREMENT;
+
+COMMIT;
+
+-- --------------------------------------------------------
+
+--
+-- Stored Procedure: Toon Speeddates Overzicht
+-- Deze procedure geeft een overzicht van alle speeddates per bedrijf
+--
+
+DELIMITER $$
+CREATE PROCEDURE `ToonSpeeddatesOverzicht`()
+BEGIN
+    SELECT 
+        cd.company_name,
+        COUNT(s.date_id) as totaal_slots,
+        SUM(CASE WHEN s.bezet = 0 THEN 1 ELSE 0 END) as beschikbaar,
+        SUM(CASE WHEN s.bezet = 1 THEN 1 ELSE 0 END) as gereserveerd,
+        ROUND((SUM(CASE WHEN s.bezet = 1 THEN 1 ELSE 0 END) / COUNT(s.date_id)) * 100, 2) as bezettingsgraad_percentage
+    FROM companies_details cd
+    LEFT JOIN speeddates s ON cd.id = s.company_id
+    GROUP BY cd.id, cd.company_name
+    ORDER BY cd.company_name;
+END$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Stored Procedure: Zoek Beschikbare Speeddates
+-- Deze procedure zoekt beschikbare speeddates voor een specifieke tijd
+--
+
+DELIMITER $$
+CREATE PROCEDURE `ZoekBeschikbareSpeeddates`(IN zoek_tijd TIME)
+BEGIN
+    SELECT 
+        s.date_id,
+        cd.company_name,
+        s.begin_tijd,
+        s.eind_tijd,
+        s.bezet
+    FROM speeddates s
+    JOIN companies_details cd ON s.company_id = cd.id
+    WHERE s.bezet = 0 
+    AND s.begin_tijd >= zoek_tijd
+    ORDER BY s.begin_tijd
+    LIMIT 20;
+END$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Stored Procedure: Reset Alle Speeddates
+-- Deze procedure maakt alle speeddates weer beschikbaar (handig voor testing)
+--
+
+DELIMITER $$
+CREATE PROCEDURE `ResetAlleSpeeddates`()
+BEGIN
+    UPDATE speeddates 
+    SET student_id = NULL,
+        bezet = 0,
+        gereserveerd_op = NULL;
+    
+    SELECT 'SUCCESS' as status, 'Alle speeddates zijn gereset naar beschikbaar' as message;
+END$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Stored Procedure: Verwijder Oude Speeddates
+-- Deze procedure verwijdert speeddates van bedrijven die niet meer bestaan
+--
+
+DELIMITER $$
+CREATE PROCEDURE `VerwijderOudeSpeeddates`()
+BEGIN
+    DECLARE aantal_verwijderd INT DEFAULT 0;
+    
+    DELETE FROM speeddates 
+    WHERE company_id NOT IN (SELECT id FROM companies_details);
+    
+    SET aantal_verwijderd = ROW_COUNT();
+    
+    SELECT 'SUCCESS' as status, CONCAT(aantal_verwijderd, ' oude speeddates verwijderd') as message;
+END$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- View: Speeddates Kalender Overzicht
+-- Deze view toont alle speeddates in chronologische volgorde
+--
+
+CREATE VIEW `v_speeddates_kalender` AS
+SELECT 
+    s.date_id,
+    cd.company_name,
+    s.begin_tijd,
+    s.eind_tijd,
+    CASE 
+        WHEN s.bezet = 0 THEN 'Beschikbaar'
+        WHEN s.bezet = 1 THEN CONCAT('Gereserveerd door: ', u.name)
+    END as status,
+    s.gereserveerd_op
+FROM speeddates s
+JOIN companies_details cd ON s.company_id = cd.id
+LEFT JOIN students_details sd ON s.student_id = sd.id
+LEFT JOIN users u ON sd.user_id = u.id
+ORDER BY s.begin_tijd, cd.company_name;
+
+-- --------------------------------------------------------
+
+--
+-- View: Student Speeddate Overzicht
+-- Deze view toont alle speeddates van een specifieke student
+--
+
+CREATE VIEW `v_student_speeddates` AS
+SELECT 
+    s.date_id,
+    cd.company_name,
+    s.begin_tijd,
+    s.eind_tijd,
+    s.gereserveerd_op,
+    u.name as student_naam,
+    u.email as student_email
+FROM speeddates s
+JOIN companies_details cd ON s.company_id = cd.id
+JOIN students_details sd ON s.student_id = sd.id
+JOIN users u ON sd.user_id = u.id
+WHERE s.bezet = 1
+ORDER BY s.begin_tijd;
+
+-- --------------------------------------------------------
+
+--
+-- Automatisch speeddates genereren voor bestaande bedrijven
+-- Voer dit uit om speeddates te maken voor bedrijven die al in de database staan
+--
+
+CALL GenereerSpeeddatesVoorAlleBedrijven();
 
 -- --------------------------------------------------------
 
