@@ -13,13 +13,13 @@ const pool = mysql.createPool({
   queueLimit:         0
 });
 
-// Test the connection to ensure the pool is working
+// Optionnel : vérifier la connexion au démarrage
 ;(async () => {
   try {
     await pool.query('SELECT 1');
-    console.log('MySQL pool initialized');
+    console.log('✅ MySQL pool initialized');
   } catch (err) {
-    console.error(' MySQL pool error', err);
+    console.error('❌ MySQL pool error', err);
     process.exit(1);
   }
 })();

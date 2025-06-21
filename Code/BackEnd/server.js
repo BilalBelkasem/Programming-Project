@@ -1,45 +1,50 @@
+console.log('===> SERVER BESTAND IS GEACTIVEERD');
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
 const multer = require('multer');
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer();
+require('dotenv').config();
 
-const db = require('./config/db');  // Gebruik de pool uit config/db.js
+const db = require('./config/db');
 
-const authRoutes         = require('./routes/authRoutes');
-const companiesRoutes    = require('./companies');
-const studentRoutes      = require('./students');
-const badgeRoutes        = require('./badge');
-const mijnProfielRoutes  = require('./Controller/ProfielStudent');
-const bedrijfProfielRoutes = require('./Controller/BedrijfProfiel');
+// Routes importeren
+const authMiddleware       = require('./middleware/authMiddleware');
+const authRoutes           = require('./routes/authRoutes');
+const companiesRoutes      = require('./companies');
+const studentRoutes        = require('./students');
+const badgeRoutes          = require('./badge');
+const mijnProfielRoutes    = require('./Controller/mijnprofiel');
+const studentDetailsRoutes = require('./Controller/studentDetails');
+const reservationsRoutes   = require('./Controller/reservations');
+const adminSpeeddateConfigRoutes = require('./Controller/adminSpeeddateConfig');
 
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public', { index: 'public.html' }));
 
-// Middleware om de db pool beschikbaar te maken in req
+// DB beschikbaar maken per request
 app.use((req, res, next) => {
-  req.db = db;  // db is al een promise pool vanuit config/db.js
+  req.db = db;
   next();
 });
 
+// Routes mounten met auth middleware waar nodig
 app.use('/api', authRoutes);
 app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
-app.use('/api/mijnprofiel', mijnProfielRoutes);
-app.use('/api', bedrijfProfielRoutes);
+app.use('/api/mijnprofiel', authMiddleware.authenticateToken, mijnProfielRoutes);
+app.use('/api/student_details', studentDetailsRoutes);
+app.use('/api/reservations', reservationsRoutes);
+app.use('/api/admin/speeddate-config', adminSpeeddateConfigRoutes);
 
-app.get('/api/health', (req, res) => {
-  res.send('API is up and running');
-});
-
+// Extra routes
 app.get('/api/users', async (req, res) => {
   try {
-    const [users] = await req.db.query(
-      'SELECT id, name FROM users WHERE role = "student"'
-    );
+    const [users] = await req.db.query('SELECT id, name FROM users WHERE role = "student"');
     res.json(users);
   } catch (err) {
     console.error('Users route error:', err);
@@ -69,15 +74,10 @@ app.delete('/api/studenten/:id', async (req, res) => {
   const conn = await req.db.getConnection();
   try {
     await conn.beginTransaction();
-    await conn.query(
-      'DELETE FROM students_details WHERE user_id = ?',
-      [studentId]
-    );
-    await conn.query(
-      'DELETE FROM users WHERE id = ?',
-      [studentId]
-    );
+    await conn.query('DELETE FROM students_details WHERE user_id = ?', [studentId]);
+    await conn.query('DELETE FROM users WHERE id = ?', [studentId]);
     await conn.commit();
+    console.log(`User met id ${studentId} succesvol verwijderd.`);
     res.json({ message: 'Student succesvol verwijderd' });
   } catch (err) {
     await conn.rollback();
@@ -92,9 +92,20 @@ app.post('/api/register-company', upload.single('logo'), async (req, res) => {
   try {
     const logoBuffer = req.file ? req.file.buffer : null;
     const {
-      email, phone_number, password, company_name, website, sector,
-      booth_contact_name, street, city, postal_code, booth_contact_email,
-      invoice_contact_name, invoice_contact_email, vat_number
+      email,
+      phone_number,
+      password,
+      company_name,
+      website,
+      sector,
+      booth_contact_name,
+      street,
+      city,
+      postal_code,
+      booth_contact_email,
+      invoice_contact_name,
+      invoice_contact_email,
+      vat_number
     } = req.body;
 
     const sql = `
@@ -130,17 +141,7 @@ app.post('/api/register-company', upload.single('logo'), async (req, res) => {
   }
 });
 
-app.get('/api/company-details', async (req, res) => {
-  try {
-    const [rows] = await req.db.query('SELECT * FROM companies_details');
-    res.json(rows);
-  } catch (err) {
-    console.error('Fout bij ophalen company details:', err);
-    res.status(500).json({ error: err.message });
-  }
-});
-
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Backend listening on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });

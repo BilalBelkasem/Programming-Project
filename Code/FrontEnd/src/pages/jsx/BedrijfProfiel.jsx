@@ -1,6 +1,6 @@
  import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/logo Erasmus.png';
+import logo from '../../assets/logoerasmus.png';
 import '../Css/BedrijfProfiel.css';
 
 export default function BedrijfProfiel() {
@@ -27,10 +27,12 @@ export default function BedrijfProfiel() {
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
-          <Link to="/dashboard" className="navLink">Info</Link>
-          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/favorieten" className="navLink">Studenten</Link>
-          <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
+          <Link to="/dashboard" className="nav-btn active">Info</Link>
+          <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
+          <Link to="/speeddates" className="nav-btn">Speeddates</Link>
+          <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
+          <Link to="/favorieten" className="nav-btn">Favorieten</Link>
+          <Link to="/mijn-profiel" className="nav-btn">Mijn Profiel</Link>
         </nav>
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
@@ -48,7 +50,6 @@ export default function BedrijfProfiel() {
         </div>
 
         <div className="profile-grid">
-          <div className="field"><strong>Naam contactpersoon:</strong> {bedrijf.name || <em>–</em>}</div>
           <div className="field"><strong>Bedrijfsnaam:</strong> {bedrijf.companyName || <em>–</em>}</div>
           <div className="field"><strong>Functie:</strong> {bedrijf.function || <em>–</em>}</div>
           <div className="field"><strong>E-mail:</strong> {bedrijf.email || <em>–</em>}</div>

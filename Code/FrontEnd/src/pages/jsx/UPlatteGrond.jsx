@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import plattegrondImg from "../../assets/plattegrond.png";
-import logo from "../../assets/logo Erasmus.png";
+import logo from "../../assets/logoerasmus.png";
 import "../css/GPlatteGrond.css";
 
 const legendItems = [
@@ -15,24 +15,23 @@ export default function UPlatteGrond({ onLogout }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    if (onLogout) onLogout(); // roep App.jsx logout functie aan
+    if (onLogout) onLogout();
     navigate("/login");
   };
 
   return (
     <div className="uplattegrond-wrapper">
-      {/* Header */}
+      {/* Nieuwe gestylede header */}
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
-
         <nav className="nav">
-          <Link to="/dashboard" className="navLink">Info</Link>
-          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
-          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/UFavorietenBedrijven" className="navLink">Favorieten</Link>
-          <Link to="/mijn-profiel" className="navLink">mijn profiel</Link>
+          <Link to="/dashboard" className="nav-btn ">Info</Link>
+          <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
+          <Link to="/speeddates" className="nav-btn ">Speeddates</Link>
+          <Link to="/plattegrond" className="nav-btn active">Plattegrond</Link>
+          <Link to="/favorieten" className="nav-btn">Favorieten</Link>
+          <Link to="/mijn-profiel" className="nav-btn">Mijn Profiel</Link>
         </nav>
-
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 

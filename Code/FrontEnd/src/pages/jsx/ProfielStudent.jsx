@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/logo Erasmus.png';
+import logo from '../../assets/logoerasmus.png';
 import '../Css/ProfielStudent.css';
+import axios from 'axios';
 
 export default function ProfielStudent({ user }) {
   const [formData, setFormData] = useState({
@@ -13,20 +14,34 @@ export default function ProfielStudent({ user }) {
     email: '',
     about: '',
     lookingFor: [],
-    domain: [],
+    domains: [],
     profilePicture: null,
   });
 
-  const [errors, setErrors] = useState({});
-
   useEffect(() => {
     if (user && user.id) {
-      fetch(`/api/mijnprofiel/${user.id}`)
+      const token = localStorage.getItem('token');
+      axios.get('/api/mijnprofiel', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
         .then(res => {
-          if (!res.ok) throw new Error('Failed to fetch profile');
-          return res.json();
-        })
-        .then(data => {
+          const data = res.data;
+
+          
+          const domains = [];
+          if (data.domain_data) domains.push("Data");
+          if (data.domain_networking) domains.push("Netwerking");
+          if (data.domain_ai) domains.push("AI / Robotica");
+          if (data.domain_software) domains.push("Software");
+
+          const lookingFor = [];
+          if (data.interest_jobstudent) lookingFor.push("Jobstudent");
+          if (data.interest_connect) lookingFor.push("Connecties");
+          if (data.interest_stage) lookingFor.push("Stage");
+          if (data.interest_job) lookingFor.push("Job");
+
           setFormData({
             name: data.name || '',
             school: data.school || '',
@@ -35,8 +50,8 @@ export default function ProfielStudent({ user }) {
             linkedin: data.linkedin_url || '',
             email: data.email || '',
             about: data.about || '',
-            lookingFor: data.lookingFor || [],
-            domain: data.domain || [],
+            lookingFor,
+            domains,
             profilePicture: null,
           });
         })
@@ -47,22 +62,8 @@ export default function ProfielStudent({ user }) {
     }
   }, [user]);
 
-  const validateEmail = (email) => {
-    if (!email) return "Email is verplicht";
-    const re = /\S+@\S+\.\S+/;
-    if (!re.test(email)) return "Ongeldig emailadres";
-    return "";
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    // Bij email: meteen validatie doen
-    if (name === 'email') {
-      const emailError = validateEmail(value);
-      setErrors(prev => ({ ...prev, email: emailError }));
-    }
-
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
@@ -87,13 +88,6 @@ export default function ProfielStudent({ user }) {
   };
 
   const handleSubmit = async () => {
-    const emailError = validateEmail(formData.email);
-    if (emailError) {
-      setErrors(prev => ({ ...prev, email: emailError }));
-      alert('Vul een geldig emailadres in.');
-      return;
-    }
-
     if (!user || !user.id) {
       alert('Geen gebruiker ingelogd!');
       return;
@@ -108,21 +102,17 @@ export default function ProfielStudent({ user }) {
       about: formData.about,
       linkedin: formData.linkedin,
       lookingFor: formData.lookingFor,
-      domain: formData.domain,
+      domains: formData.domains,
     };
 
     try {
-      const res = await fetch(`/api/mijnprofiel/${user.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedData)
+      const token = localStorage.getItem('token');
+      await axios.put('/api/mijnprofiel', updatedData, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
       });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("Server response:", errorText);
-        throw new Error('Update mislukt');
-      }
 
       alert('Wijzigingen succesvol bevestigd!');
     } catch (err) {
@@ -145,15 +135,14 @@ export default function ProfielStudent({ user }) {
     <div className="page-wrapper">
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
-
         <nav className="nav">
-          <Link to="/dashboard" className="navLink">Info</Link>
-          <Link to="/bedrijven" className="navLink">Bedrijven</Link>
-          <Link to="/plattegrond" className="navLink">Plattegrond</Link>
-          <Link to="/favorieten" className="navLink">Favorieten</Link>
-          <Link to="/mijn-profiel" className="navLink">Mijn profiel</Link>
+          <Link to="/dashboard" className="nav-btn">Info</Link>
+          <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
+          <Link to="/speeddates" className="nav-btn">Speeddates</Link>
+          <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
+          <Link to="/favorieten" className="nav-btn">Favorieten</Link>
+          <Link to="/mijn-profiel" className="nav-btn active">Mijn Profiel</Link>
         </nav>
-
         <div onClick={handleLogout} className="logoutIcon" title="Uitloggen">⇦</div>
       </header>
 
@@ -170,12 +159,7 @@ export default function ProfielStudent({ user }) {
         <div className="form-grid">
           <div className="left">
             <label>Voornaam + Achternaam</label>
-            <input
-              name="name"
-              value={formData.name}
-              readOnly
-              className="readonly-input"
-            />
+            <input name="name" value={formData.name} onChange={handleChange} />
 
             <label>School (optioneel)</label>
             <input name="school" value={formData.school} onChange={handleChange} />
@@ -191,15 +175,8 @@ export default function ProfielStudent({ user }) {
             <label>LinkedIn (optioneel)</label>
             <input name="linkedin" value={formData.linkedin} onChange={handleChange} />
 
-            <label>Email <span style={{ color: 'red' }}>*</span></label>
-            <input
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={errors.email ? 'input-error' : ''}
-              required
-            />
-            {errors.email && <div className="error-text">{errors.email}</div>}
+            <label>Email</label>
+            <input name="email" value={formData.email} onChange={handleChange} />
           </div>
 
           <div className="right">
@@ -213,12 +190,29 @@ export default function ProfielStudent({ user }) {
                   <input
                     type="checkbox"
                     value={option}
-                    checked={formData.domain.includes(option)}
-                    onChange={(e) => handleCheckboxChange(e, "domain")}
+                    checked={formData.domains.includes(option)}
+                    onChange={(e) => handleCheckboxChange(e, "domains")}
                   />
                   {option}
                 </label>
               ))}
+            </div>
+
+            <div className="section">
+              <label>Wat zoekt u?</label>
+              <div className="checkbox-group">
+                {["Jobstudent", "Connecties", "Stage", "Job"].map(option => (
+                  <label key={option}>
+                    <input
+                      type="checkbox"
+                      value={option}
+                      checked={formData.lookingFor.includes(option)}
+                      onChange={(e) => handleCheckboxChange(e, "lookingFor")}
+                    />
+                    {option}
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -233,31 +227,7 @@ export default function ProfielStudent({ user }) {
           ></textarea>
         </div>
 
-        <div className="section">
-          <label>Wat zoekt u?</label>
-          <div className="checkbox-group">
-            {["Jobstudent", "Connecties", "Stage", "Job"].map(option => (
-              <label key={option}>
-                <input
-                  type="checkbox"
-                  value={option}
-                  checked={formData.lookingFor.includes(option)}
-                  onChange={(e) => handleCheckboxChange(e, "lookingFor")}
-                />
-                {option}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <button
-          className="confirm-btn"
-          onClick={handleSubmit}
-          disabled={!!errors.email || !formData.email}
-          title={(!formData.email || errors.email) ? "Vul een geldig emailadres in" : ""}
-        >
-          Bevestig wijzigingen
-        </button>
+        <button className="confirm-btn" onClick={handleSubmit}>Bevestig wijzigingen</button>
       </div>
     </div>
   );
