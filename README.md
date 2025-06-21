@@ -3,12 +3,12 @@
 Een full-stack webapplicatie ontwikkeld door studenten van Erasmus Hogeschool Brussel voor het event Career Launch 2026. Studenten en bedrijven kunnen zich registreren, profielen beheren, speeddates boeken en elkaar snel terugvinden via QR-codes. Admins kunnen bedrijven en studenten beheren en badges printen voor gebruik op de beursvloer.
 
 ## 👥 Team
-- **Marwân Amakran** - Full-stack Development
-- **Bilal Belkasem** - Backend & Database
-- **Digay Kengoum** - Frontend & UI/UX
-- **Denis Bujorean** - API Development
-- **Ayman Bounaânaâ** - Database Design
-- **Jelle Schroeven** - Testing & Documentation
+- **Marwân Amakran** 
+- **Bilal Belkasem** 
+- **Digay Kengoum** 
+- **Denis Bujorean** 
+- **Ayman Bounaânaâ** 
+- **Jelle Schroeven** 
 
 ## ⚙️ Tech Stack
 
