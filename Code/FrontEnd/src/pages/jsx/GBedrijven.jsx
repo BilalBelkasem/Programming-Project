@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logoerasmus.png';
 import '../css/Gbedrijveninfopagina.css';
 import axios from 'axios';
+import SharedFooter from '../../components/SharedFooter';
 
 export default function GBedrijven({ onLogout }) {
   const navigate = useNavigate();
@@ -154,50 +155,7 @@ export default function GBedrijven({ onLogout }) {
         </div>
 
       </main>
-      <footer className="site-footer">
-  <div className="footer-grid">
-    <div className="footer-column">
-      <h4>Over ons</h4>
-      <ul>
-        <li><a href="/">Info</a></li>
-        <li><a href="/gbedrijven">Bedrijven</a></li>
-        <li><a href="/g-plattegrond">Plattegrond</a></li>
-      </ul>
-    </div>
-    <div className="footer-column">
-      <h4>Contact</h4>
-      <div className="contact-item">
-        <span className="icon">📍</span>
-        Nijverheidskaai 170, 1070 Brussel
-      </div>
-      <div className="contact-item">
-        <span className="icon">✉️</span>
-        info@erasmushogeschool.be
-      </div>
-    </div>
-    <div className="footer-column">
-      <h4>Sociale media</h4>
-      <div className="social-icons">
-        <a href="https://facebook.com" className="social-icon">📘</a>
-        <a href="https://instagram.com" className="social-icon">📷</a>
-        <a href="https://linkedin.com" className="social-icon">💼</a>
-      </div>
-    </div>
-  </div>
-
-  <div className="footer-bottom">
-    &copy; {new Date().getFullYear()} Erasmus Hogeschool Brussel. Alle rechten voorbehouden.
-    <div className="legal-links">
-      <a href="/privacy">Privacybeleid</a>
-      <span>|</span>
-      <a href="/terms">Gebruiksvoorwaarden</a>
-    </div>
-  </div>
-
-  <div className="easter-egg">
-    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer">don't klik</a>
-  </div>
-</footer>
+      <SharedFooter />
     </div>
   );
 }

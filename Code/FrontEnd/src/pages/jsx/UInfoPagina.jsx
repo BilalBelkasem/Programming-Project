@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logoerasmus.png';
 import banner from '../../assets/Banner C.png';
 import '../Css/UInfoPagina.css';
+import SharedFooter from '../../components/SharedFooter';
 
 export default function UInfoPagina({ onLogout }) {
   const navigate = useNavigate();
@@ -122,47 +123,7 @@ export default function UInfoPagina({ onLogout }) {
           </section>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="site-footer">
-        <div className="footer-columns">
-          <div className="footer-column">
-            <h4>Contacteer ons</h4>
-            <p>Email: <a href="mailto:info@ehb.be">info@ehb.be</a></p>
-            <p>Tel: 02 523 37 37</p>
-          </div>
-
-          <div className="footer-column">
-            <h4>Meer info</h4>
-            <ul>
-              <li><a href="#">Over de jobbeurs</a></li>
-              <li><a href="#">Praktische info</a></li>
-              <li><a href="#">Voor bedrijven</a></li>
-            </ul>
-          </div>
-
-          <div className="footer-column">
-            <h4>Sociale media</h4>
-            <ul>
-              <li><a href="https://www.linkedin.com/school/erasmushogeschool-brussel/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
-              <li><a href="https://www.instagram.com/erasmushogeschool/" target="_blank" rel="noopener noreferrer">Instagram</a></li>
-              <li><a href="https://www.facebook.com/erasmushogeschool" target="_blank" rel="noopener noreferrer">Facebook</a></li>
-              <li><a href="https://x.com/ehbrussel" target="_blank" rel="noopener noreferrer">X (Twitter)</a></li>
-              <li><a href="https://www.tiktok.com/@erasmushogeschool" target="_blank" rel="noopener noreferrer">TikTok</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="footer-bottom">
-          <p>© 2025 Erasmushogeschool Brussel – Design & Technologie</p>
-        </div>
-
-        <div className="easter-egg">
-          <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer">
-            don't klik
-          </a>
-        </div>
-      </footer>
+      <SharedFooter />
     </div>
   );
 }

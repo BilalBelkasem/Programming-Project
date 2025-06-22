@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../../assets/logoerasmus.png';
 import '../Css/BedrijfProfiel.css';
+import SharedFooter from '../../components/SharedFooter';
 
 export default function BedrijfProfiel() {
   const { id } = useParams();
@@ -121,6 +122,7 @@ export default function BedrijfProfiel() {
           <p>Bedrijf niet gevonden.</p>
         )}
       </main>
+      <SharedFooter />
     </div>
   );
 }

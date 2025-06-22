@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import SharedHeaderIngelogd from '../../components/SharedHeaderIngelogd';
+import SharedFooter from '../../components/SharedFooter';
 import '../Css/Speeddates.css';
 
 const Speeddates = () => {
@@ -340,6 +341,7 @@ const Speeddates = () => {
         {user?.role === 'student' && renderStudentView()}
         {user?.role === 'bedrijf' && renderCompanyView()}
       </main>
+      <SharedFooter />
     </div>
   );
 };

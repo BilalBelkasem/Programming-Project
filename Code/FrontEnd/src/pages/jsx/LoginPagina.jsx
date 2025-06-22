@@ -114,7 +114,6 @@ export default function LoginPagina({ onLogin }) {
               Registreer je bedrijf
             </Link>
             <Link to="/" className="back-button">← Terug naar startpagina</Link>
-            
           </div>
         </div>
       </div>

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import '../Css/ProfielBedrijven.css';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
 import axios from 'axios';
+import SharedFooter from '../../components/SharedFooter';
 
 export default function ProfielBedrijven() {
   const [formData, setFormData] = useState({
@@ -219,6 +220,7 @@ export default function ProfielBedrijven() {
           Bevestig wijzigingen
         </button>
       </main>
+      <SharedFooter />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import plattegrondImg from "../../assets/plattegrond.png";
 import logo from "../../assets/logoerasmus.png";
 import "../css/GPlatteGrond.css";
+import SharedFooter from "../../components/SharedFooter";
 
 const legendItems = [
   { id: 1, naam: "TechNova" },
@@ -58,6 +59,7 @@ export default function UPlatteGrond({ onLogout }) {
           </div>
         </div>
       </div>
+      <SharedFooter />
     </div>
   );
 }

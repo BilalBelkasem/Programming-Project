@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
 import '../Css/ClientRegistration.css';
 import logo from '../../assets/logoerasmus.png';
+import SharedFooter from '../../components/SharedFooter';
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -121,6 +122,10 @@ const Register = () => {
           <Link to="/login" className="back-text">← terug</Link>
         </form>
       </div>
+      <p className='registration-login-prompt'>
+        Heb je al een account? <Link to='/login'>Log dan hier in</Link>
+      </p>
+      <SharedFooter />
     </div>
   );
 };

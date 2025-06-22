@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import logo from '../../assets/logoerasmus.png';
 import '../Css/ProfielStudent.css';
 import axios from 'axios';
+import SharedFooter from '../../components/SharedFooter';
 
 export default function ProfielStudent({ user }) {
   const [formData, setFormData] = useState({
@@ -210,6 +211,7 @@ export default function ProfielStudent({ user }) {
 
         <button className="confirm-btn" onClick={handleSubmit}>Bevestig wijzigingen</button>
       </div>
+      <SharedFooter />
     </div>
   );
 }

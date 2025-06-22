@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logoerasmus.png';
 import '../css/UBedrijven.css';
 import axios from 'axios';
+import SharedFooter from '../../components/SharedFooter';
 
 const TYPE_KANS = [
   { key: 'zoek_jobstudent', label: 'Jobstudent' },
@@ -208,6 +209,7 @@ export default function UBedrijven({ onLogout }) {
           )}
         </div>
       </main>
+      <SharedFooter />
     </div>
   );
 }

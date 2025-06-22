@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logoerasmus.png';
 import '../css/UBedrijven.css';
 import axios from 'axios';
+import SharedFooter from '../../components/SharedFooter';
 
 export default function UFavorietenBedrijven({ onLogout }) {
   const navigate = useNavigate();
@@ -119,6 +120,7 @@ export default function UFavorietenBedrijven({ onLogout }) {
           )}
         </div>
       </main>
+      <SharedFooter />
     </div>
   );
 }
