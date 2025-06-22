@@ -36,11 +36,12 @@ export default function UBedrijven({ onLogout }) {
     const fetchData = async () => {
       try {
         const user = JSON.parse(localStorage.getItem('user'));
-        if (!user || !user.token) {
+        const token = localStorage.getItem('token');
+
+        if (!user || !token) {
           navigate('/login');
           return;
         }
-        const token = user.token;
 
         const bedrijvenRes = await axios.get('http://localhost:5000/api/open-bedrijven');
         setBedrijven(bedrijvenRes.data);
@@ -77,7 +78,7 @@ export default function UBedrijven({ onLogout }) {
 
   const toggleLike = async (bedrijfId) => {
     const user = JSON.parse(localStorage.getItem('user'));
-    const token = user?.token;
+    const token = localStorage.getItem('token');
     const isFavoriet = favorieten.includes(bedrijfId);
 
     try {

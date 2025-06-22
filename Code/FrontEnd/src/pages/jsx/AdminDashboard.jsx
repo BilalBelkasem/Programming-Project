@@ -9,7 +9,9 @@ export default function AdminDashboard() {
 
   // Logout handler
   const handleLogout = () => {
-    navigate('/');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
   };
 
   // Open badge pagina (die public.html via Express backend)

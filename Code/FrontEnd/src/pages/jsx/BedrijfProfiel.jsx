@@ -1,4 +1,4 @@
- import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logoerasmus.png';
 import '../Css/BedrijfProfiel.css';
@@ -17,7 +17,7 @@ export default function BedrijfProfiel() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.href = '/login';
   };

@@ -92,7 +92,7 @@ export default function GBedrijven({ onLogout }) {
         <div className="header-section center">
           <nav className="nav-center">
             <Link to="/" className="nav-btn">info</Link>
-            <Link to="/GBedrijven" className="nav-btn active">bedrijven</Link>
+            <Link to="/bedrijven" className="nav-btn active">bedrijven</Link>
             <Link to="/g-plattegrond" className="nav-btn">plattegrond</Link>
             <Link to="/login" className="nav-btn">login/registeren</Link>
           </nav>
@@ -156,7 +156,7 @@ export default function GBedrijven({ onLogout }) {
       <h4>Over ons</h4>
       <ul>
         <li><a href="/">Info</a></li>
-        <li><a href="/GBedrijven">Bedrijven</a></li>
+        <li><a href="/gbedrijven">Bedrijven</a></li>
         <li><a href="/g-plattegrond">Plattegrond</a></li>
       </ul>
     </div>

@@ -30,7 +30,7 @@ export default function GPlatteGrond({ onLogout }) {
         <div className="header-section center">
           <nav className="nav-center">
             <Link to="/" className="nav-btn">info</Link>
-            <Link to="/GBedrijven" className="nav-btn">bedrijven</Link>
+            <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
             <Link to="/g-plattegrond" className="nav-btn active">plattegrond</Link>
             <Link to="/login" className="nav-btn">login/registeren</Link>
           </nav>
@@ -68,7 +68,7 @@ export default function GPlatteGrond({ onLogout }) {
       <h4>Over ons</h4>
       <ul>
         <li><a href="/">Info</a></li>
-        <li><a href="/GBedrijven">Bedrijven</a></li>
+        <li><a href="/gbedrijven">Bedrijven</a></li>
         <li><a href="/g-plattegrond">Plattegrond</a></li>
       </ul>
     </div>
@@ -103,7 +103,7 @@ export default function GPlatteGrond({ onLogout }) {
   </div>
 
   <div className="easter-egg">
-    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer">don’t klik</a>
+    <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer">don't klik</a>
   </div>
 </footer>
     </div>

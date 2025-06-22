@@ -48,7 +48,8 @@ const AdminSpeeddateConfig = () => {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/login');
   };
 

@@ -24,15 +24,15 @@ import BedrijfProfiel from './pages/jsx/BedrijfProfiel.jsx';
 import Speeddates from './pages/jsx/Speeddates.jsx';
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const token = localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    return !!(token && user);
+  });
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem('user');
     return stored ? JSON.parse(stored) : null;
   });
-
-  useEffect(() => {
-    localStorage.setItem('isLoggedIn', isLoggedIn ? 'true' : 'false');
-  }, [isLoggedIn]);
 
   useEffect(() => {
     if (user) {
@@ -45,6 +45,8 @@ export default function App() {
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   };
 
   function ProtectedRoute({ children, role, idParam }) {
@@ -89,9 +91,16 @@ export default function App() {
         element={isLoggedIn ? <UInfoPagina onLogout={handleLogout} /> : <Navigate to="/bedrijven" replace />}
       />
 
-      <Route path="/bedrijven" element={<Navigate to={isLoggedIn ? "/ubedrijven" : "/gbedrijven"} replace />} />
-      <Route path="/ubedrijven" element={<UBedrijven />} />
-      <Route path="/gbedrijven" element={<GBedrijven />} />
+      <Route 
+        path="/bedrijven" 
+        element={
+          isLoggedIn && user ? (
+            <UBedrijven onLogout={handleLogout} />
+          ) : (
+            <GBedrijven />
+          )
+        }
+      />
 
       <Route
         path="/admin"

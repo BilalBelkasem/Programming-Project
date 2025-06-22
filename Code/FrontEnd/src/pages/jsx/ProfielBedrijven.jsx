@@ -110,7 +110,7 @@ export default function ProfielBedrijven() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.href = '/login';
   };

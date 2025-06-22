@@ -154,7 +154,8 @@ const Speeddates = () => {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     delete axios.defaults.headers.common['Authorization'];
     navigate("/login");
   };
