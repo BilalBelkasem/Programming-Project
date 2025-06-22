@@ -157,7 +157,7 @@ const Speeddates = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     delete axios.defaults.headers.common['Authorization'];
-    navigate("/login");
+    navigate("/");
   };
 
   const renderStudentView = () => (

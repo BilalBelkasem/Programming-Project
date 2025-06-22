@@ -54,7 +54,7 @@ export default function UFavorietenBedrijven({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) onLogout();
-    navigate("/login");
+    navigate("/");
   };
 
   return (

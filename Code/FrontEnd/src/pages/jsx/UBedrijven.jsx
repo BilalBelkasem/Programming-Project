@@ -131,7 +131,7 @@ export default function UBedrijven({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) onLogout();
-    navigate("/login");
+    navigate("/");
   };
 
   return (

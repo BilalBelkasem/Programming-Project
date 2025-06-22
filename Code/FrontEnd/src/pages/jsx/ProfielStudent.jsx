@@ -124,7 +124,7 @@ export default function ProfielStudent({ user }) {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '/login';
+    window.location.href = '/';
   };
 
   if (!user || user.role !== 'student') {

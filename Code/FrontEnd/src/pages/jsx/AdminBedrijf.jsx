@@ -11,7 +11,11 @@ export default function AdminBedrijf() {
 
   const navigate = useNavigate();
 
-  const handleLogout = () => navigate('/');
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
   const handleBack = () => navigate('/admin');
 
   // ✅ Laad bedrijven van backend bij mount

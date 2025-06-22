@@ -9,7 +9,7 @@ export default function UInfoPagina({ onLogout }) {
 
   const handleLogout = () => {
     onLogout();
-    navigate('/login');
+    navigate('/');
   };
 
   return (
@@ -73,13 +73,13 @@ export default function UInfoPagina({ onLogout }) {
               <li>Navigeer naar de <strong>login/registeren</strong> knop in het hoofdmenu.</li>
               <li>Selecteer <strong>"Inloggen"</strong> als je al een account hebt.</li>
               <li>Vul je <strong>e-mailadres</strong> en <strong>wachtwoord</strong> in.</li>
-              <li>Klik op <strong>“Inloggen”</strong> om toegang te krijgen tot je persoonlijke omgeving.</li>
+              <li>Klik op <strong>"Inloggen"</strong> om toegang te krijgen tot je persoonlijke omgeving.</li>
             </ol>
 
             <h3 className="auth-subtitle">🆕 Registreren (voor nieuwe gebruikers)</h3>
             <ol className="auth-steps">
               <li>Klik op de <strong>login/registeren</strong> knop in het hoofdmenu.</li>
-              <li>Selecteer <strong>“Registreren”</strong> voor een nieuw account.</li>
+              <li>Selecteer <strong>"Registreren"</strong> voor een nieuw account.</li>
               <li>Vul je gegevens in:
                 <ul>
                   <li>Naam</li>
@@ -88,13 +88,13 @@ export default function UInfoPagina({ onLogout }) {
                 </ul>
               </li>
               <li>Vink het vakje aan om de <strong>gebruikersvoorwaarden te accepteren</strong>.</li>
-              <li>Klik op <strong>“Account aanmaken”</strong> om je registratie te voltooien.</li>
+              <li>Klik op <strong>"Account aanmaken"</strong> om je registratie te voltooien.</li>
               <li>Eventueel ontvang je een <strong>bevestigingsmail</strong> met activatielink.</li>
             </ol>
 
             <h3 className="auth-subtitle">❓ Wachtwoord vergeten?</h3>
             <ol className="auth-steps">
-              <li>Klik op <strong>“Wachtwoord vergeten?”</strong> op het inlogscherm.</li>
+              <li>Klik op <strong>"Wachtwoord vergeten?"</strong> op het inlogscherm.</li>
               <li>Voer je geregistreerd e-mailadres in.</li>
               <li>Je ontvangt een e-mail met een link om een nieuw wachtwoord in te stellen.</li>
             </ol>

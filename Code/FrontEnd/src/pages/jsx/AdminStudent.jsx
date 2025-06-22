@@ -10,7 +10,11 @@ export default function AdminStudent() {
   const [studenten, setStudenten] = useState([]);
   const navigate = useNavigate();
 
-  const handleLogout = () => navigate('/');
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
   const handleBack = () => navigate('/admin');
 
   // Studenten ophalen van backend met auth header

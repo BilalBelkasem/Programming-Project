@@ -16,7 +16,7 @@ export default function UPlatteGrond({ onLogout }) {
 
   const handleLogout = () => {
     if (onLogout) onLogout();
-    navigate("/login");
+    navigate("/");
   };
 
   return (

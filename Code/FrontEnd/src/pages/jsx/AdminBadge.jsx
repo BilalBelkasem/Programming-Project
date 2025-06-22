@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import logo from '../../assets/logo Erasmus.png';
 import '../../pages/Css/AdminBadge.css';
@@ -17,9 +16,13 @@ const badgeData = [
 export default function AdminBadge() {
   const [zoekterm, setZoekterm] = useState('');
   const navigate = useNavigate();
-
-  const handleLogout = () => navigate('/');
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
   const handleBack = () => navigate('/admin');
+  const [studenten, setStudenten] = useState([]);
 
   const gefilterdeItems = badgeData.filter(item =>
     item.naam.toLowerCase().includes(zoekterm.toLowerCase())
