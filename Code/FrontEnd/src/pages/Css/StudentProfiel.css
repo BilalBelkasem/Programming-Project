@@ -70,7 +70,8 @@
   transition: color 0.3s ease;
 }
 
-.like-button:hover {
+.like-button:hover,
+.like-button.liked {
   color: red;
 }
 
