@@ -13,7 +13,6 @@ exports.register = async (req, res) => {
 
     const name = `${firstName} ${lastName}`;
     const profile_slug = `${firstName.toLowerCase()}-${lastName.toLowerCase()}`;
-    const organization = role === 'student' ? 'Hogeschool Gent' : null;
 
     const [existing] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
     if (existing.length > 0) {
@@ -24,7 +23,7 @@ exports.register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const query = 'INSERT INTO users (name, email, password_hash, role, organization, profile_slug) VALUES (?, ?, ?, ?, ?, ?)';
-    const [result] = await db.query(query, [name, email, hashedPassword, role, organization, profile_slug]);
+    const [result] = await db.query(query, [name, email, hashedPassword, role, null, profile_slug]);
     const userId = result.insertId;
 
     if (role === 'student') {
@@ -36,7 +35,7 @@ exports.register = async (req, res) => {
     res.status(201).json({ 
       message: 'User registered successfully',
       token,
-      user: { id: userId, name, email, role, organization, profile_slug }
+      user: { id: userId, name, email, role, organization: null, profile_slug }
     });
 
   } catch (error) {
