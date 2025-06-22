@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logoerasmus.png';
 import '../css/UBedrijven.css';
@@ -8,12 +8,26 @@ export default function UBedrijven({ onLogout }) {
   const navigate = useNavigate();
   const [bedrijven, setBedrijven] = useState([]);
   const [favorieten, setFavorieten] = useState([]);
+  const [filters, setFilters] = useState({
+    zoek_jobstudent: false,
+    zoek_stage: false,
+    zoek_job: false,
+    zoek_connecties: false,
+    domein_data: false,
+    domein_netwerking: false,
+    domein_ai: false,
+    domein_software: false,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const user = JSON.parse(localStorage.getItem('user'));
-        const token = user?.token;
+        if (!user || !user.token) {
+          navigate('/login');
+          return;
+        }
+        const token = user.token;
 
         const bedrijvenRes = await axios.get('http://localhost:5000/api/open-bedrijven');
         setBedrijven(bedrijvenRes.data);
@@ -30,12 +44,25 @@ export default function UBedrijven({ onLogout }) {
       }
     };
     fetchData();
-  }, []);
+  }, [navigate]);
 
-  const handleLogout = () => {
-    if (onLogout) onLogout();
-    navigate("/login");
+  const handleFilterChange = (event) => {
+    const { name, checked } = event.target;
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      [name]: checked
+    }));
   };
+
+  const filteredBedrijven = useMemo(() => {
+    const actieveFilters = Object.keys(filters).filter(key => filters[key]);
+    if (actieveFilters.length === 0) {
+      return bedrijven;
+    }
+    return bedrijven.filter(bedrijf => {
+      return actieveFilters.every(filterKey => bedrijf[filterKey] === 1);
+    });
+  }, [bedrijven, filters]);
 
   const toggleLike = async (bedrijfId) => {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -66,6 +93,39 @@ export default function UBedrijven({ onLogout }) {
     }
   };
 
+  const renderZoekOpties = (bedrijf) => {
+    const opties = {
+      zoek_jobstudent: 'Jobstudent',
+      zoek_stage: 'Stage',
+      zoek_job: 'Job',
+      zoek_connecties: 'Connecties',
+    };
+    const gevondenOpties = Object.entries(opties)
+      .filter(([key]) => bedrijf[key])
+      .map(([, label]) => label);
+    
+    return gevondenOpties.length > 0 ? gevondenOpties.map(label => <span key={label} className="tag zoek-tag">{label}</span>) : <span className="tag geen-info">N.v.t.</span>;
+  };
+
+  const renderDomeinen = (bedrijf) => {
+    const domeinen = {
+      domein_data: 'Data',
+      domein_netwerking: 'Netwerken',
+      domein_ai: 'AI',
+      domein_software: 'Software',
+    };
+    const gevondenDomeinen = Object.entries(domeinen)
+      .filter(([key]) => bedrijf[key])
+      .map(([, label]) => label);
+
+    return gevondenDomeinen.length > 0 ? gevondenDomeinen.map(label => <span key={label} className="tag domein-tag">{label}</span>) : <span className="tag geen-info">N.v.t.</span>;
+  };
+
+  const handleLogout = () => {
+    if (onLogout) onLogout();
+    navigate("/login");
+  };
+
   return (
     <div className="pageWrapper">
       
@@ -84,20 +144,54 @@ export default function UBedrijven({ onLogout }) {
 
       <main className="main">
         <h2 className="title">Ontdek bedrijven</h2>
+
+        <div className="filterContainer">
+          <div className="filterGroup">
+            <h4>Bedrijf zoekt:</h4>
+            {Object.entries({zoek_jobstudent: 'Jobstudent', zoek_stage: 'Stage', zoek_job: 'Job', zoek_connecties: 'Connecties'}).map(([key, label]) => (
+              <label key={key}>
+                <input type="checkbox" name={key} checked={filters[key]} onChange={handleFilterChange} />
+                {label}
+              </label>
+            ))}
+          </div>
+          <div className="filterGroup">
+            <h4>Domein:</h4>
+            {Object.entries({domein_data: 'Data', domein_netwerking: 'Netwerken', domein_ai: 'AI', domein_software: 'Software'}).map(([key, label]) => (
+              <label key={key}>
+                <input type="checkbox" name={key} checked={filters[key]} onChange={handleFilterChange} />
+                {label}
+              </label>
+            ))}
+          </div>
+        </div>
+        
         <div className="bedrijvenContainer">
-          {bedrijven.length === 0 ? (
-            <p style={{ color: 'gray' }}>Geen bedrijven gevonden...</p>
+          {filteredBedrijven.length === 0 ? (
+            <p style={{ color: 'gray', textAlign: 'center', width: '100%' }}>Geen bedrijven gevonden die aan uw criteria voldoen.</p>
           ) : (
-            bedrijven.map((bedrijf) => (
+            filteredBedrijven.map((bedrijf) => (
               <div key={bedrijf.id} className="bedrijfCard">
-                <h3 className="bedrijfNaam">{bedrijf.company_name}</h3>
-                <p className="bedrijfBeschrijving">{bedrijf.sector}</p>
                 <button
                   onClick={() => toggleLike(bedrijf.id)}
                   className={`likeButton ${favorieten.includes(bedrijf.id) ? 'liked' : ''}`}
                 >
                   ♥
                 </button>
+                <h3 className="bedrijfNaam">{bedrijf.company_name}</h3>
+                <p className="bedrijfBeschrijving">{bedrijf.sector}</p>
+                <div className="tagSectie">
+                  <h5>Zoekt:</h5>
+                  <div className="tagContainer">
+                    {renderZoekOpties(bedrijf)}
+                  </div>
+                </div>
+                <div className="tagSectie">
+                  <h5>Domein:</h5>
+                  <div className="tagContainer">
+                    {renderDomeinen(bedrijf)}
+                  </div>
+                </div>
               </div>
             ))
           )}

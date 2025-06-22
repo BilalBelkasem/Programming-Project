@@ -270,6 +270,77 @@
   background-color: #b2bec3;
 }
 
+/* ========== FILTER SECTIE ========== */
+.filterContainer {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+  border: 1px solid #eee;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filterGroup h4 {
+  margin: 0 0 5px 0;
+  font-size: 17px;
+  color: #C8102E;
+  font-weight: 600;
+}
+
+.filterGroup label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.filterGroup input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #C8102E;
+}
+
+/* ========== CARDS & TAGS ========== */
+.tagSectie {
+  margin-top: 12px;
+}
+
+.tagSectie h5 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #636e72;
+  font-weight: 600;
+}
+
+.tag.zoek-tag {
+  background-color: #e0f7fa;
+  color: #00796b;
+  font-weight: 500;
+}
+
+.tag.domein-tag {
+  background-color: #fff3e0;
+  color: #ef6c00;
+  font-weight: 500;
+}
+
+.tag.geen-info {
+  background-color: #f5f5f5;
+  color: #757575;
+  font-style: italic;
+  font-size: 11px;
+}
+
 @media (max-width: 768px) {
   .header {
     flex-direction: column;

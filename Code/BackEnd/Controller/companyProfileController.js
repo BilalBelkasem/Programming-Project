@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
 exports.getCompanyProfile = async (req, res) => {
-  const userId = req.user.id;
+  const companyId = req.params.id;
 
   try {
     const [rows] = await req.db.query(`
@@ -11,7 +11,7 @@ exports.getCompanyProfile = async (req, res) => {
       FROM users u
       JOIN companies_details c ON c.user_id = u.id
       WHERE u.id = ? AND u.role = 'bedrijf'
-    `, [userId]);
+    `, [companyId]);
 
     if (rows.length === 0) return res.status(404).json({ error: 'Profiel niet gevonden' });
 

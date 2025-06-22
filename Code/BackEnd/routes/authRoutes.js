@@ -24,7 +24,7 @@ router.get('/protected', authenticateToken, StudentRegistratieController.getProt
 router.get('/studenten', authenticateToken, studentAdmin.getAllStudents);
 router.get('/bedrijven', authenticateToken,  bedrijfAdmin.getAllCompanies);
 router.delete('/bedrijven/:id', authenticateToken, bedrijfAdmin.deleteCompany);
-router.get('/company-profile', authenticateToken, isCompany, CompanyProfileController.getCompanyProfile);
+router.get('/company-profile/:id', authenticateToken, isCompany, CompanyProfileController.getCompanyProfile);
 router.put('/company-profile', authenticateToken, CompanyProfileController.updateCompanyProfile);
 
 
