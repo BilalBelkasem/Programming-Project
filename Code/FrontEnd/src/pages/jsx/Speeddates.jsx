@@ -94,9 +94,12 @@ const Speeddates = () => {
     setSelectedCompany(company);
     setSelectedSlot(null);
     setReservationError('');
-    axios.get(`/api/companies/${company.id}/slots`)
+    axios.get(`/api/reservations/companies/${company.id}/slots`)
       .then(res => setTimeSlots(res.data))
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error(`Fout bij ophalen slots voor bedrijf ${company.id}:`, err);
+        setTimeSlots([]);
+      });
   };
 
   const handleConfirmReservation = () => {

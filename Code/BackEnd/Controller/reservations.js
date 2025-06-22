@@ -46,6 +46,33 @@ router.get('/config', authenticateToken, async (req, res) => {
     }
 });
 
+// GET all available slots for a specific company
+router.get('/companies/:companyId/slots', authenticateToken, async (req, res) => {
+    const { companyId } = req.params;
+    try {
+        const [companyDetails] = await db.query('SELECT id FROM companies_details WHERE user_id = ?', [companyId]);
+        
+        if (companyDetails.length === 0) {
+            return res.json([]);
+        }
+        const detailsId = companyDetails[0].id;
+
+        const [slots] = await db.query(`
+            SELECT 
+                date_id as _id,
+                TIME_FORMAT(begin_tijd, '%H:%i') as time
+            FROM speeddates
+            WHERE company_id = ? AND status = 'available'
+            ORDER BY begin_tijd
+        `, [detailsId]);
+
+        res.json(slots);
+    } catch (err) {
+        console.error(`Error fetching slots for company user_id ${companyId}:`, err);
+        res.status(500).json({ error: 'Failed to fetch time slots' });
+    }
+});
+
 // GET all reservations for the logged-in user (student)
 router.get('/user/me', authenticateToken, isStudent, async (req, res) => {
     try {
@@ -90,9 +117,15 @@ router.post('/', authenticateToken, isStudent, async (req, res) => {
         if (studentDetails.length === 0) return res.status(404).json({ error: 'Student details not found' });
         const studentId = studentDetails[0].id;
 
+        const [companyDetails] = await db.query('SELECT id FROM companies_details WHERE user_id = ?', [companyId]);
+        if (companyDetails.length === 0) {
+            return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
+        }
+        const detailsId = companyDetails[0].id;
+
         const [existingReservation] = await db.query(
-            'SELECT date_id FROM speeddates WHERE company_id = ? AND student_id = ? AND status IN ("booked", "cancelled_by_admin")',
-            [companyId, studentId]
+            'SELECT date_id FROM speeddates WHERE company_id = ? AND student_id = ? AND status = "booked"',
+            [detailsId, studentId]
         );
 
         if (existingReservation.length > 0) {
