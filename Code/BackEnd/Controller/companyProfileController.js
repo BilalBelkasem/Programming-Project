@@ -1,23 +1,20 @@
 const db = require('../config/db');
 
-exports.getCompanyProfile = async (req, res) => {
-  const userId = req.user.id;
-
+async function fetchCompanyProfile(companyId, res) {
   try {
-    const [rows] = await req.db.query(`
+    const [rows] = await db.query(`
       SELECT u.name, u.email, c.company_name, c.about,
              c.website, c.zoek_jobstudent, c.zoek_connecties, c.zoek_stage, c.zoek_job,
              c.domein_data, c.domein_netwerking, c.domein_ai, c.domein_software
       FROM users u
       JOIN companies_details c ON c.user_id = u.id
       WHERE u.id = ? AND u.role = 'bedrijf'
-    `, [userId]);
+    `, [companyId]);
 
     if (rows.length === 0) return res.status(404).json({ error: 'Profiel niet gevonden' });
 
     const row = rows[0];
 
-    // ✅ Converteer integers naar booleans
     res.json({
       ...row,
       zoek_jobstudent: row.zoek_jobstudent === 1,
@@ -33,6 +30,14 @@ exports.getCompanyProfile = async (req, res) => {
     console.error('Fout bij ophalen profiel:', err);
     res.status(500).json({ error: 'Serverfout' });
   }
+}
+
+exports.getCompanyProfile = (req, res) => {
+  fetchCompanyProfile(req.params.id, res);
+};
+
+exports.getOwnCompanyProfile = (req, res) => {
+  fetchCompanyProfile(req.user.id, res);
 };
 
 

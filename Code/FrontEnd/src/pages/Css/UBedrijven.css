@@ -112,17 +112,24 @@
 }
 
 .bedrijfCard {
-  aspect-ratio: 2 / 1;
-  padding: 16px;
-  border-radius: 6px;
-  background-color: #ccc;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  gap: 12px;
+  border: 1px solid #eee;
   position: relative;
-  text-align: center;
-  width: 100%;
+  width: auto;
+  aspect-ratio: auto;
+  text-align: left;
+}
+
+.bedrijfCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 .bedrijfNaam {
@@ -156,6 +163,93 @@
 /* ❤️ Als het bedrijf geliket is */
 .likeButton.liked {
   color: red; /* rood als geliket */
+}
+
+/* ========== FILTER SECTIE ========== */
+.filterContainer {
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+  border: 1px solid #eee;
+  max-width: 1000px;
+  margin: 0 auto 30px;
+}
+
+.filterGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filterGroup h4 {
+  margin: 0 0 5px 0;
+  font-size: 17px;
+  color: #C8102E;
+  font-weight: 600;
+}
+
+.filterGroup label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.filterGroup input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #C8102E;
+}
+
+/* ========== CARDS & TAGS ========== */
+.tagSectie {
+  margin-top: 12px;
+}
+
+.tagSectie h5 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #636e72;
+  font-weight: 600;
+}
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.tag {
+  background-color: #dfe6e9;
+  color: #2d3436;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.tag.zoek-tag {
+  background-color: #e0f7fa;
+  color: #00796b;
+}
+
+.tag.domein-tag {
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+
+.tag.geen-info {
+  background-color: #f5f5f5;
+  color: #757575;
+  font-style: italic;
+  font-size: 11px;
 }
 
 @media (max-width: 768px) {

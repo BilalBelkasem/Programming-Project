@@ -24,8 +24,9 @@ router.get('/protected', authenticateToken, StudentRegistratieController.getProt
 router.get('/studenten', authenticateToken, studentAdmin.getAllStudents);
 router.get('/bedrijven', authenticateToken,  bedrijfAdmin.getAllCompanies);
 router.delete('/bedrijven/:id', authenticateToken, bedrijfAdmin.deleteCompany);
-router.get('/company-profile', authenticateToken, isCompany, CompanyProfileController.getCompanyProfile);
+router.get('/company-profile/:id', authenticateToken, isCompany, CompanyProfileController.getCompanyProfile);
 router.put('/company-profile', authenticateToken, CompanyProfileController.updateCompanyProfile);
+router.get('/company-profile', authenticateToken, isCompany, CompanyProfileController.getOwnCompanyProfile);
 
 
 
@@ -40,6 +41,7 @@ router.delete('/favorieten/:companyId', FavorietenController.deleteFavoriet);
 
 // BEDRIJVEN ROUTE
 router.get('/open-bedrijven', BedrijvenController.getBedrijven);
+router.delete('/studenten/:id', authenticateToken, isAdmin, studentAdmin.deleteStudent);
 
 
 module.exports = router;
