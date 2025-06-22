@@ -7,11 +7,8 @@ router.get('/', async (req, res) => {
   try {
     const [companies] = await db.query(`
       SELECT 
-        cd.id,
-        cd.company_name as name,
-        cd.about as description,
-        cd.sector as industry,
-        cd.city as location
+        cd.user_id,
+        cd.company_name
       FROM companies_details cd
       JOIN users u ON cd.user_id = u.id
       WHERE u.role = 'bedrijf'

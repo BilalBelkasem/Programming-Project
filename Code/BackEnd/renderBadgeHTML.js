@@ -9,10 +9,10 @@ async function renderBadgeHTML(data, student = null) {
     name = data.user_name || 'Unknown';
     title = data.sector || '';
     organization = data.company_name || '';
+    // Always link to the company profile page
     qrDataURL = await QRCode.toDataURL(
-      data.website || `https://careerlaunch.be/verify/${data.id}`
+      `https://careerlaunch.be/company/${data.id}`
     );
-    // Role badge text
     roleText = data.role === 'bedrijf' ? 'Exhibitor Badge' : 'Badge';
   } else {
     name = data.name;

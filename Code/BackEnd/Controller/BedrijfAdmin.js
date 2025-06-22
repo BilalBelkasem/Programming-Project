@@ -23,8 +23,8 @@ exports.getAllCompanies = async (req, res) => {
 
 
 exports.deleteCompany = async (req, res) => {
-  const companyId = req.params.id;
-  console.log(`DELETE request ontvangen voor company id: ${companyId}`);
+  const companyUserId = req.params.id;
+  console.log(`DELETE request ontvangen voor company id: ${companyUserId}`);
   let connection;
 
   try {
@@ -32,18 +32,34 @@ exports.deleteCompany = async (req, res) => {
     await connection.beginTransaction();
 
     
-    await connection.query('DELETE FROM companies_details WHERE user_id = ?', [companyId]);
+    const [rows] = await connection.query(
+      'SELECT id FROM companies_details WHERE user_id = ?',
+      [companyUserId]
+    );
+    if (rows.length === 0) {
+      throw new Error('Bedrijf niet gevonden');
+    }
+    const companyDetailsId = rows[0].id;
 
     
-    await connection.query('DELETE FROM users WHERE id = ?', [companyId]);
+    await connection.query('DELETE FROM feedback WHERE company_id = ?', [companyDetailsId]);
+
+    
+    await connection.query('DELETE FROM stands WHERE company_id = ?', [companyDetailsId]);
+
+    
+    await connection.query('DELETE FROM companies_details WHERE user_id = ?', [companyUserId]);
+
+   
+    await connection.query('DELETE FROM users WHERE id = ?', [companyUserId]);
 
     await connection.commit();
-    
-    console.log(`Bedrijf met id ${companyId} succesvol verwijderd.`);
+
+    console.log(`Bedrijf met id ${companyUserId} succesvol verwijderd.`);
     res.json({ message: 'Bedrijf succesvol verwijderd' });
 
   } catch (err) {
-    console.error(`Fout bij verwijderen bedrijf ${companyId}:`, err);
+    console.error(`Fout bij verwijderen bedrijf ${companyUserId}:`, err);
     if (connection) {
       await connection.rollback();
     }
