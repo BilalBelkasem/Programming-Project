@@ -24,49 +24,39 @@ export default function CompanyRegistrationForm() {
     invoice_contact_name: '',
     invoice_contact_email: '',
     vat_number: '',
-    logo: null,
   });
 
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
-    const { name, files, value } = e.target;
-
-    if (name === 'logo') {
-      const file = files[0];
-      if (file) {
-        const maxSize = 2 * 1024 * 1024;
-        if (file.size > maxSize) {
-          alert('Het logo mag maximaal 2MB zijn.');
-          return;
-        }
-        setFormData({ ...formData, logo: file });
-      }
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Reset error on new submission
 
     if (formData.password !== formData.confirmPassword) {
-      alert('Wachtwoorden komen niet overeen.');
+      setError('Wachtwoorden komen niet overeen.');
       return;
     }
 
     const legeVelden = Object.entries(formData).filter(
       ([key, value]) => {
-        if (key === 'logo') return false;
         return value === '' || value === null;
       }
     );
 
     if (legeVelden.length > 0) {
-      alert('Vul alle verplichte velden in voordat je registreert.');
+      const legeLabels = legeVelden.map(([key]) => key).join(', ');
+      setError(`Vul alle verplichte velden in. De volgende velden missen: ${legeLabels}`);
       return;
     }
 
+    setLoading(true);
     try {
       const response = await axios.post(
         'http://localhost:5000/api/register-company',
@@ -80,7 +70,9 @@ export default function CompanyRegistrationForm() {
       navigate('/login');
     } catch (error) {
       console.error('Registratie mislukt:', error.response?.data || error);
-      alert('Registratie mislukt: ' + (error.response?.data?.error || 'Onbekende fout'));
+      setError('Registratie mislukt: ' + (error.response?.data?.error || 'Onbekende fout'));
+    } finally {
+      setLoading(false); // Stop loading regardless of outcome
     }
   };
 
@@ -91,6 +83,8 @@ export default function CompanyRegistrationForm() {
       </div>
 
       <h2 className="form-title">Registreren bedrijf</h2>
+
+      {error && <div className="error-message">{error}</div>}
 
       {[
         { label: 'E-mailadres', name: 'email' },
@@ -158,6 +152,7 @@ export default function CompanyRegistrationForm() {
           name="sector"
           value={formData.sector}
           onChange={handleChange}
+          required
         >
           <option value="">- Selecteren -</option>
           <option value="Software & webontwikkeling (focus op back-end)">Software & webontwikkeling (focus op back-end)</option>
@@ -172,7 +167,9 @@ export default function CompanyRegistrationForm() {
         </select>
       </div>
 
-      <button type="submit" className="form-button">Registreren</button>
+      <button type="submit" className="form-button" disabled={loading}>
+        {loading ? 'Bezig met registreren...' : 'Registreren'}
+      </button>
       <Link to="/login" className="form-back">← Terug</Link>
     </form>
   );

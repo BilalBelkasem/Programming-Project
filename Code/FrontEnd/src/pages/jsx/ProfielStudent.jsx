@@ -67,16 +67,6 @@ export default function ProfielStudent({ user }) {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData(prev => ({
-        ...prev,
-        profilePicture: URL.createObjectURL(file),
-      }));
-    }
-  };
-
   const handleCheckboxChange = (e, field) => {
     const value = e.target.value;
     setFormData(prev => ({
@@ -147,15 +137,6 @@ export default function ProfielStudent({ user }) {
       </header>
 
       <div className="container">
-        <div className="profile-picture">
-          <img
-            src={formData.profilePicture || '/profile.jpg'}
-            alt="Profile"
-            className="circle"
-          />
-          <input type="file" accept="image/*" onChange={handleImageUpload} className="upload-btn" />
-        </div>
-
         <div className="form-grid">
           <div className="left">
             <label>Voornaam + Achternaam</label>

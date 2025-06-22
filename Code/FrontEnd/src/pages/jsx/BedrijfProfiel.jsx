@@ -39,13 +39,6 @@ export default function BedrijfProfiel() {
 
       <main className="container">
         <div className="profile-row">
-          <div className="profile-picture">
-            {bedrijf.profilePicture ? (
-              <img src={bedrijf.profilePicture} alt="Bedrijfsfoto" className="circle" />
-            ) : (
-              <div className="circle">[Foto]</div>
-            )}
-          </div>
           <button className="like-button small" title="Like ♥">♥</button>
         </div>
 

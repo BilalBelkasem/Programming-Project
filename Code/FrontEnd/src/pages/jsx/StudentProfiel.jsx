@@ -72,13 +72,6 @@
 
         <main className="container">
           <div className="profile-row">
-            <div className="profile-picture">
-              {student?.profile_picture ? (
-                <img src={student.profile_picture} alt="Profiel" className="circle" />
-              ) : (
-                <div className="circle">[Foto]</div>
-              )}
-            </div>
             <div className="student-name-title">
               <h2>{displayValue(student?.full_name, 'Voornaam + Achternaam')}</h2>
             </div>
