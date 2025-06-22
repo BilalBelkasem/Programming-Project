@@ -133,7 +133,14 @@ export default function App() {
         }
       />
 
-      <Route path="/bedrijfprofiel/:id" element={<BedrijfProfiel />} />
+      <Route 
+        path="/bedrijfprofiel/:id" 
+        element={
+          <ProtectedRoute role={['student', 'bedrijf', 'admin']}>
+            <BedrijfProfiel />
+          </ProtectedRoute>
+        } 
+      />
       <Route path="/plattegrond" element={<UPlatteGrond />} />
       <Route path="/g-plattegrond" element={<GPlatteGrond />} />
 

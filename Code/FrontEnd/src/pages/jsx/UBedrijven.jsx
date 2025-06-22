@@ -179,7 +179,12 @@ export default function UBedrijven({ onLogout }) {
             <p style={{ color: 'gray', textAlign: 'center', width: '100%' }}>Geen bedrijven gevonden die aan uw criteria voldoen.</p>
           ) : (
             filteredBedrijven.map((bedrijf) => (
-              <div key={bedrijf.id} className="bedrijfCard">
+              <div 
+                key={bedrijf.id} 
+                className="bedrijfCard" 
+                onClick={() => navigate(`/bedrijfprofiel/${bedrijf.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
                 <button
                   onClick={(e) => {
                     e.stopPropagation(); // Zorgt ervoor dat klik op hartje NIET navigeert
