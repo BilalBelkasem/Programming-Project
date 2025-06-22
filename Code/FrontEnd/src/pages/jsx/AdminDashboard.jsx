@@ -16,7 +16,7 @@ export default function AdminDashboard() {
 
   // Open badge pagina (die public.html via Express backend)
   const openBadgePage = () => {
-    window.open('http://localhost:5000', '_blank'); // open in nieuw tabblad
+    window.open('/api', '_blank'); // open in nieuw tabblad
   };
 
   return (

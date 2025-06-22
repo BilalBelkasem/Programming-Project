@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const BedrijvenController = require('./BedrijvenController');
 
 exports.getAllCompanies = async (req, res) => {
   const sql = `
@@ -54,6 +55,9 @@ exports.deleteCompany = async (req, res) => {
     await connection.query('DELETE FROM users WHERE id = ?', [companyUserId]);
 
     await connection.commit();
+
+    // Invalidate cache since we deleted a company
+    BedrijvenController.invalidateCache();
 
     console.log(`Bedrijf met id ${companyUserId} succesvol verwijderd.`);
     res.json({ message: 'Bedrijf succesvol verwijderd' });

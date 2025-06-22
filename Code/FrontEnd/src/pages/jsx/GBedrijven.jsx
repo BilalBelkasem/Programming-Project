@@ -22,7 +22,7 @@ export default function GBedrijven({ onLogout }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/open-bedrijven');
+        const res = await axios.get('/api/open-bedrijven');
         setBedrijven(res.data);
       } catch (err) {
         console.error('Fout bij ophalen bedrijven:', err);

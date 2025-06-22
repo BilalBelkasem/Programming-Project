@@ -1,7 +1,18 @@
 // bedrijvenController.js
 
+// Simple in-memory cache
+let bedrijvenCache = null;
+let cacheTimestamp = null;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 exports.getBedrijven = async (req, res) => {
   try {
+    // Check if we have valid cached data
+    const now = Date.now();
+    if (bedrijvenCache && cacheTimestamp && (now - cacheTimestamp) < CACHE_DURATION) {
+      return res.json(bedrijvenCache);
+    }
+
     const [bedrijven] = await req.db.query(`
       SELECT 
         u.id, 
@@ -22,8 +33,6 @@ exports.getBedrijven = async (req, res) => {
       WHERE u.role = 'bedrijf'
     `);
 
-    console.log("✅ Resultaat van de database:", bedrijven);
-
     if (!Array.isArray(bedrijven)) {
       console.error("❌ bedrijven is geen array! Inhoud:", bedrijven);
       return res.status(500).json({
@@ -31,6 +40,10 @@ exports.getBedrijven = async (req, res) => {
         details: bedrijven
       });
     }
+
+    // Update cache
+    bedrijvenCache = bedrijven;
+    cacheTimestamp = now;
 
     res.json(bedrijven);
   } catch (err) {
@@ -40,4 +53,10 @@ exports.getBedrijven = async (req, res) => {
       details: err.message
     });
   }
+};
+
+// Function to invalidate cache (call this when companies are updated)
+exports.invalidateCache = () => {
+  bedrijvenCache = null;
+  cacheTimestamp = null;
 };

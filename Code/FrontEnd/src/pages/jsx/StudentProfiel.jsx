@@ -18,7 +18,7 @@ export default function StudentProfiel() {
       return;
     }
 
-    axios.get(`http://localhost:5000/api/student_details/user/${id}`)
+    axios.get(`/api/student_details/user/${id}`)
       .then(response => {
         const raw = response.data;
         // Convert booleans to arrays
@@ -43,7 +43,7 @@ export default function StudentProfiel() {
       });
 
     if (user && user.role === 'bedrijf') {
-        axios.get(`http://localhost:5000/api/bedrijf-like-student/favorites/${user.id}`)
+        axios.get(`/api/bedrijf-like-student/favorites/${user.id}`)
             .then(res => {
                 const likedIds = res.data.map(s => s.id);
                 if (likedIds.includes(parseInt(id, 10))) {
@@ -64,10 +64,10 @@ export default function StudentProfiel() {
 
     try {
       if (isLiked) {
-        await axios.delete('http://localhost:5000/api/bedrijf-like-student/unlike', { data: payload });
+        await axios.delete('/api/bedrijf-like-student/unlike', { data: payload });
         setIsLiked(false);
       } else {
-        await axios.post('http://localhost:5000/api/bedrijf-like-student/like', payload);
+        await axios.post('/api/bedrijf-like-student/like', payload);
         setIsLiked(true);
       }
     } catch (err) {

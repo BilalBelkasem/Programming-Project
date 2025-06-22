@@ -20,7 +20,7 @@ export default function AdminBedrijf() {
 
   // ✅ Laad bedrijven van backend bij mount
   useEffect(() => {
-    axios.get('http://localhost:5000/api/bedrijven', {
+    axios.get('/api/bedrijven', {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
@@ -37,7 +37,7 @@ export default function AdminBedrijf() {
   const handleVerwijder = (id, naam) => {
     const bevestiging = window.confirm(`Ben je zeker dat je ${naam} wilt verwijderen?`);
     if (bevestiging) {
-      axios.delete(`http://localhost:5000/api/bedrijven/${id}`, {
+      axios.delete(`/api/bedrijven/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }

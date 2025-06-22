@@ -60,7 +60,7 @@ export default function CompanyRegistrationForm() {
     setLoading(true);
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/register-company',
+        '/api/register-company',
         formData, // send as JSON
         { headers: { 'Content-Type': 'application/json' } }
       );

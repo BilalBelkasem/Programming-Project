@@ -14,7 +14,7 @@ export default function BedrijfProfiel() {
   useEffect(() => {
     const fetchBedrijf = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/company-profile/public/${id}`);
+        const response = await axios.get(`/api/company-profile/public/${id}`);
         setBedrijf(response.data);
       } catch (err) {
         if (err.response && err.response.data && err.response.data.error) {

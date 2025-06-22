@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const BedrijvenController = require('./BedrijvenController');
 
 exports.registerCompany = async (req, res) => {
   try {
@@ -63,6 +64,9 @@ exports.registerCompany = async (req, res) => {
       ]
     );
     const companyId = companyResult.insertId;
+
+    // Invalidate cache since we added a new company
+    BedrijvenController.invalidateCache();
 
     const token = jwt.sign(
       { id: userId, email, role },

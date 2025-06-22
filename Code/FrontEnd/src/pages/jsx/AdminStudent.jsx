@@ -21,7 +21,7 @@ export default function AdminStudent() {
   const laadStudenten = () => {
     const token = localStorage.getItem('token');
 
-    axios.get('http://localhost:5000/api/studenten', {
+    axios.get('/api/studenten', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -43,7 +43,7 @@ export default function AdminStudent() {
     const token = localStorage.getItem('token');
 
     if (window.confirm(`Ben je zeker dat je ${naam} wilt verwijderen?`)) {
-      axios.delete(`http://localhost:5000/api/studenten/${id}`, {
+      axios.delete(`/api/studenten/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

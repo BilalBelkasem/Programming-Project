@@ -44,10 +44,10 @@ export default function UBedrijven({ onLogout }) {
           return;
         }
 
-        const bedrijvenRes = await axios.get('http://localhost:5000/api/open-bedrijven');
+        const bedrijvenRes = await axios.get('/api/open-bedrijven');
         setBedrijven(bedrijvenRes.data);
 
-        const favorietenRes = await axios.get(`http://localhost:5000/api/favorieten/${user.id}`, {
+        const favorietenRes = await axios.get(`/api/favorieten/${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const geliketeIds = favorietenRes.data.map((bedrijf) => bedrijf.id);
@@ -84,12 +84,12 @@ export default function UBedrijven({ onLogout }) {
 
     try {
       if (isFavoriet) {
-        await axios.delete(`http://localhost:5000/api/favorieten/${bedrijfId}?student_id=${user.id}`, {
+        await axios.delete(`/api/favorieten/${bedrijfId}?student_id=${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFavorieten(prev => prev.filter(id => id !== bedrijfId));
       } else {
-        await axios.post('http://localhost:5000/api/favorieten', {
+        await axios.post('/api/favorieten', {
           student_id: user.id,
           company_id: bedrijfId
         }, {

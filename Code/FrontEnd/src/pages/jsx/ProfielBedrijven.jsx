@@ -23,7 +23,7 @@ export default function ProfielBedrijven() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/company-profile', {
+        const res = await axios.get('/api/company-profile', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           }
@@ -87,7 +87,7 @@ export default function ProfielBedrijven() {
         domains: formData.domains        
       };
 
-      await axios.put('http://localhost:5000/api/company-profile', payload, {
+      await axios.put('/api/company-profile', payload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
