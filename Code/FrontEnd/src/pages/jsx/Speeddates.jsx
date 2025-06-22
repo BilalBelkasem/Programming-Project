@@ -41,13 +41,12 @@ const Speeddates = () => {
 
     if (loggedInUser.role === 'student') {
       // Fetch data for student view
-      axios.get('/api/companies').then(res => {
+      axios.get('/api/open-bedrijven').then(res => {
         setAllCompanies(res.data);
         setFilteredCompanies(res.data);
+        const uniqueSectors = [...new Set(res.data.map(c => c.sector).filter(Boolean))];
+        setSectors(uniqueSectors);
       }).catch(err => console.error('Error fetching companies:', err));
-
-      axios.get('/api/companies/sectors').then(res => setSectors(res.data))
-        .catch(err => console.error('Error fetching sectors:', err));
 
       axios.get('/api/reservations/user/me').then(res => setMyReservations(res.data))
         .catch(err => console.error('Error fetching reservations:', err));
@@ -65,8 +64,8 @@ const Speeddates = () => {
   useEffect(() => {
     // Apply search query filter whenever it changes
     const searchFiltered = allCompanies.filter(company => {
-      const sectorMatch = selectedSectors.length === 0 || selectedSectors.includes(company.industry);
-      const searchMatch = [company.name, company.description, company.industry, company.location].some(field =>
+      const sectorMatch = selectedSectors.length === 0 || selectedSectors.includes(company.sector);
+      const searchMatch = searchQuery.trim() === '' || [company.company_name, company.about, company.sector, company.location].some(field =>
         field && typeof field === 'string' && field.toLowerCase().includes(searchQuery.toLowerCase())
       );
       return sectorMatch && searchMatch;
@@ -84,7 +83,7 @@ const Speeddates = () => {
 
   const applySectorFilter = () => {
     const sectorFiltered = allCompanies.filter(company =>
-      selectedSectors.length === 0 || selectedSectors.includes(company.industry)
+      selectedSectors.length === 0 || selectedSectors.includes(company.sector)
     );
     setFilteredCompanies(sectorFiltered);
     setShowFilter(false);
@@ -212,10 +211,10 @@ const Speeddates = () => {
         ) : (
           filteredCompanies.map(c => (
             <div key={c.id} className="company-card" onClick={() => handleCompanyClick(c)}>
-              <h3 className="company-name">{c.name || 'Bedrijfsnaam niet beschikbaar'}</h3>
-              <p className="company-description">{c.description || 'Geen beschrijving beschikbaar'}</p>
+              <h3 className="company-name">{c.company_name || 'Bedrijfsnaam niet beschikbaar'}</h3>
+              <p className="company-description">{c.about || 'Geen beschrijving beschikbaar'}</p>
               <div className="company-meta">
-                <span>{c.industry || 'Sector niet beschikbaar'}</span>
+                <span>{c.sector || 'Sector niet beschikbaar'}</span>
                 <span>{c.location || 'Locatie niet beschikbaar'}</span>
               </div>
               <span className="session-badge">5 min sessies</span>
@@ -228,7 +227,7 @@ const Speeddates = () => {
         <div className="slot-modal">
           <div className="slot-modal-content">
             <button className="close-btn" onClick={() => { setSelectedCompany(null); setSelectedSlot(null); setReservationError(''); }}>×</button>
-            <h2>{selectedCompany.name}</h2>
+            <h2>{selectedCompany.company_name}</h2>
             <div className="slot-list">
               {timeSlots.length > 0 ? timeSlots.map(slot => (
                 <button
@@ -269,7 +268,7 @@ const Speeddates = () => {
           <div className="reservations-list">
             {myReservations.map(r => (
               <div key={r._id} className={`reservation-card ${r.status === 'cancelled_by_admin' ? 'cancelled' : ''}`}>
-                <h4>{r.company.name}</h4>
+                <h4>{r.company.company_name}</h4>
                 <p>Tijd: {r.time}</p>
                 {r.status === 'cancelled_by_admin' && (
                   <div className="cancellation-info">

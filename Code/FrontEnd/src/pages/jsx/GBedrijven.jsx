@@ -40,13 +40,17 @@ export default function GBedrijven({ onLogout }) {
   };
 
   const filteredBedrijven = useMemo(() => {
-    const actieveFilters = Object.keys(filters).filter(key => filters[key]);
-    if (actieveFilters.length === 0) {
+    const zoekFilters = Object.keys(filters).filter(key => key.startsWith('zoek_') && filters[key]);
+    const domeinFilters = Object.keys(filters).filter(key => key.startsWith('domein_') && filters[key]);
+
+    if (zoekFilters.length === 0 && domeinFilters.length === 0) {
       return bedrijven;
     }
 
     return bedrijven.filter(bedrijf => {
-      return actieveFilters.every(filterKey => bedrijf[filterKey] === 1);
+      const zoektMatch = zoekFilters.length === 0 || zoekFilters.some(filter => bedrijf[filter] === 1);
+      const domeinMatch = domeinFilters.length === 0 || domeinFilters.some(filter => bedrijf[filter] === 1);
+      return zoektMatch && domeinMatch;
     });
   }, [bedrijven, filters]);
 

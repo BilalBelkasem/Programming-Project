@@ -10,7 +10,6 @@ const db = require('./config/db');
 // Routes importeren
 const authMiddleware       = require('./middleware/authMiddleware');
 const authRoutes           = require('./routes/authRoutes');
-const companiesRoutes      = require('./companies');
 const studentRoutes        = require('./students');
 const badgeRoutes          = require('./badge');
 const mijnProfielRoutes    = require('./Controller/mijnprofiel');
@@ -33,7 +32,6 @@ app.use((req, res, next) => {
 
 // Routes mounten met auth middleware waar nodig
 app.use('/api', authRoutes);
-app.use('/api/companies', companiesRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/mijnprofiel', authMiddleware.authenticateToken, mijnProfielRoutes);

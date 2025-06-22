@@ -87,7 +87,7 @@ export default function ProfielStudent({ user }) {
       name: formData.name,
       email: formData.email,
       school: formData.school,
-      direction: formData.direction,
+      education: formData.direction,
       year: formData.year,
       about: formData.about,
       linkedin: formData.linkedin,
