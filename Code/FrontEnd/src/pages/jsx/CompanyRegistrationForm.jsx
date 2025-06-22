@@ -74,8 +74,10 @@ export default function CompanyRegistrationForm() {
         { headers: { 'Content-Type': 'application/json' } }
       );
 
-      alert('Bedrijf succesvol geregistreerd!');
-      navigate('/profiel-bedrijf');
+      alert('Bedrijf succesvol geregistreerd! U wordt nu doorgestuurd naar de login pagina.');
+      
+      // Navigeer naar de login pagina
+      navigate('/login');
     } catch (error) {
       console.error('Registratie mislukt:', error.response?.data || error);
       alert('Registratie mislukt: ' + (error.response?.data?.error || 'Onbekende fout'));

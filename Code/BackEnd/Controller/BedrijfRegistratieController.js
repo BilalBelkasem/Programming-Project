@@ -46,7 +46,7 @@ exports.registerCompany = async (req, res) => {
     const userId = userResult.insertId;
 
     // Insert company details
-    await db.query(
+    const [companyResult] = await db.query(
       `INSERT INTO companies_details (
         user_id, company_name, sector, website, phone_number,
         street, postal_code, city,
@@ -62,6 +62,7 @@ exports.registerCompany = async (req, res) => {
         po_number, vat_number
       ]
     );
+    const companyId = companyResult.insertId;
 
     const token = jwt.sign(
       { id: userId, email, role },
@@ -74,6 +75,7 @@ exports.registerCompany = async (req, res) => {
       token,
       user: {
         id: userId,
+        company_id: companyId,
         name,
         email,
         role,

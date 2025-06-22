@@ -29,13 +29,22 @@ exports.deleteStudent = async (req, res) => {
     connection = await db.getConnection();
     await connection.beginTransaction();
 
-    // Step 1: Delete from favorites
+    // Step 1: Delete from favorites (student_id verwijst naar users.id)
     await connection.query('DELETE FROM favorites WHERE student_id = ?', [studentId]);
 
-    // Step 2: Delete from students_details
+    // Step 2: Update speeddates (student_id verwijst naar students_details.id)
+    // Eerst zoeken naar students_details.id
+    const [studentDetails] = await connection.query('SELECT id FROM students_details WHERE user_id = ?', [studentId]);
+    if (studentDetails.length > 0) {
+      const studentDetailsId = studentDetails[0].id;
+      // Update speeddates om student_id op NULL te zetten en status op 'available'
+      await connection.query('UPDATE speeddates SET student_id = NULL, status = "available" WHERE student_id = ?', [studentDetailsId]);
+    }
+
+    // Step 3: Delete from students_details
     await connection.query('DELETE FROM students_details WHERE user_id = ?', [studentId]);
 
-    // Step 3: Delete from users
+    // Step 4: Delete from users
     await connection.query('DELETE FROM users WHERE id = ?', [studentId]);
 
     await connection.commit();

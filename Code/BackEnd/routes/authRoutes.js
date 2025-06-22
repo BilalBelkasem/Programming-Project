@@ -13,11 +13,28 @@ const studentAdmin = require('../Controller/StudentAdmin');
 const bedrijfAdmin = require('../Controller/BedrijfAdmin');
 const CompanyProfileController = require('../Controller/companyProfileController');
 const MijnProfielController = require('../Controller/mijnprofiel');
+const BedrijfLikeStudentController = require('../Controller/BedrijfLikeStudentController');
 
 // PUBLIC ROUTES
 router.post('/register', StudentRegistratieController.register);
 router.post('/register-company', BedrijfRegistratieController.registerCompany);
 router.post('/login', LoginController.login);
+
+// PUBLIC API ROUTES (voor badge pagina)
+router.get('/students', async (req, res) => {
+  try {
+    const [students] = await req.db.query(`
+      SELECT u.id, u.name, s.school, s.education, s.year, u.email
+      FROM users u
+      JOIN students_details s ON u.id = s.user_id
+      WHERE u.role = 'student'
+    `);
+    res.json(students);
+  } catch (err) {
+    console.error('Error fetching students:', err);
+    res.status(500).json({ error: 'Failed to fetch students' });
+  }
+});
 
 // PROTECTED ROUTES
 router.get('/protected', authenticateToken, StudentRegistratieController.getProtectedData);
@@ -38,6 +55,9 @@ router.get('/profile', authenticateToken, (req, res) => {
 router.post('/favorieten', FavorietenController.addFavoriet);
 router.get('/favorieten/:studentId', FavorietenController.getFavorieten);
 router.delete('/favorieten/:companyId', FavorietenController.deleteFavoriet);
+
+// BEDRIJF LIKE STUDENT ROUTES
+router.use('/bedrijf-like-student', BedrijfLikeStudentController);
 
 // BEDRIJVEN ROUTE
 router.get('/open-bedrijven', BedrijvenController.getBedrijven);
