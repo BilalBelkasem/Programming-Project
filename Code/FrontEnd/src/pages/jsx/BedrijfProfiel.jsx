@@ -1,20 +1,33 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import axios from 'axios';
 import logo from '../../assets/logoerasmus.png';
 import '../Css/BedrijfProfiel.css';
 
 export default function BedrijfProfiel() {
-  const bedrijf = {
-    name: '',
-    companyName: '',
-    function: '',
-    email: '',
-    linkedin: '',
-    about: '',
-    lookingFor: [],
-    domains: [],
-    profilePicture: null,
-  };
+  const { id } = useParams();
+  const [bedrijf, setBedrijf] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBedrijf = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/company-profile/public/${id}`);
+        setBedrijf(response.data);
+      } catch (err) {
+        if (err.response && err.response.data && err.response.data.error) {
+          setError(err.response.data.error);
+        } else {
+          setError('Kon de bedrijfsgegevens niet ophalen.');
+        }
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBedrijf();
+  }, [id]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -22,12 +35,40 @@ export default function BedrijfProfiel() {
     window.location.href = '/';
   };
 
+  const renderLookingFor = () => {
+    if (!bedrijf) return null;
+    const lookingForOptions = [
+      { key: 'zoek_jobstudent', label: 'Jobstudent' },
+      { key: 'zoek_connecties', label: 'Connecties' },
+      { key: 'zoek_stage', label: 'Stage' },
+      { key: 'zoek_job', label: 'Voltijds personeel' },
+    ];
+    const lookingFor = lookingForOptions.filter(opt => bedrijf[opt.key]).map(opt => opt.label);
+    return lookingFor.length > 0 ? lookingFor.join(', ') : 'Niet opgegeven';
+  };
+
+  const renderDomains = () => {
+    if (!bedrijf) return null;
+    const domainOptions = [
+      { key: 'domein_data', label: 'Data' },
+      { key: 'domein_netwerking', label: 'Netwerking' },
+      { key: 'domein_ai', label: 'AI / Robotica' },
+      { key: 'domein_software', label: 'Software' },
+    ];
+    const domains = domainOptions.filter(opt => bedrijf[opt.key]).map(opt => opt.label);
+    return domains.length > 0 ? domains.join(', ') : 'Niet opgegeven';
+  };
+
+  if (loading) {
+    return <div className="page-wrapper"><p>Laden...</p></div>;
+  }
+
   return (
     <div className="page-wrapper">
       <header className="header">
         <img src={logo} alt="Erasmus Logo" className="logo" />
         <nav className="nav">
-          <Link to="/dashboard" className="nav-btn active">Info</Link>
+          <Link to="/dashboard" className="nav-btn">Info</Link>
           <Link to="/bedrijven" className="nav-btn">Bedrijven</Link>
           <Link to="/speeddates" className="nav-btn">Speeddates</Link>
           <Link to="/plattegrond" className="nav-btn">Plattegrond</Link>
@@ -38,54 +79,47 @@ export default function BedrijfProfiel() {
       </header>
 
       <main className="container">
-        <div className="profile-row">
-          <button className="like-button small" title="Like ♥">♥</button>
-        </div>
+        {error ? (
+          <p>{error}</p>
+        ) : bedrijf ? (
+          <>
+            <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>{bedrijf.company_name}</h1>
+            <div className="profile-grid">
+              <div className="field">
+                <strong>Sector</strong>
+                <div className="value-bar">{bedrijf.sector || <em>Niet opgegeven</em>}</div>
+              </div>
+              <div className="field">
+                <strong>Adres</strong>
+                <div className="value-bar">{`${bedrijf.street || ''} ${bedrijf.postal_code || ''} ${bedrijf.city || ''}`.trim() || <em>Niet opgegeven</em>}</div>
+              </div>
 
-        <div className="profile-grid">
-          <div className="field"><strong>Bedrijfsnaam:</strong> {bedrijf.companyName || <em>–</em>}</div>
-          <div className="field"><strong>Functie:</strong> {bedrijf.function || <em>–</em>}</div>
-          <div className="field"><strong>E-mail:</strong> {bedrijf.email || <em>–</em>}</div>
-          {bedrijf.linkedin && (
-            <div className="field full">
-              <strong>LinkedIn:</strong>{" "}
-              <a href={bedrijf.linkedin} target="_blank" rel="noreferrer">{bedrijf.linkedin}</a>
+              <div className="field full">
+                <strong>Website</strong>
+                <div className="value-bar">{bedrijf.website || <em>Niet opgegeven</em>}</div>
+              </div>
+
+              <div className="field full">
+                <strong>Over ons</strong>
+                <div className="textarea">
+                    {bedrijf.about || <em>Niet opgegeven</em>}
+                </div>
+              </div>
+
+              <div className="field full">
+                <strong>Wat zoekt dit bedrijf?</strong>
+                <div className="value-bar">{renderLookingFor()}</div>
+              </div>
+
+              <div className="field full">
+                <strong>IT-domeinen</strong>
+                <div className="value-bar">{renderDomains()}</div>
+              </div>
             </div>
-          )}
-        </div>
-
-        <div className="section">
-          <h2>Over het bedrijf</h2>
-          <div className="textarea">
-            {bedrijf.about ? bedrijf.about : <em>Geen beschrijving opgegeven</em>}
-          </div>
-        </div>
-
-        <div className="section">
-          <h3>Wat zoekt dit bedrijf?</h3>
-          <div className="checkbox-group">
-            {bedrijf.lookingFor.length === 0 ? (
-              <p><em>Geen selectie opgegeven</em></p>
-            ) : (
-              bedrijf.lookingFor.map((item, i) => (
-                <div key={i}>✔ {item}</div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="section">
-          <h3>IT-domeinen</h3>
-          <div className="checkbox-group">
-            {bedrijf.domains.length === 0 ? (
-              <p><em>Geen selectie opgegeven</em></p>
-            ) : (
-              bedrijf.domains.map((item, i) => (
-                <div key={i}>✔ {item}</div>
-              ))
-            )}
-          </div>
-        </div>
+          </>
+        ) : (
+          <p>Bedrijf niet gevonden.</p>
+        )}
       </main>
     </div>
   );

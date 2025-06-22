@@ -1,17 +1,18 @@
 const db = require('../config/db');
 
-async function fetchCompanyProfile(companyId, res) {
+async function fetchCompanyProfile(req, companyId, res) {
   try {
-    const [rows] = await db.query(`
+    const [rows] = await req.db.query(`
       SELECT u.name, u.email, c.company_name, c.about,
-             c.website, c.zoek_jobstudent, c.zoek_connecties, c.zoek_stage, c.zoek_job,
+             c.website, c.street, c.postal_code, c.city, c.sector,
+             c.zoek_jobstudent, c.zoek_connecties, c.zoek_stage, c.zoek_job,
              c.domein_data, c.domein_netwerking, c.domein_ai, c.domein_software
       FROM users u
       JOIN companies_details c ON c.user_id = u.id
       WHERE u.id = ? AND u.role = 'bedrijf'
     `, [companyId]);
 
-    if (rows.length === 0) return res.status(404).json({ error: 'Profiel niet gevonden' });
+    if (rows.length === 0) return res.status(404).json({ error: 'Geen bedrijf met deze ID gevonden.' });
 
     const row = rows[0];
 
@@ -32,14 +33,17 @@ async function fetchCompanyProfile(companyId, res) {
   }
 }
 
+exports.getPublicCompanyProfile = (req, res) => {
+  fetchCompanyProfile(req, req.params.id, res);
+};
+
 exports.getCompanyProfile = (req, res) => {
-  fetchCompanyProfile(req.params.id, res);
+  fetchCompanyProfile(req, req.params.id, res);
 };
 
 exports.getOwnCompanyProfile = (req, res) => {
-  fetchCompanyProfile(req.user.id, res);
+  fetchCompanyProfile(req, req.user.id, res);
 };
-
 
 exports.updateCompanyProfile = async (req, res) => {
   const userId = req.user.id;

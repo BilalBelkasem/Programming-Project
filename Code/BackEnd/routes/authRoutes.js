@@ -19,6 +19,7 @@ const BedrijfLikeStudentController = require('../Controller/BedrijfLikeStudentCo
 router.post('/register', StudentRegistratieController.register);
 router.post('/register-company', BedrijfRegistratieController.registerCompany);
 router.post('/login', LoginController.login);
+router.get('/company-profile/public/:id', CompanyProfileController.getPublicCompanyProfile);
 
 // PUBLIC API ROUTES (voor badge pagina)
 router.get('/students', async (req, res) => {
@@ -41,7 +42,7 @@ router.get('/protected', authenticateToken, StudentRegistratieController.getProt
 router.get('/studenten', authenticateToken, studentAdmin.getAllStudents);
 router.get('/bedrijven', authenticateToken,  bedrijfAdmin.getAllCompanies);
 router.delete('/bedrijven/:id', authenticateToken, bedrijfAdmin.deleteCompany);
-router.get('/company-profile/:id', authenticateToken, isCompany, CompanyProfileController.getCompanyProfile);
+router.get('/company-profile/:id', authenticateToken, CompanyProfileController.getCompanyProfile);
 router.put('/company-profile', authenticateToken, CompanyProfileController.updateCompanyProfile);
 router.get('/company-profile', authenticateToken, isCompany, CompanyProfileController.getOwnCompanyProfile);
 
