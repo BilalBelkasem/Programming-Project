@@ -146,10 +146,16 @@ export default function UFavorietenBedrijven({ onLogout }) {
               <div
                 key={item.id}
                 className="bedrijfCard"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: item.type === 'student' ? 'pointer' : 'default' }}
-                onClick={item.type === 'student' ? () => navigate(`/studentprofiel/${item.id}`) : undefined}
-                role={item.type === 'student' ? 'button' : undefined}
-                tabIndex={item.type === 'student' ? 0 : undefined}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+                onClick={() => {
+                  if (item.type === 'student') {
+                    navigate(`/studentprofiel/${item.id}`);
+                  } else if (item.type === 'bedrijf') {
+                    navigate(`/bedrijfprofiel/${item.id}`);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
               >
                 <div style={{ width: '100%', position: 'relative' }}>
                   {item.type === 'student' ? (

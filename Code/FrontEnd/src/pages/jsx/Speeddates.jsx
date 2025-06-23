@@ -42,7 +42,7 @@ const Speeddates = () => {
 
     if (loggedInUser.role === 'student') {
       // Fetch data for student view
-      axios.get('/api/open-bedrijven').then(res => {
+      axios.get('/api/reservations/companies-details').then(res => {
         setAllCompanies(res.data);
         setFilteredCompanies(res.data);
         const uniqueSectors = [...new Set(res.data.map(c => c.sector).filter(Boolean))];
@@ -94,10 +94,10 @@ const Speeddates = () => {
     setSelectedCompany(company);
     setSelectedSlot(null);
     setReservationError('');
-    axios.get(`/api/reservations/companies/${company.id}/slots`)
+    axios.get(`/api/reservations/companies/${company.user_id}/slots`)
       .then(res => setTimeSlots(res.data))
       .catch(err => {
-        console.error(`Fout bij ophalen slots voor bedrijf ${company.id}:`, err);
+        console.error(`Fout bij ophalen slots voor bedrijf ${company.user_id}:`, err);
         setTimeSlots([]);
       });
   };
@@ -272,8 +272,13 @@ const Speeddates = () => {
           <div className="reservations-list">
             {myReservations.map(r => (
               <div key={r._id} className={`reservation-card ${r.status === 'cancelled_by_admin' ? 'cancelled' : ''}`}>
-                <h4>{r.company.company_name}</h4>
-                <p>Tijd: {r.time}</p>
+                <h4>{
+                  allCompanies.find(c => c.company_id === r.company_id)?.company_name ||
+                  'Onbekend bedrijf'
+                }</h4>
+                <p>
+                  Tijd: {(r.begin_tijd || r.time || r.startTime || 'onbekend')} - {(r.eind_tijd || r.endTime || 'onbekend')}
+                </p>
                 {r.status === 'cancelled_by_admin' && (
                   <div className="cancellation-info">
                     <p className="status-text">Geannuleerd door organisatie</p>
@@ -284,7 +289,7 @@ const Speeddates = () => {
                   onClick={() => handleCancelReservation(r._id)}
                   className={r.status === 'cancelled_by_admin' ? 'confirm-cancellation' : ''}
                 >
-                  {r.status === 'cancelled_by_admin' ? 'Ok, verwijder' : 'Annuleren'}
+                  {r.status === 'cancelled_by_admin' ? 'Ok, verwijder' : 'Annuleer'}
                 </button>
               </div>
             ))}

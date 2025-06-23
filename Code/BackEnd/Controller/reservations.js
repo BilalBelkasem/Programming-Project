@@ -83,7 +83,9 @@ router.get('/user/me', authenticateToken, isStudent, async (req, res) => {
         const [reservations] = await db.query(`
             SELECT 
                 s.date_id as _id,
+                s.company_id,
                 TIME_FORMAT(s.begin_tijd, '%H:%i') as time,
+                TIME_FORMAT(s.eind_tijd, '%H:%i') as eind_tijd,
                 cd.company_name,
                 s.status,
                 s.cancellation_reason
@@ -95,7 +97,9 @@ router.get('/user/me', authenticateToken, isStudent, async (req, res) => {
 
         const formattedReservations = reservations.map(r => ({
             _id: r._id,
+            company_id: r.company_id,
             time: r.time,
+            eind_tijd: r.eind_tijd,
             company: { name: r.company_name },
             status: r.status,
             cancellationReason: r.cancellation_reason
@@ -197,6 +201,28 @@ router.delete('/:id', authenticateToken, isStudent, async (req, res) => {
     } catch (err) {
         console.error('Error canceling reservation:', err);
         res.status(500).json({ error: 'Failed to cancel reservation' });
+    }
+});
+
+// NIEUWE ROUTE: Geef alle bedrijven met company_id en user_id voor speeddates
+router.get('/companies-details', authenticateToken, async (req, res) => {
+    try {
+        const [bedrijven] = await db.query(`
+            SELECT 
+                c.id as company_id,
+                u.id as user_id,
+                c.company_name,
+                c.sector,
+                c.about,
+                CONCAT_WS(', ', NULLIF(c.street, ''), NULLIF(c.city, '')) as location
+            FROM users u
+            JOIN companies_details c ON u.id = c.user_id
+            WHERE u.role = 'bedrijf'
+        `);
+        res.json(bedrijven);
+    } catch (err) {
+        console.error('Error fetching companies details for speeddates:', err);
+        res.status(500).json({ error: 'Failed to fetch companies details' });
     }
 });
 
