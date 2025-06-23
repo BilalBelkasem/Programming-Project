@@ -114,7 +114,7 @@ const Speeddates = () => {
 
     axios.post('/api/reservations', {
       slotId: selectedSlot._id,
-      companyId: selectedCompany.id,
+      companyId: selectedCompany.user_id,
     }, {
       headers: {
         'Authorization': `Bearer ${token}`
