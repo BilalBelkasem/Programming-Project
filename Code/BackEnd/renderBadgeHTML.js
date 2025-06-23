@@ -11,14 +11,14 @@ async function renderBadgeHTML(data, student = null) {
     organization = data.company_name || '';
     // Always link to the company profile page
     qrDataURL = await QRCode.toDataURL(
-      `https://careerlaunch.be/company/${data.id}`
+      `https://careerlaunch.be/bedrijfprofiel/${data.id}`
     );
     roleText = data.role === 'bedrijf' ? 'Exhibitor Badge' : 'Badge';
   } else {
     name = data.name;
     title = `${student.education}`;
     organization = student.school;
-    qrDataURL = await QRCode.toDataURL(`https://careerlaunch.be/student/${data.id}`);
+    qrDataURL = await QRCode.toDataURL(`https://careerlaunch.be/studentprofiel/${data.id}`);
     roleText = 'Student Badge';
   }
 
