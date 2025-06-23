@@ -1,5 +1,8 @@
 const QRCode = require('qrcode');
 
+// Gebruik een baseurl die kan worden ingesteld via een environment variable, standaard localhost
+const baseurl = process.env.BASEURL || 'http://localhost:5173'; //uw ip adress als je het als server doet
+
 async function renderBadgeHTML(data, student = null) {
   const isNewFormat = student === null;
 
@@ -9,16 +12,17 @@ async function renderBadgeHTML(data, student = null) {
     name = data.user_name || 'Unknown';
     title = data.sector || '';
     organization = data.company_name || '';
-    // Always link to the company profile page
+    // Link naar bedrijfprofiel
     qrDataURL = await QRCode.toDataURL(
-      `https://careerlaunch.be/company/${data.id}`
+      `${baseurl}/bedrijfprofiel/${data.id}`
     );
     roleText = data.role === 'bedrijf' ? 'Exhibitor Badge' : 'Badge';
   } else {
     name = data.name;
     title = `${student.education}`;
     organization = student.school;
-    qrDataURL = await QRCode.toDataURL(`https://careerlaunch.be/student/${data.id}`);
+    // Link naar studentenprofiel
+    qrDataURL = await QRCode.toDataURL(`${baseurl}/studentenprofiel/${data.id}`);
     roleText = 'Student Badge';
   }
 
