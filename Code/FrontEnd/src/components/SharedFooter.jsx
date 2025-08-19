@@ -39,7 +39,7 @@ const SharedFooter = () => {
         <div className="legal-links">
           <a href="/privacy">Privacybeleid</a>
           <span>|</span>
-          <a href="/terms">Gebruiksvoorwaarden,</a>
+          <a href="/terms">Gebruiksvoorwaarden</a>
         </div>
       </div>
     </footer>
