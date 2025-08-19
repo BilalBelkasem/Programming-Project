@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/logoerasmus.png';
+import logo from '/logoerasmus.png';
 import '../Css/ProfielStudent.css';
 import axios from 'axios';
 import SharedFooter from '../../components/SharedFooter';

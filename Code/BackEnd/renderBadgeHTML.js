@@ -1,6 +1,5 @@
 const QRCode = require('qrcode');
 
-// Gebruik een baseurl die kan worden ingesteld via een environment variable, standaard localhost
 const baseurl = process.env.BASEURL || 'http://localhost:5173'; //uw ip adress als je het als server doet
 
 async function renderBadgeHTML(data, student = null) {
@@ -113,7 +112,7 @@ async function renderBadgeHTML(data, student = null) {
     <div class="keycord-hole"></div>
 
     <div class="header">
-      <img src="/assets/default-logo.png" class="logo" alt="Logo" />
+      <img src="${baseurl}/logoerasmus.png" class="logo" alt="Logo" />
       <h2 class="name">${name}</h2>
     </div>
 

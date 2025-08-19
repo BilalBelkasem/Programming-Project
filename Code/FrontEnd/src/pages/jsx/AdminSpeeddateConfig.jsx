@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import logo from '../../assets/logoerasmus.png';
+import logo from '/logoerasmus.png';
 import '../Css/AdminSpeeddateConfig.css';
 
 const AdminSpeeddateConfig = () => {

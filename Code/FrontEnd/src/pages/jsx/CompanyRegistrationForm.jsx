@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../Css/CompanyRegistrationForm.css';
 import { useNavigate, Link } from 'react-router-dom';
-import logo from '../../assets/logoerasmus.png';
+import logo from '/logoerasmus.png';
 import axios from 'axios';
 import { Eye, EyeOff } from 'lucide-react'; // 👁️ iconen
 import SharedFooter from '../../components/SharedFooter';

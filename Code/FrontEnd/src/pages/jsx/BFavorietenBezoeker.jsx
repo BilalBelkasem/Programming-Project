@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/logoerasmus.png';
+import logo from '/logoerasmus.png';
 import '../Css/BFavorietenBezoeker.css'
 
 export default function BFavorietenStudenten({ favorieten, onUnsave }) {

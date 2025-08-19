@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
-import logo from '../../assets/logoerasmus.png';
+import logo from '/logoerasmus.png';
 import '../Css/BedrijfProfiel.css';
 import SharedFooter from '../../components/SharedFooter';
 

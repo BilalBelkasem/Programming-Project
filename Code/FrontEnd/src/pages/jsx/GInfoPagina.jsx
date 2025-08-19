@@ -1,7 +1,7 @@
 // InfoPagina.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../../assets/logoerasmus.png';
+import logo from '/logoerasmus.png';
 import banner from '../../assets/Banner2.png';
 import '../Css/GInfoPagina.css';
 import SharedFooter from '../../components/SharedFooter';

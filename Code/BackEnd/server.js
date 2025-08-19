@@ -16,6 +16,7 @@ const mijnProfielRoutes    = require('./Controller/mijnprofiel');
 const studentDetailsRoutes = require('./Controller/studentDetails');
 const reservationsRoutes   = require('./Controller/reservations');
 const adminSpeeddateConfigRoutes = require('./Controller/adminSpeeddateConfig');
+const bedrijvenController = require('./Controller/BedrijvenController');
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/mijnprofiel', authMiddleware.authenticateToken, mijnProfielRoutes)
 app.use('/api/student_details', studentDetailsRoutes);
 app.use('/api/reservations', reservationsRoutes);
 app.use('/api/admin/speeddate-config', adminSpeeddateConfigRoutes);
+app.use('/api/companies', bedrijvenController.getBedrijven);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

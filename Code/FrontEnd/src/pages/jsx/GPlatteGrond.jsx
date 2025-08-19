@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import plattegrondImg from "../../assets/plattegrond.png";
-import logo from "../../assets/logoerasmus.png";
+import logo from "/logoerasmus.png";
 import "../Css/GPlatteGrond.css";
 import SharedFooter from "../../components/SharedFooter";
 
