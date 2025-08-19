@@ -1,189 +1,195 @@
-.register-page {
-  background-color: #f8fafc;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Segoe UI', Roboto, sans-serif;
+/* ===== Design tokens ===== */
+:root{
+  --bg:#f7f8fb;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#6b7280;
+  --brand:#e30613;
+  --brand-700:#c80010;
+  --border:#eef2f7;
+  --ring:0 0 0 4px rgba(227,6,19,.15);
+  --shadow:0 8px 24px rgba(15,23,42,.06);
+  --radius:14px;
 }
 
-.register-box {
-  background-color: white;
-  padding: 2.5rem;
-  border-radius: 1rem;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.05);
-  width: 100%;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  animation: fadeIn 0.4s ease-out forwards;
+/* Reset die ons niet in de weg zit */
+*,
+*::before,
+*::after{ box-sizing:border-box; }
+
+/* ===== Pagina ===== */
+.register-page{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;   /* zodat footer onderaan kan */
+  align-items:center;
+  background:var(--bg);
+  font-family:'Segoe UI', Roboto, sans-serif;
+  padding:48px 16px;
+  color:var(--text);
 }
 
-.login-logo {
-  width: 70px;
-  margin-bottom: 1.5rem;
+/* ===== Kaart (smaller) ===== */
+.register-page .register-box{
+  background:var(--card) !important;
+  width:100%;
+  max-width: clamp(480px, 40vw, 560px); /* dunner */
+  padding:32px 28px;                    /* compacter */
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  animation:fadeIn .3s ease-out both;
 }
 
-.title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: 0.3rem;
-  color: #e30613;
-  text-transform: capitalize;
-  text-align: center;
+/* Logo */
+.login-logo{ width:76px; height:auto; margin:0 auto 10px; display:block; }
+
+/* ===== Titels ===== */
+.register-page .title{
+  margin-top:8px;
+  font-size:32px !important;
+  line-height:1.2;
+  font-weight:800 !important;
+  color:var(--brand) !important;
+  text-align:center;
+}
+.register-page .subtitle{
+  margin-top:4px;
+  font-size:15px;
+  font-weight:500;
+  color:var(--muted);
+  text-align:center;
+  margin-bottom:24px;
 }
 
-.subtitle {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #6b7280;
-  margin-bottom: 1.5rem;
-  text-align: center;
+/* ===== Form ===== */
+.register-page .register-form{ width:100%; }
+
+.register-page .form-label{
+  display:block;
+  margin:14px 0 6px;
+  font-weight:700;
+  font-size:14px;
+  color:#1f2937;
+}
+.register-page .form-label .required{ color:var(--brand); }
+
+/* Inputs */
+.register-page .form-input{
+  width:100%;
+  height:48px;
+  padding:0 14px;
+  border:1px solid var(--border) !important;
+  border-radius:10px;
+  background:#fff !important;
+  font-size:16px !important;
+  line-height:48px;
+  margin-bottom:14px;
+  transition:border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+.register-page .form-input::placeholder{ color:#9ca3af; }
+.register-page .form-input:hover{ border-color:#dde3ea; }
+.register-page .form-input:focus,
+.register-page .form-input:focus-visible{
+  outline:none;
+  border-color:var(--brand) !important;
+  box-shadow:var(--ring) !important;
+}
+.register-page .form-input:invalid{ border-color:#ef4444; }
+
+/* Autofill neutraliseren (blauwe achtergrond weg in Chrome) */
+.register-page .form-input:-webkit-autofill{
+  -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+  -webkit-text-fill-color: var(--text) !important;
+  caret-color: var(--text);
 }
 
-.register-form {
-  width: 100%;
+/* Password toggle */
+.register-page .password-wrapper{ position:relative; display:flex; align-items:center; }
+.register-page .password-wrapper input{ padding-right:48px; }
+.register-page .pass-icon-btn{
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  width:36px; height:36px; border:none; background:transparent; border-radius:8px;
+  display:flex; align-items:center; justify-content:center; cursor:pointer; opacity:.9;
+}
+.register-page .pass-icon-btn:focus-visible{ outline:none; box-shadow:var(--ring); }
+.register-page .pass-icon-btn:hover{ opacity:1; }
+.register-page .pass-icon-btn svg{
+  width:20px; height:20px;
+  stroke:#6b7280 !important; color:#6b7280 !important; fill:none !important;
+  transition:stroke .15s, color .15s, transform .05s;
+  pointer-events:none;
+}
+.register-page .pass-icon-btn:hover svg{ stroke:#000 !important; color:#000 !important; }
+.register-page .pass-icon-btn:active svg{ transform:scale(.96); }
+
+/* Knop */
+.register-page .register-button{
+  width:100%;
+  height:48px;
+  background:var(--brand) !important;
+  color:#fff !important;
+  font-weight:800 !important;
+  border:none;
+  border-radius:10px;
+  font-size:16px !important;
+  cursor:pointer;
+  margin-top:6px;
+  transition:background-color .15s ease, transform .05s ease, box-shadow .15s ease;
+}
+.register-page .register-button:hover{ background:var(--brand-700) !important; }
+.register-page .register-button:active{ transform:translateY(1px); }
+.register-page .register-button:focus-visible{ outline:none; box-shadow:var(--ring); }
+.register-page .register-button:disabled{ opacity:.6; cursor:not-allowed; }
+
+/* Link onder knop */
+.register-page .back-text{
+  margin-top:14px; display:block; text-align:center;
+  font-size:14px; color:var(--muted); text-decoration:none;
+}
+.register-page .back-text:hover{ text-decoration:underline; }
+
+/* Error */
+.register-page .error-message{
+  color:#b91c1c;
+  background:#ffe5e5;
+  border:1px solid #fecaca;
+  padding:.6rem 1rem;
+  border-radius:8px;
+  margin-bottom:14px;
+  text-align:center;
 }
 
-.form-label {
-  display: block;
-  margin-bottom: 0.3rem;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: #374151;
+/* “Heb je al een account?” */
+.registration-login-prompt{
+  margin:12px 0 24px;
+  font-size:14px;
+  color:#475569;
+  text-align:center;
+}
+.registration-login-prompt a{ color:var(--brand); font-weight:700; text-decoration:none; }
+.registration-login-prompt a:hover{ text-decoration:underline; }
+
+/* ===== Footer-styling (zoals screenshot) ===== */
+.site-footer{ background:#edf2f7; width:100%; }
+.footer-inner{ max-width:960px; margin:0 auto; padding:40px 16px; }
+.footer-section{ margin-bottom:28px; }
+.footer-heading{
+  font-size:20px; font-weight:800; color:var(--brand);
+  margin:0 0 14px; position:relative; display:inline-block;
+}
+.footer-heading::after{
+  content:""; position:absolute; left:0; bottom:-6px; height:3px; width:72px; background:var(--brand);
 }
 
-.form-input {
-  width: 100%;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 1rem;
-  line-height: 1.5;
-}
+/* ===== Animatie & responsive ===== */
+@keyframes fadeIn{ from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)} }
+@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
 
-.form-input:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.register-button {
-  width: 100%;
-  background-color: #e30613;
-  color: white;
-  font-weight: 600;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  transition: background-color 0.3s ease;
-}
-
-.register-button:hover {
-  background-color: #c80010;
-}
-
-.back-text {
-  margin-top: 1rem;
-  display: block;
-  text-align: center;
-  font-size: 0.9rem;
-  color: #6b7280;
-  text-decoration: none;
-}
-
-.back-text:hover {
-  text-decoration: underline;
-}
-
-.error-message {
-  color: red;
-  background-color: #ffe5e5;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  width: 100%;
-  text-align: center;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 👁️ Password visibility toggle */
-.password-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.password-wrapper input {
-  padding-right: 40px;
-  line-height: 1.5;
-}
-
-.pass-icon-btn {
-  position: absolute;
-  right: 10px;
-  top: calc(50% - 2px); /* Gecentreerd fix */
-  transform: translateY(-50%);
-  cursor: pointer;
-  padding: 0;
-  margin: 0;
-  opacity: 0.7;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pass-icon-btn svg {
-  width: 20px;
-  height: 20px;
-  stroke: #777 !important;
-  color: #777 !important;
-  fill: none !important;
-  transition: stroke 0.3s ease, color 0.3s ease;
-}
-
-.pass-icon-btn:hover {
-  opacity: 1;
-}
-
-.pass-icon-btn:hover svg {
-  stroke: #000 !important;
-  color: #000 !important;
-}
-
-@media (max-width: 768px) {
-  .register-page {
-    padding: 0.5rem;
-  }
-  .register-box {
-    padding: 1rem;
-    max-width: 100%;
-  }
-  .title {
-    font-size: 1.2rem;
-    margin-bottom: 0.7rem;
-  }
-  .subtitle {
-    font-size: 0.95rem;
-  }
-  .form-label, .form-input, .register-button, .back-text {
-    font-size: 0.95rem;
-  }
-  .register-button {
-    padding: 0.5rem;
-  }
+@media (max-width:768px){
+  .register-page{ padding:28px 12px; }
+  .register-page .register-box{ padding:22px 16px; max-width:100%; }
+  .register-page .title{ font-size:22px !important; }
+  .register-page .form-input,
+  .register-page .register-button{ height:46px; font-size:15px !important; }
 }

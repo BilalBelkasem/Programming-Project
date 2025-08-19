@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logoerasmus.png';
 import '../css/UBedrijven.css';
@@ -14,14 +14,17 @@ const TYPE_KANS = [
 const IT_DOMEIN = [
   { key: 'domein_data', label: 'Data' },
   { key: 'domein_software', label: 'Software' },
-  { key: 'domein_netwerking', label: 'Netwerking' },
-  { key: 'domein_ai', label: 'Robotica / AI' },
+  { key: 'domein_netwerking', label: 'Netwerken' },
+  { key: 'domein_ai', label: 'AI' },
 ];
 
 export default function UBedrijven({ onLogout }) {
   const navigate = useNavigate();
+
   const [bedrijven, setBedrijven] = useState([]);
   const [favorieten, setFavorieten] = useState([]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
   const [filters, setFilters] = useState({
     zoek_jobstudent: false,
     zoek_stage: false,
@@ -61,20 +64,18 @@ export default function UBedrijven({ onLogout }) {
 
   const handleFilterChange = (event) => {
     const { name, checked } = event.target;
-    setFilters(prevFilters => ({
-      ...prevFilters,
-      [name]: checked
+    setFilters((prev) => ({
+      ...prev,
+      [name]: checked,
     }));
   };
 
   const filteredBedrijven = useMemo(() => {
-    const actieveFilters = Object.keys(filters).filter(key => filters[key]);
-    if (actieveFilters.length === 0) {
-      return bedrijven;
-    }
-    return bedrijven.filter(bedrijf => {
-      return actieveFilters.every(filterKey => bedrijf[filterKey] === 1);
-    });
+    const actieveFilters = Object.keys(filters).filter((key) => filters[key]);
+    if (actieveFilters.length === 0) return bedrijven;
+    return bedrijven.filter((bedrijf) =>
+      actieveFilters.every((filterKey) => bedrijf[filterKey] === 1)
+    );
   }, [bedrijven, filters]);
 
   const toggleLike = async (bedrijfId) => {
@@ -87,15 +88,14 @@ export default function UBedrijven({ onLogout }) {
         await axios.delete(`/api/favorieten/${bedrijfId}?student_id=${user.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setFavorieten(prev => prev.filter(id => id !== bedrijfId));
+        setFavorieten((prev) => prev.filter((id) => id !== bedrijfId));
       } else {
-        await axios.post('/api/favorieten', {
-          student_id: user.id,
-          company_id: bedrijfId
-        }, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setFavorieten(prev => [...prev, bedrijfId]);
+        await axios.post(
+          '/api/favorieten',
+          { student_id: user.id, company_id: bedrijfId },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setFavorieten((prev) => [...prev, bedrijfId]);
       }
     } catch (err) {
       console.error('Fout bij togglen van favoriet:', err);
@@ -112,8 +112,14 @@ export default function UBedrijven({ onLogout }) {
     const gevondenOpties = Object.entries(opties)
       .filter(([key]) => bedrijf[key])
       .map(([, label]) => label);
-    
-    return gevondenOpties.length > 0 ? gevondenOpties.map(label => <span key={label} className="tag zoek-tag">{label}</span>) : <span className="tag geen-info">N.v.t.</span>;
+
+    return gevondenOpties.length > 0
+      ? gevondenOpties.map((label) => (
+          <span key={label} className="tag zoek-tag">
+            {label}
+          </span>
+        ))
+      : <span className="tag geen-info">N.v.t.</span>;
   };
 
   const renderDomeinen = (bedrijf) => {
@@ -127,12 +133,18 @@ export default function UBedrijven({ onLogout }) {
       .filter(([key]) => bedrijf[key])
       .map(([, label]) => label);
 
-    return gevondenDomeinen.length > 0 ? gevondenDomeinen.map(label => <span key={label} className="tag domein-tag">{label}</span>) : <span className="tag geen-info">N.v.t.</span>;
+    return gevondenDomeinen.length > 0
+      ? gevondenDomeinen.map((label) => (
+          <span key={label} className="tag domein-tag">
+            {label}
+          </span>
+        ))
+      : <span className="tag geen-info">N.v.t.</span>;
   };
 
   const handleLogout = () => {
     if (onLogout) onLogout();
-    navigate("/");
+    navigate('/');
   };
 
   return (
@@ -153,67 +165,103 @@ export default function UBedrijven({ onLogout }) {
       <main className="main-content">
         <h2 className="title">Ontdek bedrijven</h2>
 
-        <div className="filterContainer">
-          <div className="filterGroup">
-            <h4>Bedrijf zoekt:</h4>
-            {Object.entries({zoek_jobstudent: 'Jobstudent', zoek_stage: 'Stage', zoek_job: 'Job', zoek_connecties: 'Connecties'}).map(([key, label]) => (
-              <label key={key}>
-                <input type="checkbox" name={key} checked={filters[key]} onChange={handleFilterChange} />
-                {label}
-              </label>
-            ))}
-          </div>
-          <div className="filterGroup">
-            <h4>Domein:</h4>
-            {Object.entries({domein_data: 'Data', domein_netwerking: 'Netwerken', domein_ai: 'AI', domein_software: 'Software'}).map(([key, label]) => (
-              <label key={key}>
-                <input type="checkbox" name={key} checked={filters[key]} onChange={handleFilterChange} />
-                {label}
-              </label>
-            ))}
+        {/* Toggle + slider */}
+        <button
+          type="button"
+          className={`filterToggle ${filtersOpen ? 'open' : ''}`}
+          aria-expanded={filtersOpen}
+          aria-controls="filters-collapsible"
+          onClick={() => setFiltersOpen((o) => !o)}
+        >
+          Filters
+        </button>
+
+        <div id="filters-collapsible" className={`collapsible ${filtersOpen ? 'open' : ''}`}>
+          <div className="filterContainer">
+            <div className="filterGroup">
+              <h4>Bedrijf zoekt:</h4>
+              {Object.entries({
+                zoek_jobstudent: 'Jobstudent',
+                zoek_stage: 'Stage',
+                zoek_job: 'Job',
+                zoek_connecties: 'Connecties',
+              }).map(([key, label]) => (
+                <label key={key}>
+                  <input
+                    type="checkbox"
+                    name={key}
+                    checked={filters[key]}
+                    onChange={handleFilterChange}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+
+            <div className="filterGroup">
+              <h4>Domein:</h4>
+              {Object.entries({
+                domein_data: 'Data',
+                domein_netwerking: 'Netwerken',
+                domein_ai: 'AI',
+                domein_software: 'Software',
+              }).map(([key, label]) => (
+                <label key={key}>
+                  <input
+                    type="checkbox"
+                    name={key}
+                    checked={filters[key]}
+                    onChange={handleFilterChange}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
           </div>
         </div>
-        
+
         <div className="bedrijvenContainer">
           {filteredBedrijven.length === 0 ? (
-            <p style={{ color: 'gray', textAlign: 'center', width: '100%' }}>Geen bedrijven gevonden die aan uw criteria voldoen.</p>
+            <p style={{ color: 'gray', textAlign: 'center', width: '100%' }}>
+              Geen bedrijven gevonden die aan uw criteria voldoen.
+            </p>
           ) : (
             filteredBedrijven.map((bedrijf) => (
-              <div 
-                key={bedrijf.id} 
-                className="bedrijfCard" 
+              <div
+                key={bedrijf.id}
+                className="bedrijfCard"
                 onClick={() => navigate(`/bedrijfprofiel/${bedrijf.id}`)}
                 style={{ cursor: 'pointer' }}
               >
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // Zorgt ervoor dat klik op hartje NIET navigeert
+                    e.stopPropagation();
                     toggleLike(bedrijf.id);
                   }}
                   className={`likeButton ${favorieten.includes(bedrijf.id) ? 'liked' : ''}`}
-                  style={{ position: 'absolute', top: '10px', right: '10px' }}
+                  aria-label="Favoriet toggelen"
                 >
                   ♥
                 </button>
+
                 <h3 className="bedrijfNaam">{bedrijf.company_name}</h3>
                 <p className="bedrijfBeschrijving">{bedrijf.sector}</p>
+
                 <div className="tagSectie">
                   <h5>Zoekt:</h5>
-                  <div className="tagContainer">
-                    {renderZoekOpties(bedrijf)}
-                  </div>
+                  <div className="tagContainer">{renderZoekOpties(bedrijf)}</div>
                 </div>
+
                 <div className="tagSectie">
                   <h5>Domein:</h5>
-                  <div className="tagContainer">
-                    {renderDomeinen(bedrijf)}
-                  </div>
+                  <div className="tagContainer">{renderDomeinen(bedrijf)}</div>
                 </div>
               </div>
             ))
           )}
         </div>
       </main>
+
       <SharedFooter />
     </div>
   );

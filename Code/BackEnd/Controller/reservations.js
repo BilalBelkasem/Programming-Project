@@ -3,7 +3,6 @@ const router = express.Router();
 const db = require('../config/db');
 const { authenticateToken, isCompany, isStudent } = require('../middleware/authMiddleware');
 
-// GET all reservations for the logged-in company
 router.get('/company/me', authenticateToken, isCompany, async (req, res) => {
     try {
         const [companyDetails] = await db.query('SELECT id FROM companies_details WHERE user_id = ?', [req.user.id]);
@@ -32,7 +31,6 @@ router.get('/company/me', authenticateToken, isCompany, async (req, res) => {
     }
 });
 
-// GET speeddate event configuration
 router.get('/config', authenticateToken, async (req, res) => {
     try {
         const [config] = await db.query('SELECT TIME_FORMAT(start_uur, "%H:%i") as start, TIME_FORMAT(eind_uur, "%H:%i") as end FROM speeddates_config WHERE actief = 1 LIMIT 1');
@@ -46,7 +44,6 @@ router.get('/config', authenticateToken, async (req, res) => {
     }
 });
 
-// GET all available slots for a specific company
 router.get('/companies/:companyId/slots', authenticateToken, async (req, res) => {
     const { companyId } = req.params;
     try {
@@ -73,7 +70,6 @@ router.get('/companies/:companyId/slots', authenticateToken, async (req, res) =>
     }
 });
 
-// GET all reservations for the logged-in user (student)
 router.get('/user/me', authenticateToken, isStudent, async (req, res) => {
     try {
         const [studentDetails] = await db.query('SELECT id FROM students_details WHERE user_id = ?', [req.user.id]);
@@ -112,7 +108,6 @@ router.get('/user/me', authenticateToken, isStudent, async (req, res) => {
     }
 });
 
-// POST a new reservation
 router.post('/', authenticateToken, isStudent, async (req, res) => {
     const { slotId, companyId } = req.body;
     
@@ -121,11 +116,7 @@ router.post('/', authenticateToken, isStudent, async (req, res) => {
         if (studentDetails.length === 0) return res.status(404).json({ error: 'Student details not found' });
         const studentId = studentDetails[0].id;
 
-        const [companyDetails] = await db.query('SELECT id FROM companies_details WHERE user_id = ?', [companyId]);
-        if (companyDetails.length === 0) {
-            return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
-        }
-        const detailsId = companyDetails[0].id;
+        const detailsId = companyId;
 
         const [existingReservation] = await db.query(
             'SELECT date_id FROM speeddates WHERE company_id = ? AND student_id = ? AND status = "booked"',
@@ -166,7 +157,6 @@ router.post('/', authenticateToken, isStudent, async (req, res) => {
     }
 });
 
-// DELETE a reservation
 router.delete('/:id', authenticateToken, isStudent, async (req, res) => {
     const { id } = req.params;
     
@@ -184,10 +174,8 @@ router.delete('/:id', authenticateToken, isStudent, async (req, res) => {
         const currentStatus = reservation[0].status;
 
         if (currentStatus === 'cancelled_by_admin') {
-            // If cancelled by admin, the user's action deletes it permanently from the database
             await db.query('DELETE FROM speeddates WHERE date_id = ?', [id]);
         } else if (currentStatus === 'booked') {
-            // If it was a normal booking, just make it available again
             await db.query(`
                 UPDATE speeddates 
                 SET student_id = NULL, status = 'available', gereserveerd_op = NULL, cancellation_reason = NULL
@@ -204,7 +192,6 @@ router.delete('/:id', authenticateToken, isStudent, async (req, res) => {
     }
 });
 
-// NIEUWE ROUTE: Geef alle bedrijven met company_id en user_id voor speeddates
 router.get('/companies-details', authenticateToken, async (req, res) => {
     try {
         const [bedrijven] = await db.query(`
@@ -226,4 +213,4 @@ router.get('/companies-details', authenticateToken, async (req, res) => {
     }
 });
 
-module.exports = router; 
+module.exports = router;
