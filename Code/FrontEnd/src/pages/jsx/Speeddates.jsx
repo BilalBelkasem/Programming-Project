@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import logo from '../../assets/logo Erasmus.png';
-import SharedHeaderIngelogd from '../../components/SharedHeaderIngelogd';
 import SharedFooter from '../../components/SharedFooter';
 import '../Css/Speeddates.css';
 
@@ -19,7 +18,6 @@ const Speeddates = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilter, setShowFilter] = useState(false);
   const [selectedCompany, setSelectedCompany] = useState(null);
-  const [selectedSlot, setSelectedSlot] = useState(null);
   const [timeSlots, setTimeSlots] = useState([]);
   const [myReservations, setMyReservations] = useState([]);
   const [reservationError, setReservationError] = useState('');
@@ -42,22 +40,27 @@ const Speeddates = () => {
 
     if (loggedInUser.role === 'student') {
       // Fetch data for student view
-      axios.get('/api/reservations/companies-details').then(res => {
-        setAllCompanies(res.data);
-        setFilteredCompanies(res.data);
-        const uniqueSectors = [...new Set(res.data.map(c => c.sector).filter(Boolean))];
-        setSectors(uniqueSectors);
-      }).catch(err => console.error('Error fetching companies:', err));
+      axios.get('/api/reservations/companies-details')
+        .then(res => {
+          setAllCompanies(res.data);
+          setFilteredCompanies(res.data);
+          const uniqueSectors = [...new Set(res.data.map(c => c.sector).filter(Boolean))];
+          setSectors(uniqueSectors);
+        })
+        .catch(err => console.error('Error fetching companies:', err));
 
-      axios.get('/api/reservations/user/me').then(res => setMyReservations(res.data))
+      axios.get('/api/reservations/user/me')
+        .then(res => setMyReservations(res.data))
         .catch(err => console.error('Error fetching reservations:', err));
 
     } else if (loggedInUser.role === 'bedrijf') {
       // Fetch data for company view
-      axios.get('/api/reservations/company/me').then(res => setCompanySchedule(res.data))
+      axios.get('/api/reservations/company/me')
+        .then(res => setCompanySchedule(res.data))
         .catch(err => console.error('Error fetching company schedule:', err));
 
-      axios.get('/api/reservations/config').then(res => setEventConfig(res.data))
+      axios.get('/api/reservations/config')
+        .then(res => setEventConfig(res.data))
         .catch(err => console.error('Error fetching event config:', err));
     }
   }, [navigate]);
@@ -92,8 +95,8 @@ const Speeddates = () => {
 
   const handleCompanyClick = (company) => {
     setSelectedCompany(company);
-    setSelectedSlot(null);
     setReservationError('');
+    // company.user_id = users.id (pour récupérer les slots)
     axios.get(`/api/reservations/companies/${company.user_id}/slots`)
       .then(res => setTimeSlots(res.data))
       .catch(err => {
@@ -102,36 +105,31 @@ const Speeddates = () => {
       });
   };
 
-  const handleConfirmReservation = () => {
-    if (!selectedSlot) return;
-
-    const user = JSON.parse(localStorage.getItem('user'));
+  // === RÉSERVATION IMMÉDIATE AU CLIC ===
+  const reserveNow = async (slot) => {
     const token = localStorage.getItem('token');
-    if (!user || !token) {
+    if (!token) {
       alert('You must be logged in to make a reservation.');
       return;
     }
+    try {
+      await axios.post('/api/reservations/by-time', {
+        company_id: selectedCompany.company_id,   // companies_details.id
+        begin_tijd: slot.begin_tijd               // "HH:MM:SS"
+      }, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
 
-    axios.post('/api/reservations', {
-      slotId: selectedSlot._id,
-      companyId: selectedCompany.user_id,
-    }, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    }).then(res => {
-      setMyReservations(prev => [...prev, res.data]);
-      setTimeSlots(prev => prev.filter(s => s._id !== selectedSlot._id));
-      setSelectedCompany(null);
-      setSelectedSlot(null);
+      // Marquer le slot comme pris + recharger mes réservations
+      setTimeSlots(prev => prev.map(s =>
+        s.begin_tijd === slot.begin_tijd ? { ...s, status: 'booked' } : s
+      ));
+      const { data } = await axios.get('/api/reservations/user/me');
+      setMyReservations(data);
       setReservationError('');
-    }).catch(err => {
-      if (err.response && err.response.status === 409) {
-        setReservationError(err.response.data.error);
-      } else {
-        alert(err.response?.data?.error || 'Kon de reservatie niet bevestigen.');
-      }
-    });
+    } catch (err) {
+      setReservationError(err.response?.data?.error || 'Kon de reservatie niet bevestigen.');
+    }
   };
 
   const handleCancelReservation = (id) => {
@@ -141,19 +139,14 @@ const Speeddates = () => {
       return;
     }
     axios.delete(`/api/reservations/${id}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
+      headers: { 'Authorization': `Bearer ${token}` }
+    }).then(() => {
+      setMyReservations(prev => prev.filter(r => r._id !== id));
+      if (selectedCompany) {
+        // Optionnel: recharger les slots de cette entreprise
+        handleCompanyClick(selectedCompany);
       }
-    })
-      .then(() => {
-        setMyReservations(prev => prev.filter(r => r._id !== id));
-        if (selectedCompany) {
-          const canceledReservation = myReservations.find(r => r._id === id);
-          if (canceledReservation && canceledReservation.company._id === selectedCompany.id) {
-            handleCompanyClick(selectedCompany);
-          }
-        }
-      });
+    });
   };
 
   const handleLogout = () => {
@@ -167,7 +160,7 @@ const Speeddates = () => {
     <>
       <h1 className="speeddates-title">Speeddate Reservaties</h1>
       <p className="speeddates-subtitle">Reserveer je speeddate met innovatieve bedrijven</p>
-      
+
       <div className="search-and-filter-container">
         <input
           className="speeddates-search"
@@ -181,25 +174,25 @@ const Speeddates = () => {
 
       {showFilter && (
         <div className="filter-modal">
-            <div className="filter-modal-content">
-                <h3>Filter op Sector</h3>
-                <div className="sector-list">
-                    {sectors.map(sector => (
-                        <div key={sector} className="sector-checkbox">
-                            <input
-                                type="checkbox"
-                                id={sector}
-                                value={sector}
-                                checked={selectedSectors.includes(sector)}
-                                onChange={() => handleSectorChange(sector)}
-                            />
-                            <label htmlFor={sector}>{sector}</label>
-                        </div>
-                    ))}
+          <div className="filter-modal-content">
+            <h3>Filter op Sector</h3>
+            <div className="sector-list">
+              {sectors.map(sector => (
+                <div key={sector} className="sector-checkbox">
+                  <input
+                    type="checkbox"
+                    id={sector}
+                    value={sector}
+                    checked={selectedSectors.includes(sector)}
+                    onChange={() => handleSectorChange(sector)}
+                  />
+                  <label htmlFor={sector}>{sector}</label>
                 </div>
-                <button onClick={applySectorFilter}>Toepassen</button>
-                <button onClick={() => setShowFilter(false)}>Sluiten</button>
+              ))}
             </div>
+            <button onClick={applySectorFilter}>Toepassen</button>
+            <button onClick={() => setShowFilter(false)}>Sluiten</button>
+          </div>
         </div>
       )}
 
@@ -214,7 +207,7 @@ const Speeddates = () => {
           </div>
         ) : (
           filteredCompanies.map(c => (
-            <div key={c.id} className="company-card" onClick={() => handleCompanyClick(c)}>
+            <div key={c.user_id} className="company-card" onClick={() => handleCompanyClick(c)}>
               <h3 className="company-name">{c.company_name || 'Bedrijfsnaam niet beschikbaar'}</h3>
               <p className="company-description">{c.about || 'Geen beschrijving beschikbaar'}</p>
               <div className="company-meta">
@@ -230,32 +223,23 @@ const Speeddates = () => {
       {selectedCompany && (
         <div className="slot-modal">
           <div className="slot-modal-content">
-            <button className="close-btn" onClick={() => { setSelectedCompany(null); setSelectedSlot(null); setReservationError(''); }}>×</button>
+            <button className="close-btn" onClick={() => { setSelectedCompany(null); setReservationError(''); }}>×</button>
             <h2>{selectedCompany.company_name}</h2>
             <div className="slot-list">
               {timeSlots.length > 0 ? timeSlots.map(slot => (
                 <button
-                  key={slot._id}
-                  className={`slot-button ${selectedSlot?._id === slot._id ? 'selected' : ''}`}
-                  onClick={() => {
-                    setSelectedSlot(slot);
-                    setReservationError('');
-                  }}
+                  key={`${slot._id}-${slot.begin_tijd || slot.time}`}
+                  className={`slot-button ${slot.status !== 'available' ? 'disabled' : ''}`}
+                  disabled={slot.status !== 'available'}
+                  onClick={() => reserveNow(slot)}   // Réservation immédiate
                 >
-                  {slot.time}
+                  {slot.time} {slot.status !== 'available' ? '(bezet)' : ''}
                 </button>
               )) : (
                 <p>Geen beschikbare tijdslots voor dit bedrijf.</p>
               )}
             </div>
             {reservationError && <p className="reservation-error">{reservationError}</p>}
-            <button 
-              className="confirm-btn"
-              onClick={handleConfirmReservation}
-              disabled={!selectedSlot}
-            >
-              Bevestig Reservatie
-            </button>
           </div>
         </div>
       )}
@@ -273,8 +257,7 @@ const Speeddates = () => {
             {myReservations.map(r => (
               <div key={r._id} className={`reservation-card ${r.status === 'cancelled_by_admin' ? 'cancelled' : ''}`}>
                 <h4>{
-                  allCompanies.find(c => c.company_id === r.company_id)?.company_name ||
-                  'Onbekend bedrijf'
+                  allCompanies.find(c => c.company_id === r.company_id)?.company_name || 'Onbekend bedrijf'
                 }</h4>
                 <p>
                   Tijd: {(r.begin_tijd || r.time || r.startTime || 'onbekend')} - {(r.eind_tijd || r.endTime || 'onbekend')}
